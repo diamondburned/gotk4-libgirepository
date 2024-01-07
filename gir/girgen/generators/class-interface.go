@@ -305,7 +305,7 @@ func generateInterfaceGenerator(gen FileGeneratorWriter, igen *ifacegen.Generato
 
 	if gtype, ok := GenerateGType(gen, igen.Name, igen.GLibGetType); ok {
 		data.HasMarshaler = true
-		writer.Header().AddMarshaler(gtype.GetType, igen.StructName)
+		gtype.AddToHeader(writer.Header(), igen.StructName)
 	}
 
 	writer.Pen().WriteTmpl(classInterfaceTmpl, data)

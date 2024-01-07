@@ -3,21 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTreeListRowSorter = coreglib.Type(C.gtk_tree_list_row_sorter_get_type())
+	GTypeTreeListRowSorter = coreglib.Type(girepository.MustFind("Gtk", "TreeListRowSorter").RegisteredGType())
 )
 
 func init() {
@@ -82,86 +83,6 @@ func marshalTreeListRowSorter(p uintptr) (interface{}, error) {
 	return wrapTreeListRowSorter(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewTreeListRowSorter: create a special-purpose sorter that applies the
-// sorting of sorter to the levels of a GtkTreeListModel.
-//
-// Note that this sorter relies on gtk.TreeListModel:passthrough being FALSE as
-// it can only sort gtk.TreeListRows.
-//
-// The function takes the following parameters:
-//
-//    - sorter (optional): GtkSorter, or NULL.
-//
-// The function returns the following values:
-//
-//    - treeListRowSorter: new GtkTreeListRowSorter.
-//
-func NewTreeListRowSorter(sorter *Sorter) *TreeListRowSorter {
-	var _arg1 *C.GtkSorter            // out
-	var _cret *C.GtkTreeListRowSorter // in
-
-	if sorter != nil {
-		_arg1 = (*C.GtkSorter)(unsafe.Pointer(coreglib.InternObject(sorter).Native()))
-		C.g_object_ref(C.gpointer(coreglib.InternObject(sorter).Native()))
-	}
-
-	_cret = C.gtk_tree_list_row_sorter_new(_arg1)
-	runtime.KeepAlive(sorter)
-
-	var _treeListRowSorter *TreeListRowSorter // out
-
-	_treeListRowSorter = wrapTreeListRowSorter(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _treeListRowSorter
-}
-
-// GetSorter returns the sorter used by self.
-//
-// The function returns the following values:
-//
-//    - sorter (optional) used.
-//
-func (self *TreeListRowSorter) GetSorter() *Sorter {
-	var _arg0 *C.GtkTreeListRowSorter // out
-	var _cret *C.GtkSorter            // in
-
-	_arg0 = (*C.GtkTreeListRowSorter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_tree_list_row_sorter_get_sorter(_arg0)
-	runtime.KeepAlive(self)
-
-	var _sorter *Sorter // out
-
-	if _cret != nil {
-		_sorter = wrapSorter(coreglib.Take(unsafe.Pointer(_cret)))
-	}
-
-	return _sorter
-}
-
-// SetSorter sets the sorter to use for items with the same parent.
-//
-// This sorter will be passed the gtk.TreeListRow:item of the tree list rows
-// passed to self.
-//
-// The function takes the following parameters:
-//
-//    - sorter (optional) to use, or NULL.
-//
-func (self *TreeListRowSorter) SetSorter(sorter *Sorter) {
-	var _arg0 *C.GtkTreeListRowSorter // out
-	var _arg1 *C.GtkSorter            // out
-
-	_arg0 = (*C.GtkTreeListRowSorter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if sorter != nil {
-		_arg1 = (*C.GtkSorter)(unsafe.Pointer(coreglib.InternObject(sorter).Native()))
-	}
-
-	C.gtk_tree_list_row_sorter_set_sorter(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(sorter)
-}
-
 // TreeListRowSorterClass: instance of this type is always passed by reference.
 type TreeListRowSorterClass struct {
 	*treeListRowSorterClass
@@ -169,12 +90,7 @@ type TreeListRowSorterClass struct {
 
 // treeListRowSorterClass is the struct that's finalized.
 type treeListRowSorterClass struct {
-	native *C.GtkTreeListRowSorterClass
+	native unsafe.Pointer
 }
 
-func (t *TreeListRowSorterClass) ParentClass() *SorterClass {
-	valptr := &t.native.parent_class
-	var _v *SorterClass // out
-	_v = (*SorterClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoTreeListRowSorterClass = girepository.MustFind("Gtk", "TreeListRowSorterClass")

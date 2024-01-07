@@ -3,23 +3,21 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeResource = coreglib.Type(C.g_resource_get_type())
+	GTypeResource = coreglib.Type(girepository.MustFind("Gio", "Resource").RegisteredGType())
 )
 
 func init() {
@@ -182,261 +180,12 @@ type Resource struct {
 
 // resource is the struct that's finalized.
 type resource struct {
-	native *C.GResource
+	native unsafe.Pointer
 }
+
+var GIRInfoResource = girepository.MustFind("Gio", "Resource")
 
 func marshalResource(p uintptr) (interface{}, error) {
 	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
-	return &Resource{&resource{(*C.GResource)(b)}}, nil
-}
-
-// NewResourceFromData constructs a struct Resource.
-func NewResourceFromData(data *glib.Bytes) (*Resource, error) {
-	var _arg1 *C.GBytes    // out
-	var _cret *C.GResource // in
-	var _cerr *C.GError    // in
-
-	_arg1 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(data)))
-
-	_cret = C.g_resource_new_from_data(_arg1, &_cerr)
-	runtime.KeepAlive(data)
-
-	var _resource *Resource // out
-	var _goerr error        // out
-
-	_resource = (*Resource)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_resource)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_resource_unref((*C.GResource)(intern.C))
-		},
-	)
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _resource, _goerr
-}
-
-// EnumerateChildren returns all the names of children at the specified path in
-// the resource. The return result is a NULL terminated list of strings which
-// should be released with g_strfreev().
-//
-// If path is invalid or does not exist in the #GResource,
-// G_RESOURCE_ERROR_NOT_FOUND will be returned.
-//
-// lookup_flags controls the behaviour of the lookup.
-//
-// The function takes the following parameters:
-//
-//    - path: pathname inside the resource.
-//    - lookupFlags: LookupFlags.
-//
-// The function returns the following values:
-//
-//    - utf8s: array of constant strings.
-//
-func (resource *Resource) EnumerateChildren(path string, lookupFlags ResourceLookupFlags) ([]string, error) {
-	var _arg0 *C.GResource           // out
-	var _arg1 *C.char                // out
-	var _arg2 C.GResourceLookupFlags // out
-	var _cret **C.char               // in
-	var _cerr *C.GError              // in
-
-	_arg0 = (*C.GResource)(gextras.StructNative(unsafe.Pointer(resource)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.GResourceLookupFlags(lookupFlags)
-
-	_cret = C.g_resource_enumerate_children(_arg0, _arg1, _arg2, &_cerr)
-	runtime.KeepAlive(resource)
-	runtime.KeepAlive(path)
-	runtime.KeepAlive(lookupFlags)
-
-	var _utf8s []string // out
-	var _goerr error    // out
-
-	defer C.free(unsafe.Pointer(_cret))
-	{
-		var i int
-		var z *C.char
-		for p := _cret; *p != z; p = &unsafe.Slice(p, 2)[1] {
-			i++
-		}
-
-		src := unsafe.Slice(_cret, i)
-		_utf8s = make([]string, i)
-		for i := range src {
-			_utf8s[i] = C.GoString((*C.gchar)(unsafe.Pointer(src[i])))
-			defer C.free(unsafe.Pointer(src[i]))
-		}
-	}
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _utf8s, _goerr
-}
-
-// Info looks for a file at the specified path in the resource and if found
-// returns information about it.
-//
-// lookup_flags controls the behaviour of the lookup.
-//
-// The function takes the following parameters:
-//
-//    - path: pathname inside the resource.
-//    - lookupFlags: LookupFlags.
-//
-// The function returns the following values:
-//
-//    - size (optional): location to place the length of the contents of the
-//      file, or NULL if the length is not needed.
-//    - flags (optional): location to place the flags about the file, or NULL if
-//      the length is not needed.
-//
-func (resource *Resource) Info(path string, lookupFlags ResourceLookupFlags) (uint, uint32, error) {
-	var _arg0 *C.GResource           // out
-	var _arg1 *C.char                // out
-	var _arg2 C.GResourceLookupFlags // out
-	var _arg3 C.gsize                // in
-	var _arg4 C.guint32              // in
-	var _cerr *C.GError              // in
-
-	_arg0 = (*C.GResource)(gextras.StructNative(unsafe.Pointer(resource)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.GResourceLookupFlags(lookupFlags)
-
-	C.g_resource_get_info(_arg0, _arg1, _arg2, &_arg3, &_arg4, &_cerr)
-	runtime.KeepAlive(resource)
-	runtime.KeepAlive(path)
-	runtime.KeepAlive(lookupFlags)
-
-	var _size uint    // out
-	var _flags uint32 // out
-	var _goerr error  // out
-
-	_size = uint(_arg3)
-	_flags = uint32(_arg4)
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _size, _flags, _goerr
-}
-
-// LookupData looks for a file at the specified path in the resource and returns
-// a #GBytes that lets you directly access the data in memory.
-//
-// The data is always followed by a zero byte, so you can safely use the data as
-// a C string. However, that byte is not included in the size of the GBytes.
-//
-// For uncompressed resource files this is a pointer directly into the resource
-// bundle, which is typically in some readonly data section in the program
-// binary. For compressed files we allocate memory on the heap and automatically
-// uncompress the data.
-//
-// lookup_flags controls the behaviour of the lookup.
-//
-// The function takes the following parameters:
-//
-//    - path: pathname inside the resource.
-//    - lookupFlags: LookupFlags.
-//
-// The function returns the following values:
-//
-//    - bytes or NULL on error. Free the returned object with g_bytes_unref().
-//
-func (resource *Resource) LookupData(path string, lookupFlags ResourceLookupFlags) (*glib.Bytes, error) {
-	var _arg0 *C.GResource           // out
-	var _arg1 *C.char                // out
-	var _arg2 C.GResourceLookupFlags // out
-	var _cret *C.GBytes              // in
-	var _cerr *C.GError              // in
-
-	_arg0 = (*C.GResource)(gextras.StructNative(unsafe.Pointer(resource)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.GResourceLookupFlags(lookupFlags)
-
-	_cret = C.g_resource_lookup_data(_arg0, _arg1, _arg2, &_cerr)
-	runtime.KeepAlive(resource)
-	runtime.KeepAlive(path)
-	runtime.KeepAlive(lookupFlags)
-
-	var _bytes *glib.Bytes // out
-	var _goerr error       // out
-
-	_bytes = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_bytes)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_bytes_unref((*C.GBytes)(intern.C))
-		},
-	)
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _bytes, _goerr
-}
-
-// OpenStream looks for a file at the specified path in the resource and returns
-// a Stream that lets you read the data.
-//
-// lookup_flags controls the behaviour of the lookup.
-//
-// The function takes the following parameters:
-//
-//    - path: pathname inside the resource.
-//    - lookupFlags: LookupFlags.
-//
-// The function returns the following values:
-//
-//    - inputStream or NULL on error. Free the returned object with
-//      g_object_unref().
-//
-func (resource *Resource) OpenStream(path string, lookupFlags ResourceLookupFlags) (InputStreamer, error) {
-	var _arg0 *C.GResource           // out
-	var _arg1 *C.char                // out
-	var _arg2 C.GResourceLookupFlags // out
-	var _cret *C.GInputStream        // in
-	var _cerr *C.GError              // in
-
-	_arg0 = (*C.GResource)(gextras.StructNative(unsafe.Pointer(resource)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.GResourceLookupFlags(lookupFlags)
-
-	_cret = C.g_resource_open_stream(_arg0, _arg1, _arg2, &_cerr)
-	runtime.KeepAlive(resource)
-	runtime.KeepAlive(path)
-	runtime.KeepAlive(lookupFlags)
-
-	var _inputStream InputStreamer // out
-	var _goerr error               // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gio.InputStreamer is nil")
-		}
-
-		object := coreglib.AssumeOwnership(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(InputStreamer)
-			return ok
-		})
-		rv, ok := casted.(InputStreamer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.InputStreamer")
-		}
-		_inputStream = rv
-	}
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _inputStream, _goerr
+	return &Resource{&resource{(unsafe.Pointer)(b)}}, nil
 }

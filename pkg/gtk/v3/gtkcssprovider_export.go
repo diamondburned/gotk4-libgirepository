@@ -11,14 +11,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_CssProvider_ConnectParsingError
-func _gotk4_gtk3_CssProvider_ConnectParsingError(arg0 C.gpointer, arg1 *C.GtkCssSection, arg2 *C.GError, arg3 C.guintptr) {
+func _gotk4_gtk3_CssProvider_ConnectParsingError(arg0 C.gpointer, arg1 *C.void, arg2 *C.GError, arg3 C.guintptr) {
 	var f func(section *CSSSection, err error)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -34,11 +34,14 @@ func _gotk4_gtk3_CssProvider_ConnectParsingError(arg0 C.gpointer, arg1 *C.GtkCss
 	var _err error           // out
 
 	_section = (*CSSSection)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	C.gtk_css_section_ref(arg1)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_section)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.gtk_css_section_unref((*C.GtkCssSection)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				Gtk.GIRInfoCSSSection.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 	_err = gerror.Take(unsafe.Pointer(arg2))

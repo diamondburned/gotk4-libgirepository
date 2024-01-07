@@ -6,17 +6,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeNativeVolumeMonitor = coreglib.Type(C.g_native_volume_monitor_get_type())
+	GTypeNativeVolumeMonitor = coreglib.Type(girepository.MustFind("Gio", "NativeVolumeMonitor").RegisteredGType())
 )
 
 func init() {
@@ -100,12 +102,7 @@ type NativeVolumeMonitorClass struct {
 
 // nativeVolumeMonitorClass is the struct that's finalized.
 type nativeVolumeMonitorClass struct {
-	native *C.GNativeVolumeMonitorClass
+	native unsafe.Pointer
 }
 
-func (n *NativeVolumeMonitorClass) ParentClass() *VolumeMonitorClass {
-	valptr := &n.native.parent_class
-	var _v *VolumeMonitorClass // out
-	_v = (*VolumeMonitorClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoNativeVolumeMonitorClass = girepository.MustFind("Gio", "NativeVolumeMonitorClass")

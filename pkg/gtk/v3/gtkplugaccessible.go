@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypePlugAccessible = coreglib.Type(C.gtk_plug_accessible_get_type())
+	GTypePlugAccessible = coreglib.Type(girepository.MustFind("Gtk", "PlugAccessible").RegisteredGType())
 )
 
 func init() {
@@ -90,25 +89,6 @@ func marshalPlugAccessible(p uintptr) (interface{}, error) {
 	return wrapPlugAccessible(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// The function returns the following values:
-//
-func (plug *PlugAccessible) ID() string {
-	var _arg0 *C.GtkPlugAccessible // out
-	var _cret *C.gchar             // in
-
-	_arg0 = (*C.GtkPlugAccessible)(unsafe.Pointer(coreglib.InternObject(plug).Native()))
-
-	_cret = C.gtk_plug_accessible_get_id(_arg0)
-	runtime.KeepAlive(plug)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
-
-	return _utf8
-}
-
 // PlugAccessibleClass: instance of this type is always passed by reference.
 type PlugAccessibleClass struct {
 	*plugAccessibleClass
@@ -116,12 +96,7 @@ type PlugAccessibleClass struct {
 
 // plugAccessibleClass is the struct that's finalized.
 type plugAccessibleClass struct {
-	native *C.GtkPlugAccessibleClass
+	native unsafe.Pointer
 }
 
-func (p *PlugAccessibleClass) ParentClass() *WindowAccessibleClass {
-	valptr := &p.native.parent_class
-	var _v *WindowAccessibleClass // out
-	_v = (*WindowAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoPlugAccessibleClass = girepository.MustFind("Gtk", "PlugAccessibleClass")

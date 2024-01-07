@@ -11,14 +11,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_TextBuffer_ConnectApplyTag
-func _gotk4_gtk3_TextBuffer_ConnectApplyTag(arg0 C.gpointer, arg1 *C.GtkTextTag, arg2 *C.GtkTextIter, arg3 *C.GtkTextIter, arg4 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectApplyTag(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.guintptr) {
 	var f func(tag *TextTag, start, end *TextIter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
@@ -74,7 +74,7 @@ func _gotk4_gtk3_TextBuffer_ConnectChanged(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_TextBuffer_ConnectDeleteRange
-func _gotk4_gtk3_TextBuffer_ConnectDeleteRange(arg0 C.gpointer, arg1 *C.GtkTextIter, arg2 *C.GtkTextIter, arg3 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectDeleteRange(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(start, end *TextIter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -112,7 +112,7 @@ func _gotk4_gtk3_TextBuffer_ConnectEndUserAction(arg0 C.gpointer, arg1 C.guintpt
 }
 
 //export _gotk4_gtk3_TextBuffer_ConnectInsertChildAnchor
-func _gotk4_gtk3_TextBuffer_ConnectInsertChildAnchor(arg0 C.gpointer, arg1 *C.GtkTextIter, arg2 *C.GtkTextChildAnchor, arg3 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectInsertChildAnchor(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(location *TextIter, anchor *TextChildAnchor)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -134,7 +134,7 @@ func _gotk4_gtk3_TextBuffer_ConnectInsertChildAnchor(arg0 C.gpointer, arg1 *C.Gt
 }
 
 //export _gotk4_gtk3_TextBuffer_ConnectInsertPixbuf
-func _gotk4_gtk3_TextBuffer_ConnectInsertPixbuf(arg0 C.gpointer, arg1 *C.GtkTextIter, arg2 *C.GdkPixbuf, arg3 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectInsertPixbuf(arg0 C.gpointer, arg1 *C.void, arg2 *C.GdkPixbuf, arg3 C.guintptr) {
 	var f func(location *TextIter, pixbuf *gdkpixbuf.Pixbuf)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -166,7 +166,7 @@ func _gotk4_gtk3_TextBuffer_ConnectInsertPixbuf(arg0 C.gpointer, arg1 *C.GtkText
 }
 
 //export _gotk4_gtk3_TextBuffer_ConnectInsertText
-func _gotk4_gtk3_TextBuffer_ConnectInsertText(arg0 C.gpointer, arg1 *C.GtkTextIter, arg2 *C.gchar, arg3 C.gint, arg4 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectInsertText(arg0 C.gpointer, arg1 *C.void, arg2 *C.gchar, arg3 C.gint, arg4 C.guintptr) {
 	var f func(location *TextIter, text string, len int)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
@@ -190,7 +190,7 @@ func _gotk4_gtk3_TextBuffer_ConnectInsertText(arg0 C.gpointer, arg1 *C.GtkTextIt
 }
 
 //export _gotk4_gtk3_TextBuffer_ConnectMarkDeleted
-func _gotk4_gtk3_TextBuffer_ConnectMarkDeleted(arg0 C.gpointer, arg1 *C.GtkTextMark, arg2 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectMarkDeleted(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(mark *TextMark)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -210,7 +210,7 @@ func _gotk4_gtk3_TextBuffer_ConnectMarkDeleted(arg0 C.gpointer, arg1 *C.GtkTextM
 }
 
 //export _gotk4_gtk3_TextBuffer_ConnectMarkSet
-func _gotk4_gtk3_TextBuffer_ConnectMarkSet(arg0 C.gpointer, arg1 *C.GtkTextIter, arg2 *C.GtkTextMark, arg3 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectMarkSet(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(location *TextIter, mark *TextMark)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -248,7 +248,7 @@ func _gotk4_gtk3_TextBuffer_ConnectModifiedChanged(arg0 C.gpointer, arg1 C.guint
 }
 
 //export _gotk4_gtk3_TextBuffer_ConnectPasteDone
-func _gotk4_gtk3_TextBuffer_ConnectPasteDone(arg0 C.gpointer, arg1 *C.GtkClipboard, arg2 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectPasteDone(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(clipboard *Clipboard)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -268,7 +268,7 @@ func _gotk4_gtk3_TextBuffer_ConnectPasteDone(arg0 C.gpointer, arg1 *C.GtkClipboa
 }
 
 //export _gotk4_gtk3_TextBuffer_ConnectRemoveTag
-func _gotk4_gtk3_TextBuffer_ConnectRemoveTag(arg0 C.gpointer, arg1 *C.GtkTextTag, arg2 *C.GtkTextIter, arg3 *C.GtkTextIter, arg4 C.guintptr) {
+func _gotk4_gtk3_TextBuffer_ConnectRemoveTag(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.guintptr) {
 	var f func(tag *TextTag, start, end *TextIter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))

@@ -169,6 +169,11 @@ func (i *Info) RegisteredGType() coreglib.Type {
 	return coreglib.Type(C.g_registered_type_info_get_g_type((*C.GIRegisteredTypeInfo)(i.info)))
 }
 
+// StructSize returns the size of the struct.
+func (i *Info) StructSize() uintptr {
+	return uintptr(C.g_struct_info_get_size((*C.GIStructInfo)(i.info)))
+}
+
 // StructFieldOffset gets the offset of the field for the record that is i.
 func (i *Info) StructFieldOffset(name string) uintptr {
 	k := i.keys

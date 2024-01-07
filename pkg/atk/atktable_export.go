@@ -6,8 +6,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_atk1_Table_ConnectColumnDeleted

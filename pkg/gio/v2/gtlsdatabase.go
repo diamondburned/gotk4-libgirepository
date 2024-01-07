@@ -2,8 +2,10 @@
 
 package gio
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // TLS_DATABASE_PURPOSE_AUTHENTICATE_CLIENT: purpose used to verify the client

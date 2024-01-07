@@ -156,6 +156,7 @@ func (conv *Converter) cgoArrayConverter(value *ValueConverted) bool {
 		// Direct cast is not possible; make a temporary array with the CGo type
 		// so we can loop over it easily.
 		value.p.Linef("src := &%s", value.In.Name)
+		// value.p.Linef("src := unsafe.Slice((*%s)(&%s), %d)", inner.In.Type, value.In.Name, array.FixedSize)
 		value.p.Linef("for i := 0; i < %d; i++ {", array.FixedSize)
 		value.p.Linef(inner.Conversion)
 		value.p.Linef("}")
@@ -395,9 +396,9 @@ func (conv *Converter) cFree(value *ValueConverted, v string) string {
 		return fmt.Sprintf("C.g_object_unref(C.gpointer(uintptr(%s)))", ptr)
 
 	case *gir.Record:
-		free := types.RecordHasUnref(typ)
+		free := RecordHasUnref(typ)
 		if free == nil {
-			free = types.RecordHasFree(typ)
+			free = RecordHasFree(typ)
 		}
 		if free != nil {
 			return fmt.Sprintf("C.%s(%s)", free.CIdentifier, v)
@@ -529,6 +530,7 @@ func (conv *Converter) cgoConverter(value *ValueConverted) bool {
 		// uchar as well.
 		value.header.Import("unsafe")
 		value.p.Linef(
+			// Why is this not &%s? Can we check the old code?
 			"%s = C.GoString((*C.gchar)(unsafe.Pointer(%s)))",
 			value.Out.Set, value.In.Name,
 		)
@@ -619,11 +621,17 @@ func (conv *Converter) cgoConverter(value *ValueConverted) bool {
 		}
 
 		var unref bool
-		if ref := types.RecordHasRef(v); ref != nil && value.Resolved.Ptr > 0 {
+		if ref := RecordHasRef(v); ref != nil && value.Resolved.Ptr > 0 && value.MustRealloc() {
 			// MustRealloc can also be used to check if we need to take a
 			// reference: instead of reallocating, we take our own reference.
 			if value.MustRealloc() {
-				value.p.Linef("C.%s(%s)", ref.CIdentifier, value.InNamePtr(1))
+				if conv.isRuntimeLinking() {
+					// We know that we have a "ref" method, so we'll use
+					// girepository to invoke that.
+
+				} else {
+					value.p.Linef("C.%s(%s)", ref.CIdentifier, value.InNamePtr(1))
+				}
 			}
 			unref = true
 		}
@@ -640,7 +648,10 @@ func (conv *Converter) cgoConverter(value *ValueConverted) bool {
 				value.Logln(logger.Debug, "SetFinalizer set fail")
 			}
 
-			value.p.Linef(types.RecordPrintFree(value.conv.fgen, value.Resolved.Extern, "intern.C"))
+			free := RecordPrintFree(value.conv.fgen, value.Resolved, "intern.C")
+			free.Header.ApplyTo(&value.header)
+
+			value.p.Linef(free.Value)
 			value.p.Linef("},")
 			value.p.Linef(")")
 		}

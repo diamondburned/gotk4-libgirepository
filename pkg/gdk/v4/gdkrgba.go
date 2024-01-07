@@ -3,21 +3,22 @@
 package gdk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeRGBA = coreglib.Type(C.gdk_rgba_get_type())
+	GTypeRGBA = coreglib.Type(girepository.MustFind("Gdk", "RGBA").RegisteredGType())
 )
 
 func init() {
@@ -42,12 +43,14 @@ type RGBA struct {
 
 // rgbA is the struct that's finalized.
 type rgbA struct {
-	native *C.GdkRGBA
+	native unsafe.Pointer
 }
+
+var GIRInfoRGBA = girepository.MustFind("Gdk", "RGBA")
 
 func marshalRGBA(p uintptr) (interface{}, error) {
 	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
-	return &RGBA{&rgbA{(*C.GdkRGBA)(b)}}, nil
+	return &RGBA{&rgbA{(unsafe.Pointer)(b)}}, nil
 }
 
 // NewRGBA creates a new RGBA instance from the given
@@ -63,19 +66,33 @@ func NewRGBA(red, green, blue, alpha float32) RGBA {
 	var f3 C.float // out
 	f3 = C.float(alpha)
 
-	v := C.GdkRGBA{
-		red:   f0,
-		green: f1,
-		blue:  f2,
-		alpha: f3,
-	}
+	size := GIRInfoRGBA.StructSize()
+	native := make([]byte, size)
+	gextras.Sink(&native[0])
 
-	return *(*RGBA)(gextras.NewStructNative(unsafe.Pointer(&v)))
+	offset0 := GIRInfoRGBA.StructFieldOffset("red")
+	valptr0 := (*C.float)(unsafe.Add(unsafe.Pointer(&native[0]), offset0))
+	*valptr0 = f0
+
+	offset1 := GIRInfoRGBA.StructFieldOffset("green")
+	valptr1 := (*C.float)(unsafe.Add(unsafe.Pointer(&native[0]), offset1))
+	*valptr1 = f1
+
+	offset2 := GIRInfoRGBA.StructFieldOffset("blue")
+	valptr2 := (*C.float)(unsafe.Add(unsafe.Pointer(&native[0]), offset2))
+	*valptr2 = f2
+
+	offset3 := GIRInfoRGBA.StructFieldOffset("alpha")
+	valptr3 := (*C.float)(unsafe.Add(unsafe.Pointer(&native[0]), offset3))
+	*valptr3 = f3
+
+	return *(*RGBA)(gextras.NewStructNative(unsafe.Pointer(&native[0])))
 }
 
 // Red: intensity of the red channel from 0.0 to 1.0 inclusive.
 func (r *RGBA) Red() float32 {
-	valptr := &r.native.red
+	offset := GIRInfoRGBA.StructFieldOffset("red")
+	valptr := (*float32)(unsafe.Add(r.native, offset))
 	var _v float32 // out
 	_v = float32(*valptr)
 	return _v
@@ -83,7 +100,8 @@ func (r *RGBA) Red() float32 {
 
 // Green: intensity of the green channel from 0.0 to 1.0 inclusive.
 func (r *RGBA) Green() float32 {
-	valptr := &r.native.green
+	offset := GIRInfoRGBA.StructFieldOffset("green")
+	valptr := (*float32)(unsafe.Add(r.native, offset))
 	var _v float32 // out
 	_v = float32(*valptr)
 	return _v
@@ -91,7 +109,8 @@ func (r *RGBA) Green() float32 {
 
 // Blue: intensity of the blue channel from 0.0 to 1.0 inclusive.
 func (r *RGBA) Blue() float32 {
-	valptr := &r.native.blue
+	offset := GIRInfoRGBA.StructFieldOffset("blue")
+	valptr := (*float32)(unsafe.Add(r.native, offset))
 	var _v float32 // out
 	_v = float32(*valptr)
 	return _v
@@ -100,7 +119,8 @@ func (r *RGBA) Blue() float32 {
 // Alpha: opacity of the color from 0.0 for completely translucent to 1.0 for
 // opaque.
 func (r *RGBA) Alpha() float32 {
-	valptr := &r.native.alpha
+	offset := GIRInfoRGBA.StructFieldOffset("alpha")
+	valptr := (*float32)(unsafe.Add(r.native, offset))
 	var _v float32 // out
 	_v = float32(*valptr)
 	return _v
@@ -108,247 +128,29 @@ func (r *RGBA) Alpha() float32 {
 
 // Red: intensity of the red channel from 0.0 to 1.0 inclusive.
 func (r *RGBA) SetRed(red float32) {
-	valptr := &r.native.red
+	offset := GIRInfoRGBA.StructFieldOffset("red")
+	valptr := (*C.float)(unsafe.Add(r.native, offset))
 	*valptr = C.float(red)
 }
 
 // Green: intensity of the green channel from 0.0 to 1.0 inclusive.
 func (r *RGBA) SetGreen(green float32) {
-	valptr := &r.native.green
+	offset := GIRInfoRGBA.StructFieldOffset("green")
+	valptr := (*C.float)(unsafe.Add(r.native, offset))
 	*valptr = C.float(green)
 }
 
 // Blue: intensity of the blue channel from 0.0 to 1.0 inclusive.
 func (r *RGBA) SetBlue(blue float32) {
-	valptr := &r.native.blue
+	offset := GIRInfoRGBA.StructFieldOffset("blue")
+	valptr := (*C.float)(unsafe.Add(r.native, offset))
 	*valptr = C.float(blue)
 }
 
 // Alpha: opacity of the color from 0.0 for completely translucent to 1.0 for
 // opaque.
 func (r *RGBA) SetAlpha(alpha float32) {
-	valptr := &r.native.alpha
+	offset := GIRInfoRGBA.StructFieldOffset("alpha")
+	valptr := (*C.float)(unsafe.Add(r.native, offset))
 	*valptr = C.float(alpha)
-}
-
-// Copy makes a copy of a GdkRGBA.
-//
-// The result must be freed through gdk.RGBA.Free().
-//
-// The function returns the following values:
-//
-//    - rgbA: newly allocated GdkRGBA, with the same contents as rgba.
-//
-func (rgba *RGBA) Copy() *RGBA {
-	var _arg0 *C.GdkRGBA // out
-	var _cret *C.GdkRGBA // in
-
-	_arg0 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
-
-	_cret = C.gdk_rgba_copy(_arg0)
-	runtime.KeepAlive(rgba)
-
-	var _rgbA *RGBA // out
-
-	_rgbA = (*RGBA)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_rgbA)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_rgba_free((*C.GdkRGBA)(intern.C))
-		},
-	)
-
-	return _rgbA
-}
-
-// Equal compares two GdkRGBA colors.
-//
-// The function takes the following parameters:
-//
-//    - p2: another GdkRGBA.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the two colors compare equal.
-//
-func (p1 *RGBA) Equal(p2 *RGBA) bool {
-	var _arg0 C.gconstpointer // out
-	var _arg1 C.gconstpointer // out
-	var _cret C.gboolean      // in
-
-	_arg0 = *(*C.gconstpointer)(gextras.StructNative(unsafe.Pointer(p1)))
-	_arg1 = *(*C.gconstpointer)(gextras.StructNative(unsafe.Pointer(p2)))
-
-	_cret = C.gdk_rgba_equal(_arg0, _arg1)
-	runtime.KeepAlive(p1)
-	runtime.KeepAlive(p2)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Hash: hash function suitable for using for a hash table that stores GdkRGBAs.
-//
-// The function returns the following values:
-//
-//    - guint: hash value for p.
-//
-func (p *RGBA) Hash() uint {
-	var _arg0 C.gconstpointer // out
-	var _cret C.guint         // in
-
-	_arg0 = *(*C.gconstpointer)(gextras.StructNative(unsafe.Pointer(p)))
-
-	_cret = C.gdk_rgba_hash(_arg0)
-	runtime.KeepAlive(p)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// IsClear checks if an rgba value is transparent.
-//
-// That is, drawing with the value would not produce any change.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the rgba is clear.
-//
-func (rgba *RGBA) IsClear() bool {
-	var _arg0 *C.GdkRGBA // out
-	var _cret C.gboolean // in
-
-	_arg0 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
-
-	_cret = C.gdk_rgba_is_clear(_arg0)
-	runtime.KeepAlive(rgba)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// IsOpaque checks if an rgba value is opaque.
-//
-// That is, drawing with the value will not retain any results from previous
-// contents.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the rgba is opaque.
-//
-func (rgba *RGBA) IsOpaque() bool {
-	var _arg0 *C.GdkRGBA // out
-	var _cret C.gboolean // in
-
-	_arg0 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
-
-	_cret = C.gdk_rgba_is_opaque(_arg0)
-	runtime.KeepAlive(rgba)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Parse parses a textual representation of a color.
-//
-// The string can be either one of:
-//
-// - A standard name (Taken from the X11 rgb.txt file).
-//
-// - A hexadecimal value in the form “\#rgb”, “\#rrggbb”, “\#rrrgggbbb” or
-// ”\#rrrrggggbbbb”
-//
-// - A hexadecimal value in the form “\#rgba”, “\#rrggbbaa”, or
-// ”\#rrrrggggbbbbaaaa”
-//
-// - A RGB color in the form “rgb(r,g,b)” (In this case the color will have full
-// opacity)
-//
-// - A RGBA color in the form “rgba(r,g,b,a)”
-//
-// Where “r”, “g”, “b” and “a” are respectively the red, green, blue and alpha
-// color values. In the last two cases, “r”, “g”, and “b” are either integers in
-// the range 0 to 255 or percentage values in the range 0% to 100%, and a is a
-// floating point value in the range 0 to 1.
-//
-// The function takes the following parameters:
-//
-//    - spec: string specifying the color.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the parsing succeeded.
-//
-func (rgba *RGBA) Parse(spec string) bool {
-	var _arg0 *C.GdkRGBA // out
-	var _arg1 *C.char    // out
-	var _cret C.gboolean // in
-
-	_arg0 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(spec)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.gdk_rgba_parse(_arg0, _arg1)
-	runtime.KeepAlive(rgba)
-	runtime.KeepAlive(spec)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// String returns a textual specification of rgba in the form rgb(r,g,b) or
-// rgba(r,g,b,a), where “r”, “g”, “b” and “a” represent the red, green, blue and
-// alpha values respectively. “r”, “g”, and “b” are represented as integers in
-// the range 0 to 255, and “a” is represented as a floating point value in the
-// range 0 to 1.
-//
-// These string forms are string forms that are supported by the CSS3 colors
-// module, and can be parsed by gdk.RGBA.Parse().
-//
-// Note that this string representation may lose some precision, since “r”, “g”
-// and “b” are represented as 8-bit integers. If this is a concern, you should
-// use a different representation.
-//
-// The function returns the following values:
-//
-//    - utf8: newly allocated text string.
-//
-func (rgba *RGBA) String() string {
-	var _arg0 *C.GdkRGBA // out
-	var _cret *C.char    // in
-
-	_arg0 = (*C.GdkRGBA)(gextras.StructNative(unsafe.Pointer(rgba)))
-
-	_cret = C.gdk_rgba_to_string(_arg0)
-	runtime.KeepAlive(rgba)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
-
-	return _utf8
 }

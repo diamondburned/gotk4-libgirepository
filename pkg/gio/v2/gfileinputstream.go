@@ -3,50 +3,22 @@
 package gio
 
 import (
-	"context"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gcancel"
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
-// extern goffset _gotk4_gio2_FileInputStreamClass_tell(GFileInputStream*);
-// extern gboolean _gotk4_gio2_FileInputStreamClass_seek(GFileInputStream*, goffset, GSeekType, GCancellable*, GError**);
-// extern gboolean _gotk4_gio2_FileInputStreamClass_can_seek(GFileInputStream*);
-// extern GFileInfo* _gotk4_gio2_FileInputStreamClass_query_info_finish(GFileInputStream*, GAsyncResult*, GError**);
-// extern GFileInfo* _gotk4_gio2_FileInputStreamClass_query_info(GFileInputStream*, char*, GCancellable*, GError**);
-// GFileInfo* _gotk4_gio2_FileInputStream_virtual_query_info(void* fnptr, GFileInputStream* arg0, char* arg1, GCancellable* arg2, GError** arg3) {
-//   return ((GFileInfo* (*)(GFileInputStream*, char*, GCancellable*, GError**))(fnptr))(arg0, arg1, arg2, arg3);
-// };
-// GFileInfo* _gotk4_gio2_FileInputStream_virtual_query_info_finish(void* fnptr, GFileInputStream* arg0, GAsyncResult* arg1, GError** arg2) {
-//   return ((GFileInfo* (*)(GFileInputStream*, GAsyncResult*, GError**))(fnptr))(arg0, arg1, arg2);
-// };
-// gboolean _gotk4_gio2_FileInputStream_virtual_can_seek(void* fnptr, GFileInputStream* arg0) {
-//   return ((gboolean (*)(GFileInputStream*))(fnptr))(arg0);
-// };
-// gboolean _gotk4_gio2_FileInputStream_virtual_seek(void* fnptr, GFileInputStream* arg0, goffset arg1, GSeekType arg2, GCancellable* arg3, GError** arg4) {
-//   return ((gboolean (*)(GFileInputStream*, goffset, GSeekType, GCancellable*, GError**))(fnptr))(arg0, arg1, arg2, arg3, arg4);
-// };
-// goffset _gotk4_gio2_FileInputStream_virtual_tell(void* fnptr, GFileInputStream* arg0) {
-//   return ((goffset (*)(GFileInputStream*))(fnptr))(arg0);
-// };
-// void _gotk4_gio2_FileInputStream_virtual_query_info_async(void* fnptr, GFileInputStream* arg0, char* arg1, int arg2, GCancellable* arg3, GAsyncReadyCallback arg4, gpointer arg5) {
-//   ((void (*)(GFileInputStream*, char*, int, GCancellable*, GAsyncReadyCallback, gpointer))(fnptr))(arg0, arg1, arg2, arg3, arg4, arg5);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeFileInputStream = coreglib.Type(C.g_file_input_stream_get_type())
+	GTypeFileInputStream = coreglib.Type(girepository.MustFind("Gio", "FileInputStream").RegisteredGType())
 )
 
 func init() {
@@ -57,57 +29,10 @@ func init() {
 
 // FileInputStreamOverrides contains methods that are overridable.
 type FileInputStreamOverrides struct {
-	// The function returns the following values:
-	//
-	CanSeek func() bool
-	// QueryInfo queries a file input stream the given attributes. This function
-	// blocks while querying the stream. For the asynchronous (non-blocking)
-	// version of this function, see g_file_input_stream_query_info_async().
-	// While the stream is blocked, the stream will set the pending flag
-	// internally, and any other operations on the stream will fail with
-	// G_IO_ERROR_PENDING.
-	//
-	// The function takes the following parameters:
-	//
-	//    - ctx (optional): optional #GCancellable object, NULL to ignore.
-	//    - attributes: file attribute query string.
-	//
-	// The function returns the following values:
-	//
-	//    - fileInfo or NULL on error.
-	//
-	QueryInfo func(ctx context.Context, attributes string) (*FileInfo, error)
-	// QueryInfoFinish finishes an asynchronous info query operation.
-	//
-	// The function takes the following parameters:
-	//
-	//    - result: Result.
-	//
-	// The function returns the following values:
-	//
-	//    - fileInfo: Info.
-	//
-	QueryInfoFinish func(result AsyncResulter) (*FileInfo, error)
-	// The function takes the following parameters:
-	//
-	//    - ctx (optional)
-	//    - offset
-	//    - typ
-	//
-	Seek func(ctx context.Context, offset int64, typ glib.SeekType) error
-	// The function returns the following values:
-	//
-	Tell func() int64
 }
 
 func defaultFileInputStreamOverrides(v *FileInputStream) FileInputStreamOverrides {
-	return FileInputStreamOverrides{
-		CanSeek:         v.canSeek,
-		QueryInfo:       v.queryInfo,
-		QueryInfoFinish: v.queryInfoFinish,
-		Seek:            v.seek,
-		Tell:            v.tell,
-	}
+	return FileInputStreamOverrides{}
 }
 
 // FileInputStream provides input streams that take their content from a file.
@@ -141,28 +66,6 @@ func init() {
 }
 
 func initFileInputStreamClass(gclass unsafe.Pointer, overrides FileInputStreamOverrides, classInitFunc func(*FileInputStreamClass)) {
-	pclass := (*C.GFileInputStreamClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeFileInputStream))))
-
-	if overrides.CanSeek != nil {
-		pclass.can_seek = (*[0]byte)(C._gotk4_gio2_FileInputStreamClass_can_seek)
-	}
-
-	if overrides.QueryInfo != nil {
-		pclass.query_info = (*[0]byte)(C._gotk4_gio2_FileInputStreamClass_query_info)
-	}
-
-	if overrides.QueryInfoFinish != nil {
-		pclass.query_info_finish = (*[0]byte)(C._gotk4_gio2_FileInputStreamClass_query_info_finish)
-	}
-
-	if overrides.Seek != nil {
-		pclass.seek = (*[0]byte)(C._gotk4_gio2_FileInputStreamClass_seek)
-	}
-
-	if overrides.Tell != nil {
-		pclass.tell = (*[0]byte)(C._gotk4_gio2_FileInputStreamClass_tell)
-	}
-
 	if classInitFunc != nil {
 		class := (*FileInputStreamClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -185,357 +88,6 @@ func marshalFileInputStream(p uintptr) (interface{}, error) {
 	return wrapFileInputStream(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// QueryInfo queries a file input stream the given attributes. This function
-// blocks while querying the stream. For the asynchronous (non-blocking) version
-// of this function, see g_file_input_stream_query_info_async(). While the
-// stream is blocked, the stream will set the pending flag internally, and any
-// other operations on the stream will fail with G_IO_ERROR_PENDING.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): optional #GCancellable object, NULL to ignore.
-//    - attributes: file attribute query string.
-//
-// The function returns the following values:
-//
-//    - fileInfo or NULL on error.
-//
-func (stream *FileInputStream) QueryInfo(ctx context.Context, attributes string) (*FileInfo, error) {
-	var _arg0 *C.GFileInputStream // out
-	var _arg2 *C.GCancellable     // out
-	var _arg1 *C.char             // out
-	var _cret *C.GFileInfo        // in
-	var _cerr *C.GError           // in
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(attributes)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.g_file_input_stream_query_info(_arg0, _arg1, _arg2, &_cerr)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(attributes)
-
-	var _fileInfo *FileInfo // out
-	var _goerr error        // out
-
-	_fileInfo = wrapFileInfo(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _fileInfo, _goerr
-}
-
-// QueryInfoAsync queries the stream information asynchronously. When the
-// operation is finished callback will be called. You can then call
-// g_file_input_stream_query_info_finish() to get the result of the operation.
-//
-// For the synchronous version of this function, see
-// g_file_input_stream_query_info().
-//
-// If cancellable is not NULL, then the operation can be cancelled by triggering
-// the cancellable object from another thread. If the operation was cancelled,
-// the error G_IO_ERROR_CANCELLED will be set.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): optional #GCancellable object, NULL to ignore.
-//    - attributes: file attribute query string.
-//    - ioPriority: [I/O priority][io-priority] of the request.
-//    - callback (optional) to call when the request is satisfied.
-//
-func (stream *FileInputStream) QueryInfoAsync(ctx context.Context, attributes string, ioPriority int, callback AsyncReadyCallback) {
-	var _arg0 *C.GFileInputStream   // out
-	var _arg3 *C.GCancellable       // out
-	var _arg1 *C.char               // out
-	var _arg2 C.int                 // out
-	var _arg4 C.GAsyncReadyCallback // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(attributes)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.int(ioPriority)
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.g_file_input_stream_query_info_async(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(attributes)
-	runtime.KeepAlive(ioPriority)
-	runtime.KeepAlive(callback)
-}
-
-// QueryInfoFinish finishes an asynchronous info query operation.
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-// The function returns the following values:
-//
-//    - fileInfo: Info.
-//
-func (stream *FileInputStream) QueryInfoFinish(result AsyncResulter) (*FileInfo, error) {
-	var _arg0 *C.GFileInputStream // out
-	var _arg1 *C.GAsyncResult     // out
-	var _cret *C.GFileInfo        // in
-	var _cerr *C.GError           // in
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
-
-	_cret = C.g_file_input_stream_query_info_finish(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(result)
-
-	var _fileInfo *FileInfo // out
-	var _goerr error        // out
-
-	_fileInfo = wrapFileInfo(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _fileInfo, _goerr
-}
-
-// The function returns the following values:
-//
-func (stream *FileInputStream) canSeek() bool {
-	gclass := (*C.GFileInputStreamClass)(coreglib.PeekParentClass(stream))
-	fnarg := gclass.can_seek
-
-	var _arg0 *C.GFileInputStream // out
-	var _cret C.gboolean          // in
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-
-	_cret = C._gotk4_gio2_FileInputStream_virtual_can_seek(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(stream)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// queryInfo queries a file input stream the given attributes. This function
-// blocks while querying the stream. For the asynchronous (non-blocking) version
-// of this function, see g_file_input_stream_query_info_async(). While the
-// stream is blocked, the stream will set the pending flag internally, and any
-// other operations on the stream will fail with G_IO_ERROR_PENDING.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): optional #GCancellable object, NULL to ignore.
-//    - attributes: file attribute query string.
-//
-// The function returns the following values:
-//
-//    - fileInfo or NULL on error.
-//
-func (stream *FileInputStream) queryInfo(ctx context.Context, attributes string) (*FileInfo, error) {
-	gclass := (*C.GFileInputStreamClass)(coreglib.PeekParentClass(stream))
-	fnarg := gclass.query_info
-
-	var _arg0 *C.GFileInputStream // out
-	var _arg2 *C.GCancellable     // out
-	var _arg1 *C.char             // out
-	var _cret *C.GFileInfo        // in
-	var _cerr *C.GError           // in
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(attributes)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C._gotk4_gio2_FileInputStream_virtual_query_info(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, &_cerr)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(attributes)
-
-	var _fileInfo *FileInfo // out
-	var _goerr error        // out
-
-	_fileInfo = wrapFileInfo(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _fileInfo, _goerr
-}
-
-// queryInfoAsync queries the stream information asynchronously. When the
-// operation is finished callback will be called. You can then call
-// g_file_input_stream_query_info_finish() to get the result of the operation.
-//
-// For the synchronous version of this function, see
-// g_file_input_stream_query_info().
-//
-// If cancellable is not NULL, then the operation can be cancelled by triggering
-// the cancellable object from another thread. If the operation was cancelled,
-// the error G_IO_ERROR_CANCELLED will be set.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): optional #GCancellable object, NULL to ignore.
-//    - attributes: file attribute query string.
-//    - ioPriority: [I/O priority][io-priority] of the request.
-//    - callback (optional) to call when the request is satisfied.
-//
-func (stream *FileInputStream) queryInfoAsync(ctx context.Context, attributes string, ioPriority int, callback AsyncReadyCallback) {
-	gclass := (*C.GFileInputStreamClass)(coreglib.PeekParentClass(stream))
-	fnarg := gclass.query_info_async
-
-	var _arg0 *C.GFileInputStream   // out
-	var _arg3 *C.GCancellable       // out
-	var _arg1 *C.char               // out
-	var _arg2 C.int                 // out
-	var _arg4 C.GAsyncReadyCallback // out
-	var _arg5 C.gpointer
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(attributes)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.int(ioPriority)
-	if callback != nil {
-		_arg4 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg5 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C._gotk4_gio2_FileInputStream_virtual_query_info_async(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(attributes)
-	runtime.KeepAlive(ioPriority)
-	runtime.KeepAlive(callback)
-}
-
-// queryInfoFinish finishes an asynchronous info query operation.
-//
-// The function takes the following parameters:
-//
-//    - result: Result.
-//
-// The function returns the following values:
-//
-//    - fileInfo: Info.
-//
-func (stream *FileInputStream) queryInfoFinish(result AsyncResulter) (*FileInfo, error) {
-	gclass := (*C.GFileInputStreamClass)(coreglib.PeekParentClass(stream))
-	fnarg := gclass.query_info_finish
-
-	var _arg0 *C.GFileInputStream // out
-	var _arg1 *C.GAsyncResult     // out
-	var _cret *C.GFileInfo        // in
-	var _cerr *C.GError           // in
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(result).Native()))
-
-	_cret = C._gotk4_gio2_FileInputStream_virtual_query_info_finish(unsafe.Pointer(fnarg), _arg0, _arg1, &_cerr)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(result)
-
-	var _fileInfo *FileInfo // out
-	var _goerr error        // out
-
-	_fileInfo = wrapFileInfo(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _fileInfo, _goerr
-}
-
-// The function takes the following parameters:
-//
-//    - ctx (optional)
-//    - offset
-//    - typ
-//
-func (stream *FileInputStream) seek(ctx context.Context, offset int64, typ glib.SeekType) error {
-	gclass := (*C.GFileInputStreamClass)(coreglib.PeekParentClass(stream))
-	fnarg := gclass.seek
-
-	var _arg0 *C.GFileInputStream // out
-	var _arg3 *C.GCancellable     // out
-	var _arg1 C.goffset           // out
-	var _arg2 C.GSeekType         // out
-	var _cerr *C.GError           // in
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg3 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = C.goffset(offset)
-	_arg2 = C.GSeekType(typ)
-
-	C._gotk4_gio2_FileInputStream_virtual_seek(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2, _arg3, &_cerr)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(offset)
-	runtime.KeepAlive(typ)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// The function returns the following values:
-//
-func (stream *FileInputStream) tell() int64 {
-	gclass := (*C.GFileInputStreamClass)(coreglib.PeekParentClass(stream))
-	fnarg := gclass.tell
-
-	var _arg0 *C.GFileInputStream // out
-	var _cret C.goffset           // in
-
-	_arg0 = (*C.GFileInputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-
-	_cret = C._gotk4_gio2_FileInputStream_virtual_tell(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(stream)
-
-	var _gint64 int64 // out
-
-	_gint64 = int64(_cret)
-
-	return _gint64
-}
-
 // FileInputStreamClass: instance of this type is always passed by reference.
 type FileInputStreamClass struct {
 	*fileInputStreamClass
@@ -543,12 +95,7 @@ type FileInputStreamClass struct {
 
 // fileInputStreamClass is the struct that's finalized.
 type fileInputStreamClass struct {
-	native *C.GFileInputStreamClass
+	native unsafe.Pointer
 }
 
-func (f *FileInputStreamClass) ParentClass() *InputStreamClass {
-	valptr := &f.native.parent_class
-	var _v *InputStreamClass // out
-	_v = (*InputStreamClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoFileInputStreamClass = girepository.MustFind("Gio", "FileInputStreamClass")

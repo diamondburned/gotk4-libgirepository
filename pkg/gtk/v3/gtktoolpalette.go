@@ -7,20 +7,19 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeToolPaletteDragTargets = coreglib.Type(C.gtk_tool_palette_drag_targets_get_type())
+	GTypeToolPaletteDragTargets = coreglib.Type(girepository.MustFind("Gtk", "ToolPaletteDragTargets").RegisteredGType())
 )
 
 func init() {
@@ -83,13 +82,7 @@ type ToolPaletteClass struct {
 
 // toolPaletteClass is the struct that's finalized.
 type toolPaletteClass struct {
-	native *C.GtkToolPaletteClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (t *ToolPaletteClass) ParentClass() *ContainerClass {
-	valptr := &t.native.parent_class
-	var _v *ContainerClass // out
-	_v = (*ContainerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoToolPaletteClass = girepository.MustFind("Gtk", "ToolPaletteClass")

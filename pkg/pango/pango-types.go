@@ -6,10 +6,13 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <pango/pango.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // SCALE: scale between dimensions used for Pango distances and device units.
@@ -38,8 +41,10 @@ type Rectangle struct {
 
 // rectangle is the struct that's finalized.
 type rectangle struct {
-	native *C.PangoRectangle
+	native unsafe.Pointer
 }
+
+var GIRInfoRectangle = girepository.MustFind("Pango", "Rectangle")
 
 // NewRectangle creates a new Rectangle instance from the given
 // fields. Beware that this function allocates on the Go heap; be careful
@@ -54,19 +59,33 @@ func NewRectangle(x, y, width, height int) Rectangle {
 	var f3 C.int // out
 	f3 = C.int(height)
 
-	v := C.PangoRectangle{
-		x:      f0,
-		y:      f1,
-		width:  f2,
-		height: f3,
-	}
+	size := GIRInfoRectangle.StructSize()
+	native := make([]byte, size)
+	gextras.Sink(&native[0])
 
-	return *(*Rectangle)(gextras.NewStructNative(unsafe.Pointer(&v)))
+	offset0 := GIRInfoRectangle.StructFieldOffset("x")
+	valptr0 := (*C.int)(unsafe.Add(unsafe.Pointer(&native[0]), offset0))
+	*valptr0 = f0
+
+	offset1 := GIRInfoRectangle.StructFieldOffset("y")
+	valptr1 := (*C.int)(unsafe.Add(unsafe.Pointer(&native[0]), offset1))
+	*valptr1 = f1
+
+	offset2 := GIRInfoRectangle.StructFieldOffset("width")
+	valptr2 := (*C.int)(unsafe.Add(unsafe.Pointer(&native[0]), offset2))
+	*valptr2 = f2
+
+	offset3 := GIRInfoRectangle.StructFieldOffset("height")
+	valptr3 := (*C.int)(unsafe.Add(unsafe.Pointer(&native[0]), offset3))
+	*valptr3 = f3
+
+	return *(*Rectangle)(gextras.NewStructNative(unsafe.Pointer(&native[0])))
 }
 
 // X coordinate of the left side of the rectangle.
 func (r *Rectangle) X() int {
-	valptr := &r.native.x
+	offset := GIRInfoRectangle.StructFieldOffset("x")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
@@ -74,7 +93,8 @@ func (r *Rectangle) X() int {
 
 // Y coordinate of the the top side of the rectangle.
 func (r *Rectangle) Y() int {
-	valptr := &r.native.y
+	offset := GIRInfoRectangle.StructFieldOffset("y")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
@@ -82,7 +102,8 @@ func (r *Rectangle) Y() int {
 
 // Width: width of the rectangle.
 func (r *Rectangle) Width() int {
-	valptr := &r.native.width
+	offset := GIRInfoRectangle.StructFieldOffset("width")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
@@ -90,7 +111,8 @@ func (r *Rectangle) Width() int {
 
 // Height: height of the rectangle.
 func (r *Rectangle) Height() int {
-	valptr := &r.native.height
+	offset := GIRInfoRectangle.StructFieldOffset("height")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
@@ -98,24 +120,28 @@ func (r *Rectangle) Height() int {
 
 // X coordinate of the left side of the rectangle.
 func (r *Rectangle) SetX(x int) {
-	valptr := &r.native.x
+	offset := GIRInfoRectangle.StructFieldOffset("x")
+	valptr := (*C.int)(unsafe.Add(r.native, offset))
 	*valptr = C.int(x)
 }
 
 // Y coordinate of the the top side of the rectangle.
 func (r *Rectangle) SetY(y int) {
-	valptr := &r.native.y
+	offset := GIRInfoRectangle.StructFieldOffset("y")
+	valptr := (*C.int)(unsafe.Add(r.native, offset))
 	*valptr = C.int(y)
 }
 
 // Width: width of the rectangle.
 func (r *Rectangle) SetWidth(width int) {
-	valptr := &r.native.width
+	offset := GIRInfoRectangle.StructFieldOffset("width")
+	valptr := (*C.int)(unsafe.Add(r.native, offset))
 	*valptr = C.int(width)
 }
 
 // Height: height of the rectangle.
 func (r *Rectangle) SetHeight(height int) {
-	valptr := &r.native.height
+	offset := GIRInfoRectangle.StructFieldOffset("height")
+	valptr := (*C.int)(unsafe.Add(r.native, offset))
 	*valptr = C.int(height)
 }

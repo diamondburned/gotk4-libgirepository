@@ -9,14 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_CalendarDetailFunc
-func _gotk4_gtk3_CalendarDetailFunc(arg1 *C.GtkCalendar, arg2 C.guint, arg3 C.guint, arg4 C.guint, arg5 C.gpointer) (cret *C.gchar) {
+func _gotk4_gtk3_CalendarDetailFunc(arg1 *C.void, arg2 C.guint, arg3 C.guint, arg4 C.guint, arg5 C.gpointer) (cret *C.gchar) {
 	var fn CalendarDetailFunc
 	{
 		v := gbox.Get(uintptr(arg5))

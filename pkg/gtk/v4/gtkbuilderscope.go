@@ -4,30 +4,25 @@ package gtk
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// GType _gotk4_gtk4_BuilderScope_virtual_get_type_from_function(void* fnptr, GtkBuilderScope* arg0, GtkBuilder* arg1, char* arg2) {
-//   return ((GType (*)(GtkBuilderScope*, GtkBuilder*, char*))(fnptr))(arg0, arg1, arg2);
-// };
-// GType _gotk4_gtk4_BuilderScope_virtual_get_type_from_name(void* fnptr, GtkBuilderScope* arg0, GtkBuilder* arg1, char* arg2) {
-//   return ((GType (*)(GtkBuilderScope*, GtkBuilder*, char*))(fnptr))(arg0, arg1, arg2);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeBuilderClosureFlags = coreglib.Type(C.gtk_builder_closure_flags_get_type())
-	GTypeBuilderScope        = coreglib.Type(C.gtk_builder_scope_get_type())
-	GTypeBuilderCScope       = coreglib.Type(C.gtk_builder_cscope_get_type())
+	GTypeBuilderClosureFlags = coreglib.Type(girepository.MustFind("Gtk", "BuilderClosureFlags").RegisteredGType())
+	GTypeBuilderScope        = coreglib.Type(girepository.MustFind("Gtk", "BuilderScope").RegisteredGType())
+	GTypeBuilderCScope       = coreglib.Type(girepository.MustFind("Gtk", "BuilderCScope").RegisteredGType())
 )
 
 func init() {
@@ -88,6 +83,10 @@ func (b BuilderClosureFlags) Has(other BuilderClosureFlags) bool {
 	return (b & other) == other
 }
 
+// BuilderScopeOverrider contains methods that are overridable.
+type BuilderScopeOverrider interface {
+}
+
 // BuilderScope: GtkBuilderScope is an interface to provide language binding
 // support to GtkBuilder.
 //
@@ -123,6 +122,9 @@ type BuilderScoper interface {
 
 var _ BuilderScoper = (*BuilderScope)(nil)
 
+func ifaceInitBuilderScoper(gifacePtr, data C.gpointer) {
+}
+
 func wrapBuilderScope(obj *coreglib.Object) *BuilderScope {
 	return &BuilderScope{
 		Object: obj,
@@ -140,72 +142,6 @@ func (v *BuilderScope) baseBuilderScope() *BuilderScope {
 // BaseBuilderScope returns the underlying base object.
 func BaseBuilderScope(obj BuilderScoper) *BuilderScope {
 	return obj.baseBuilderScope()
-}
-
-// The function takes the following parameters:
-//
-//    - builder
-//    - functionName
-//
-// The function returns the following values:
-//
-func (self *BuilderScope) typeFromFunction(builder *Builder, functionName string) coreglib.Type {
-	gclass := (*C.GtkBuilderScopeInterface)(coreglib.PeekParentClass(self))
-	fnarg := gclass.get_type_from_function
-
-	var _arg0 *C.GtkBuilderScope // out
-	var _arg1 *C.GtkBuilder      // out
-	var _arg2 *C.char            // out
-	var _cret C.GType            // in
-
-	_arg0 = (*C.GtkBuilderScope)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = (*C.GtkBuilder)(unsafe.Pointer(coreglib.InternObject(builder).Native()))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(functionName)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	_cret = C._gotk4_gtk4_BuilderScope_virtual_get_type_from_function(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(builder)
-	runtime.KeepAlive(functionName)
-
-	var _gType coreglib.Type // out
-
-	_gType = coreglib.Type(_cret)
-
-	return _gType
-}
-
-// The function takes the following parameters:
-//
-//    - builder
-//    - typeName
-//
-// The function returns the following values:
-//
-func (self *BuilderScope) typeFromName(builder *Builder, typeName string) coreglib.Type {
-	gclass := (*C.GtkBuilderScopeInterface)(coreglib.PeekParentClass(self))
-	fnarg := gclass.get_type_from_name
-
-	var _arg0 *C.GtkBuilderScope // out
-	var _arg1 *C.GtkBuilder      // out
-	var _arg2 *C.char            // out
-	var _cret C.GType            // in
-
-	_arg0 = (*C.GtkBuilderScope)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = (*C.GtkBuilder)(unsafe.Pointer(coreglib.InternObject(builder).Native()))
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(typeName)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	_cret = C._gotk4_gtk4_BuilderScope_virtual_get_type_from_name(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(builder)
-	runtime.KeepAlive(typeName)
-
-	var _gType coreglib.Type // out
-
-	_gType = coreglib.Type(_cret)
-
-	return _gType
 }
 
 // BuilderCScopeOverrides contains methods that are overridable.
@@ -270,28 +206,6 @@ func marshalBuilderCScope(p uintptr) (interface{}, error) {
 	return wrapBuilderCScope(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewBuilderCScope creates a new GtkBuilderCScope object to use with future
-// GtkBuilder instances.
-//
-// Calling this function is only necessary if you want to add custom callbacks
-// via gtk.BuilderCScope.AddCallbackSymbol().
-//
-// The function returns the following values:
-//
-//    - builderCScope: new GtkBuilderCScope.
-//
-func NewBuilderCScope() *BuilderCScope {
-	var _cret *C.GtkBuilderScope // in
-
-	_cret = C.gtk_builder_cscope_new()
-
-	var _builderCScope *BuilderCScope // out
-
-	_builderCScope = wrapBuilderCScope(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _builderCScope
-}
-
 // BuilderCScopeClass: instance of this type is always passed by reference.
 type BuilderCScopeClass struct {
 	*builderCScopeClass
@@ -299,8 +213,10 @@ type BuilderCScopeClass struct {
 
 // builderCScopeClass is the struct that's finalized.
 type builderCScopeClass struct {
-	native *C.GtkBuilderCScopeClass
+	native unsafe.Pointer
 }
+
+var GIRInfoBuilderCScopeClass = girepository.MustFind("Gtk", "BuilderCScopeClass")
 
 // BuilderScopeInterface: virtual function table to implement for BuilderScope
 // implementations. Default implementations for each function do exist, but they
@@ -314,5 +230,7 @@ type BuilderScopeInterface struct {
 
 // builderScopeInterface is the struct that's finalized.
 type builderScopeInterface struct {
-	native *C.GtkBuilderScopeInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoBuilderScopeInterface = girepository.MustFind("Gtk", "BuilderScopeInterface")

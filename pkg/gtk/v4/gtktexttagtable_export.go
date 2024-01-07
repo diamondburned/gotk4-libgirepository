@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_TextTagTableForEach
-func _gotk4_gtk4_TextTagTableForEach(arg1 *C.GtkTextTag, arg2 C.gpointer) {
+func _gotk4_gtk4_TextTagTableForEach(arg1 *C.void, arg2 C.gpointer) {
 	var fn TextTagTableForEach
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -32,7 +34,7 @@ func _gotk4_gtk4_TextTagTableForEach(arg1 *C.GtkTextTag, arg2 C.gpointer) {
 }
 
 //export _gotk4_gtk4_TextTagTable_ConnectTagAdded
-func _gotk4_gtk4_TextTagTable_ConnectTagAdded(arg0 C.gpointer, arg1 *C.GtkTextTag, arg2 C.guintptr) {
+func _gotk4_gtk4_TextTagTable_ConnectTagAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(tag *TextTag)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -52,7 +54,7 @@ func _gotk4_gtk4_TextTagTable_ConnectTagAdded(arg0 C.gpointer, arg1 *C.GtkTextTa
 }
 
 //export _gotk4_gtk4_TextTagTable_ConnectTagChanged
-func _gotk4_gtk4_TextTagTable_ConnectTagChanged(arg0 C.gpointer, arg1 *C.GtkTextTag, arg2 C.gboolean, arg3 C.guintptr) {
+func _gotk4_gtk4_TextTagTable_ConnectTagChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.gboolean, arg3 C.guintptr) {
 	var f func(tag *TextTag, sizeChanged bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -76,7 +78,7 @@ func _gotk4_gtk4_TextTagTable_ConnectTagChanged(arg0 C.gpointer, arg1 *C.GtkText
 }
 
 //export _gotk4_gtk4_TextTagTable_ConnectTagRemoved
-func _gotk4_gtk4_TextTagTable_ConnectTagRemoved(arg0 C.gpointer, arg1 *C.GtkTextTag, arg2 C.guintptr) {
+func _gotk4_gtk4_TextTagTable_ConnectTagRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(tag *TextTag)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

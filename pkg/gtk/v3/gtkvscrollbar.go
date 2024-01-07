@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeVScrollbar = coreglib.Type(C.gtk_vscrollbar_get_type())
+	GTypeVScrollbar = coreglib.Type(girepository.MustFind("Gtk", "VScrollbar").RegisteredGType())
 )
 
 func init() {
@@ -98,36 +97,6 @@ func marshalVScrollbar(p uintptr) (interface{}, error) {
 	return wrapVScrollbar(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewVScrollbar creates a new vertical scrollbar.
-//
-// Deprecated: Use gtk_scrollbar_new() with GTK_ORIENTATION_VERTICAL instead.
-//
-// The function takes the following parameters:
-//
-//    - adjustment (optional) to use, or NULL to create a new adjustment.
-//
-// The function returns the following values:
-//
-//    - vScrollbar: new VScrollbar.
-//
-func NewVScrollbar(adjustment *Adjustment) *VScrollbar {
-	var _arg1 *C.GtkAdjustment // out
-	var _cret *C.GtkWidget     // in
-
-	if adjustment != nil {
-		_arg1 = (*C.GtkAdjustment)(unsafe.Pointer(coreglib.InternObject(adjustment).Native()))
-	}
-
-	_cret = C.gtk_vscrollbar_new(_arg1)
-	runtime.KeepAlive(adjustment)
-
-	var _vScrollbar *VScrollbar // out
-
-	_vScrollbar = wrapVScrollbar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _vScrollbar
-}
-
 // VScrollbarClass: instance of this type is always passed by reference.
 type VScrollbarClass struct {
 	*vScrollbarClass
@@ -135,12 +104,7 @@ type VScrollbarClass struct {
 
 // vScrollbarClass is the struct that's finalized.
 type vScrollbarClass struct {
-	native *C.GtkVScrollbarClass
+	native unsafe.Pointer
 }
 
-func (v *VScrollbarClass) ParentClass() *ScrollbarClass {
-	valptr := &v.native.parent_class
-	var _v *ScrollbarClass // out
-	_v = (*ScrollbarClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoVScrollbarClass = girepository.MustFind("Gtk", "VScrollbarClass")

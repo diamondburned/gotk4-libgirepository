@@ -8,8 +8,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_CellRenderer_ConnectEditingCanceled
@@ -29,7 +31,7 @@ func _gotk4_gtk4_CellRenderer_ConnectEditingCanceled(arg0 C.gpointer, arg1 C.gui
 }
 
 //export _gotk4_gtk4_CellRenderer_ConnectEditingStarted
-func _gotk4_gtk4_CellRenderer_ConnectEditingStarted(arg0 C.gpointer, arg1 *C.GtkCellEditable, arg2 *C.gchar, arg3 C.guintptr) {
+func _gotk4_gtk4_CellRenderer_ConnectEditingStarted(arg0 C.gpointer, arg1 *C.void, arg2 *C.gchar, arg3 C.guintptr) {
 	var f func(editable CellEditabler, path string)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))

@@ -3,24 +3,21 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern void _gotk4_gio2_MemoryMonitor_ConnectLowMemoryWarning(gpointer, GMemoryMonitorWarningLevel, guintptr);
-// void _gotk4_gio2_MemoryMonitor_virtual_low_memory_warning(void* fnptr, GMemoryMonitor* arg0, GMemoryMonitorWarningLevel arg1) {
-//   ((void (*)(GMemoryMonitor*, GMemoryMonitorWarningLevel))(fnptr))(arg0, arg1);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeMemoryMonitor = coreglib.Type(C.g_memory_monitor_get_type())
+	GTypeMemoryMonitor = coreglib.Type(girepository.MustFind("Gio", "MemoryMonitor").RegisteredGType())
 )
 
 func init() {
@@ -32,6 +29,10 @@ func init() {
 // MEMORY_MONITOR_EXTENSION_POINT_NAME: extension point for memory usage
 // monitoring functionality. See [Extending GIO][extending-gio].
 const MEMORY_MONITOR_EXTENSION_POINT_NAME = "gio-memory-monitor"
+
+// MemoryMonitorOverrider contains methods that are overridable.
+type MemoryMonitorOverrider interface {
+}
 
 // MemoryMonitor will monitor system memory and suggest to the application when
 // to free memory so as to leave more room for other applications. It is
@@ -103,6 +104,9 @@ type MemoryMonitorrer interface {
 
 var _ MemoryMonitorrer = (*MemoryMonitor)(nil)
 
+func ifaceInitMemoryMonitorrer(gifacePtr, data C.gpointer) {
+}
+
 func wrapMemoryMonitor(obj *coreglib.Object) *MemoryMonitor {
 	return &MemoryMonitor{
 		Initable: Initable{
@@ -124,49 +128,6 @@ func BaseMemoryMonitor(obj MemoryMonitorrer) *MemoryMonitor {
 	return obj.baseMemoryMonitor()
 }
 
-// ConnectLowMemoryWarning is emitted when the system is running low on free
-// memory. The signal handler should then take the appropriate action depending
-// on the warning level. See the MonitorWarningLevel documentation for details.
-func (v *MemoryMonitor) ConnectLowMemoryWarning(f func(level MemoryMonitorWarningLevel)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(v, "low-memory-warning", false, unsafe.Pointer(C._gotk4_gio2_MemoryMonitor_ConnectLowMemoryWarning), f)
-}
-
-// The function takes the following parameters:
-//
-func (monitor *MemoryMonitor) lowMemoryWarning(level MemoryMonitorWarningLevel) {
-	gclass := (*C.GMemoryMonitorInterface)(coreglib.PeekParentClass(monitor))
-	fnarg := gclass.low_memory_warning
-
-	var _arg0 *C.GMemoryMonitor            // out
-	var _arg1 C.GMemoryMonitorWarningLevel // out
-
-	_arg0 = (*C.GMemoryMonitor)(unsafe.Pointer(coreglib.InternObject(monitor).Native()))
-	_arg1 = C.GMemoryMonitorWarningLevel(level)
-
-	C._gotk4_gio2_MemoryMonitor_virtual_low_memory_warning(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(monitor)
-	runtime.KeepAlive(level)
-}
-
-// MemoryMonitorDupDefault gets a reference to the default Monitor for the
-// system.
-//
-// The function returns the following values:
-//
-//    - memoryMonitor: new reference to the default Monitor.
-//
-func MemoryMonitorDupDefault() *MemoryMonitor {
-	var _cret *C.GMemoryMonitor // in
-
-	_cret = C.g_memory_monitor_dup_default()
-
-	var _memoryMonitor *MemoryMonitor // out
-
-	_memoryMonitor = wrapMemoryMonitor(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _memoryMonitor
-}
-
 // MemoryMonitorInterface: virtual function table for Monitor.
 //
 // An instance of this type is always passed by reference.
@@ -176,5 +137,7 @@ type MemoryMonitorInterface struct {
 
 // memoryMonitorInterface is the struct that's finalized.
 type memoryMonitorInterface struct {
-	native *C.GMemoryMonitorInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoMemoryMonitorInterface = girepository.MustFind("Gio", "MemoryMonitorInterface")

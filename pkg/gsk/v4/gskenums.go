@@ -6,23 +6,25 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gsk/gsk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeBlendMode          = coreglib.Type(C.gsk_blend_mode_get_type())
-	GTypeCorner             = coreglib.Type(C.gsk_corner_get_type())
-	GTypeGLUniformType      = coreglib.Type(C.gsk_gl_uniform_type_get_type())
-	GTypeRenderNodeType     = coreglib.Type(C.gsk_render_node_type_get_type())
-	GTypeScalingFilter      = coreglib.Type(C.gsk_scaling_filter_get_type())
-	GTypeSerializationError = coreglib.Type(C.gsk_serialization_error_get_type())
-	GTypeTransformCategory  = coreglib.Type(C.gsk_transform_category_get_type())
+	GTypeBlendMode          = coreglib.Type(girepository.MustFind("Gsk", "BlendMode").RegisteredGType())
+	GTypeCorner             = coreglib.Type(girepository.MustFind("Gsk", "Corner").RegisteredGType())
+	GTypeGLUniformType      = coreglib.Type(girepository.MustFind("Gsk", "GLUniformType").RegisteredGType())
+	GTypeRenderNodeType     = coreglib.Type(girepository.MustFind("Gsk", "RenderNodeType").RegisteredGType())
+	GTypeScalingFilter      = coreglib.Type(girepository.MustFind("Gsk", "ScalingFilter").RegisteredGType())
+	GTypeSerializationError = coreglib.Type(girepository.MustFind("Gsk", "SerializationError").RegisteredGType())
+	GTypeTransformCategory  = coreglib.Type(girepository.MustFind("Gsk", "TransformCategory").RegisteredGType())
 )
 
 func init() {

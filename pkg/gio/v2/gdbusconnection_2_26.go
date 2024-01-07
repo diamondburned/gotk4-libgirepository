@@ -3,33 +3,21 @@
 package gio
 
 import (
-	"context"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gcancel"
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
-// extern void _gotk4_gio2_AsyncReadyCallback(GObject*, GAsyncResult*, gpointer);
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
-
-// DBusInterfaceGetPropertyFunc: type of the get_property function in
-// BusInterfaceVTable.
-type DBusInterfaceGetPropertyFunc func(connection *DBusConnection, sender, objectPath, interfaceName, propertyName string) (err error, variant *glib.Variant)
 
 // DBusInterfaceMethodCallFunc: type of the method_call function in
 // BusInterfaceVTable.
 type DBusInterfaceMethodCallFunc func(connection *DBusConnection, sender, objectPath, interfaceName, methodName string, parameters *glib.Variant, invocation *DBusMethodInvocation)
-
-// DBusInterfaceSetPropertyFunc: type of the set_property function in
-// BusInterfaceVTable.
-type DBusInterfaceSetPropertyFunc func(connection *DBusConnection, sender, objectPath, interfaceName, propertyName string, value *glib.Variant) (err error, ok bool)
 
 // DBusMessageFilterFunction: signature for function used in
 // g_dbus_connection_add_filter().
@@ -135,259 +123,6 @@ type DBusSubtreeEnumerateFunc func(connection *DBusConnection, sender, objectPat
 // the empty array case, but not in the NULL case.
 type DBusSubtreeIntrospectFunc func(connection *DBusConnection, sender, objectPath, node string) (dBusInterfaceInfos []*DBusInterfaceInfo)
 
-// BusGet: asynchronously connects to the message bus specified by bus_type.
-//
-// When the operation is finished, callback will be invoked. You can then call
-// g_bus_get_finish() to get the result of the operation.
-//
-// This is an asynchronous failable function. See g_bus_get_sync() for the
-// synchronous version.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL.
-//    - busType: Type.
-//    - callback (optional) to call when the request is satisfied.
-//
-func BusGet(ctx context.Context, busType BusType, callback AsyncReadyCallback) {
-	var _arg2 *C.GCancellable       // out
-	var _arg1 C.GBusType            // out
-	var _arg3 C.GAsyncReadyCallback // out
-	var _arg4 C.gpointer
-
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = C.GBusType(busType)
-	if callback != nil {
-		_arg3 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg4 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.g_bus_get(_arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(busType)
-	runtime.KeepAlive(callback)
-}
-
-// BusGetFinish finishes an operation started with g_bus_get().
-//
-// The returned object is a singleton, that is, shared with other callers of
-// g_bus_get() and g_bus_get_sync() for bus_type. In the event that you need a
-// private message bus connection, use g_dbus_address_get_for_bus_sync() and
-// g_dbus_connection_new_for_address().
-//
-// Note that the returned BusConnection object will (usually) have the
-// BusConnection:exit-on-close property set to TRUE.
-//
-// The function takes the following parameters:
-//
-//    - res obtained from the ReadyCallback passed to g_bus_get().
-//
-// The function returns the following values:
-//
-//    - dBusConnection or NULL if error is set. Free with g_object_unref().
-//
-func BusGetFinish(res AsyncResulter) (*DBusConnection, error) {
-	var _arg1 *C.GAsyncResult    // out
-	var _cret *C.GDBusConnection // in
-	var _cerr *C.GError          // in
-
-	_arg1 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(res).Native()))
-
-	_cret = C.g_bus_get_finish(_arg1, &_cerr)
-	runtime.KeepAlive(res)
-
-	var _dBusConnection *DBusConnection // out
-	var _goerr error                    // out
-
-	_dBusConnection = wrapDBusConnection(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _dBusConnection, _goerr
-}
-
-// BusGetSync: synchronously connects to the message bus specified by bus_type.
-// Note that the returned object may shared with other callers, e.g. if two
-// separate parts of a process calls this function with the same bus_type, they
-// will share the same object.
-//
-// This is a synchronous failable function. See g_bus_get() and
-// g_bus_get_finish() for the asynchronous version.
-//
-// The returned object is a singleton, that is, shared with other callers of
-// g_bus_get() and g_bus_get_sync() for bus_type. In the event that you need a
-// private message bus connection, use g_dbus_address_get_for_bus_sync() and
-// g_dbus_connection_new_for_address().
-//
-// Note that the returned BusConnection object will (usually) have the
-// BusConnection:exit-on-close property set to TRUE.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL.
-//    - busType: Type.
-//
-// The function returns the following values:
-//
-//    - dBusConnection or NULL if error is set. Free with g_object_unref().
-//
-func BusGetSync(ctx context.Context, busType BusType) (*DBusConnection, error) {
-	var _arg2 *C.GCancellable    // out
-	var _arg1 C.GBusType         // out
-	var _cret *C.GDBusConnection // in
-	var _cerr *C.GError          // in
-
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg2 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = C.GBusType(busType)
-
-	_cret = C.g_bus_get_sync(_arg1, _arg2, &_cerr)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(busType)
-
-	var _dBusConnection *DBusConnection // out
-	var _goerr error                    // out
-
-	_dBusConnection = wrapDBusConnection(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _dBusConnection, _goerr
-}
-
-// NewDBusConnection: asynchronously sets up a D-Bus connection for exchanging
-// D-Bus messages with the end represented by stream.
-//
-// If stream is a Connection, then the corresponding #GSocket will be put into
-// non-blocking mode.
-//
-// The D-Bus connection will interact with stream from a worker thread. As a
-// result, the caller should not interact with stream after this method has been
-// called, except by calling g_object_unref() on it.
-//
-// If observer is not NULL it may be used to control the authentication process.
-//
-// When the operation is finished, callback will be invoked. You can then call
-// g_dbus_connection_new_finish() to get the result of the operation.
-//
-// This is an asynchronous failable constructor. See
-// g_dbus_connection_new_sync() for the synchronous version.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL.
-//    - stream: OStream.
-//    - guid (optional): GUID to use if authenticating as a server or NULL.
-//    - flags describing how to make the connection.
-//    - observer (optional) or NULL.
-//    - callback (optional) to call when the request is satisfied.
-//
-func NewDBusConnection(ctx context.Context, stream IOStreamer, guid string, flags DBusConnectionFlags, observer *DBusAuthObserver, callback AsyncReadyCallback) {
-	var _arg5 *C.GCancellable        // out
-	var _arg1 *C.GIOStream           // out
-	var _arg2 *C.gchar               // out
-	var _arg3 C.GDBusConnectionFlags // out
-	var _arg4 *C.GDBusAuthObserver   // out
-	var _arg6 C.GAsyncReadyCallback  // out
-	var _arg7 C.gpointer
-
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg5 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.GIOStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	if guid != "" {
-		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(guid)))
-		defer C.free(unsafe.Pointer(_arg2))
-	}
-	_arg3 = C.GDBusConnectionFlags(flags)
-	if observer != nil {
-		_arg4 = (*C.GDBusAuthObserver)(unsafe.Pointer(coreglib.InternObject(observer).Native()))
-	}
-	if callback != nil {
-		_arg6 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg7 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.g_dbus_connection_new(_arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(guid)
-	runtime.KeepAlive(flags)
-	runtime.KeepAlive(observer)
-	runtime.KeepAlive(callback)
-}
-
-// NewDBusConnectionForAddress: asynchronously connects and sets up a D-Bus
-// client connection for exchanging D-Bus messages with an endpoint specified by
-// address which must be in the D-Bus address format
-// (https://dbus.freedesktop.org/doc/dbus-specification.html#addresses).
-//
-// This constructor can only be used to initiate client-side connections - use
-// g_dbus_connection_new() if you need to act as the server. In particular,
-// flags cannot contain the G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER,
-// G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS or
-// G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER flags.
-//
-// When the operation is finished, callback will be invoked. You can then call
-// g_dbus_connection_new_for_address_finish() to get the result of the
-// operation.
-//
-// If observer is not NULL it may be used to control the authentication process.
-//
-// This is an asynchronous failable constructor. See
-// g_dbus_connection_new_for_address_sync() for the synchronous version.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional) or NULL.
-//    - address d-Bus address.
-//    - flags describing how to make the connection.
-//    - observer (optional) or NULL.
-//    - callback (optional) to call when the request is satisfied.
-//
-func NewDBusConnectionForAddress(ctx context.Context, address string, flags DBusConnectionFlags, observer *DBusAuthObserver, callback AsyncReadyCallback) {
-	var _arg4 *C.GCancellable        // out
-	var _arg1 *C.gchar               // out
-	var _arg2 C.GDBusConnectionFlags // out
-	var _arg3 *C.GDBusAuthObserver   // out
-	var _arg5 C.GAsyncReadyCallback  // out
-	var _arg6 C.gpointer
-
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg4 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(address)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.GDBusConnectionFlags(flags)
-	if observer != nil {
-		_arg3 = (*C.GDBusAuthObserver)(unsafe.Pointer(coreglib.InternObject(observer).Native()))
-	}
-	if callback != nil {
-		_arg5 = (*[0]byte)(C._gotk4_gio2_AsyncReadyCallback)
-		_arg6 = C.gpointer(gbox.AssignOnce(callback))
-	}
-
-	C.g_dbus_connection_new_for_address(_arg1, _arg2, _arg3, _arg4, _arg5, _arg6)
-	runtime.KeepAlive(ctx)
-	runtime.KeepAlive(address)
-	runtime.KeepAlive(flags)
-	runtime.KeepAlive(observer)
-	runtime.KeepAlive(callback)
-}
-
 // DBusInterfaceVTable: virtual table for handling properties and method calls
 // for a D-Bus interface.
 //
@@ -433,8 +168,10 @@ type DBusInterfaceVTable struct {
 
 // dBusInterfaceVTable is the struct that's finalized.
 type dBusInterfaceVTable struct {
-	native *C.GDBusInterfaceVTable
+	native unsafe.Pointer
 }
+
+var GIRInfoDBusInterfaceVTable = girepository.MustFind("Gio", "DBusInterfaceVTable")
 
 // DBusSubtreeVTable: virtual table for handling subtrees registered with
 // g_dbus_connection_register_subtree().
@@ -446,5 +183,7 @@ type DBusSubtreeVTable struct {
 
 // dBusSubtreeVTable is the struct that's finalized.
 type dBusSubtreeVTable struct {
-	native *C.GDBusSubtreeVTable
+	native unsafe.Pointer
 }
+
+var GIRInfoDBusSubtreeVTable = girepository.MustFind("Gio", "DBusSubtreeVTable")

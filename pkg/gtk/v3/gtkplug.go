@@ -3,30 +3,24 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 // extern void _gotk4_gtk3_Plug_ConnectEmbedded(gpointer, guintptr);
-// extern void _gotk4_gtk3_PlugClass_embedded(GtkPlug*);
-// void _gotk4_gtk3_Plug_virtual_embedded(void* fnptr, GtkPlug* arg0) {
-//   ((void (*)(GtkPlug*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypePlug = coreglib.Type(C.gtk_plug_get_type())
+	GTypePlug = coreglib.Type(girepository.MustFind("Gtk", "Plug").RegisteredGType())
 )
 
 func init() {
@@ -37,13 +31,10 @@ func init() {
 
 // PlugOverrides contains methods that are overridable.
 type PlugOverrides struct {
-	Embedded func()
 }
 
 func defaultPlugOverrides(v *Plug) PlugOverrides {
-	return PlugOverrides{
-		Embedded: v.embedded,
-	}
+	return PlugOverrides{}
 }
 
 // Plug: together with Socket, Plug provides the ability to embed widgets from
@@ -81,12 +72,6 @@ func init() {
 }
 
 func initPlugClass(gclass unsafe.Pointer, overrides PlugOverrides, classInitFunc func(*PlugClass)) {
-	pclass := (*C.GtkPlugClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypePlug))))
-
-	if overrides.Embedded != nil {
-		pclass.embedded = (*[0]byte)(C._gotk4_gtk3_PlugClass_embedded)
-	}
-
 	if classInitFunc != nil {
 		class := (*PlugClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -121,81 +106,8 @@ func marshalPlug(p uintptr) (interface{}, error) {
 }
 
 // ConnectEmbedded gets emitted when the plug becomes embedded in a socket.
-func (plug *Plug) ConnectEmbedded(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(plug, "embedded", false, unsafe.Pointer(C._gotk4_gtk3_Plug_ConnectEmbedded), f)
-}
-
-// Embedded determines whether the plug is embedded in a socket.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the plug is embedded in a socket.
-//
-func (plug *Plug) Embedded() bool {
-	var _arg0 *C.GtkPlug // out
-	var _cret C.gboolean // in
-
-	_arg0 = (*C.GtkPlug)(unsafe.Pointer(coreglib.InternObject(plug).Native()))
-
-	_cret = C.gtk_plug_get_embedded(_arg0)
-	runtime.KeepAlive(plug)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SocketWindow retrieves the socket the plug is embedded in.
-//
-// The function returns the following values:
-//
-//    - window (optional) of the socket, or NULL.
-//
-func (plug *Plug) SocketWindow() gdk.Windower {
-	var _arg0 *C.GtkPlug   // out
-	var _cret *C.GdkWindow // in
-
-	_arg0 = (*C.GtkPlug)(unsafe.Pointer(coreglib.InternObject(plug).Native()))
-
-	_cret = C.gtk_plug_get_socket_window(_arg0)
-	runtime.KeepAlive(plug)
-
-	var _window gdk.Windower // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(gdk.Windower)
-				return ok
-			})
-			rv, ok := casted.(gdk.Windower)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-			}
-			_window = rv
-		}
-	}
-
-	return _window
-}
-
-func (plug *Plug) embedded() {
-	gclass := (*C.GtkPlugClass)(coreglib.PeekParentClass(plug))
-	fnarg := gclass.embedded
-
-	var _arg0 *C.GtkPlug // out
-
-	_arg0 = (*C.GtkPlug)(unsafe.Pointer(coreglib.InternObject(plug).Native()))
-
-	C._gotk4_gtk3_Plug_virtual_embedded(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(plug)
+func (v *Plug) ConnectEmbedded(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "embedded", false, unsafe.Pointer(C._gotk4_gtk3_Plug_ConnectEmbedded), f)
 }
 
 // PlugClass: instance of this type is always passed by reference.
@@ -205,12 +117,7 @@ type PlugClass struct {
 
 // plugClass is the struct that's finalized.
 type plugClass struct {
-	native *C.GtkPlugClass
+	native unsafe.Pointer
 }
 
-func (p *PlugClass) ParentClass() *WindowClass {
-	valptr := &p.native.parent_class
-	var _v *WindowClass // out
-	_v = (*WindowClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoPlugClass = girepository.MustFind("Gtk", "PlugClass")

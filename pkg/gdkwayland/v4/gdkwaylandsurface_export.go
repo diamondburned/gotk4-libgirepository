@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/wayland/gdkwayland.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gdkwayland4_WaylandToplevelExported
-func _gotk4_gdkwayland4_WaylandToplevelExported(arg1 *C.GdkToplevel, arg2 *C.char, arg3 C.gpointer) {
+func _gotk4_gdkwayland4_WaylandToplevelExported(arg1 *C.void, arg2 *C.char, arg3 C.gpointer) {
 	var fn WaylandToplevelExported
 	{
 		v := gbox.Get(uintptr(arg3))

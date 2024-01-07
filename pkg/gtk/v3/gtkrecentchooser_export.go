@@ -11,14 +11,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_RecentSortFunc
-func _gotk4_gtk3_RecentSortFunc(arg1 *C.GtkRecentInfo, arg2 *C.GtkRecentInfo, arg3 C.gpointer) (cret C.gint) {
+func _gotk4_gtk3_RecentSortFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) (cret C.gint) {
 	var fn RecentSortFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -32,19 +32,25 @@ func _gotk4_gtk3_RecentSortFunc(arg1 *C.GtkRecentInfo, arg2 *C.GtkRecentInfo, ar
 	var _b *RecentInfo // out
 
 	_a = (*RecentInfo)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	C.gtk_recent_info_ref(arg1)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_a)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.gtk_recent_info_unref((*C.GtkRecentInfo)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				Gtk.GIRInfoRecentInfo.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 	_b = (*RecentInfo)(gextras.NewStructNative(unsafe.Pointer(arg2)))
-	C.gtk_recent_info_ref(arg2)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_b)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.gtk_recent_info_unref((*C.GtkRecentInfo)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				Gtk.GIRInfoRecentInfo.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 

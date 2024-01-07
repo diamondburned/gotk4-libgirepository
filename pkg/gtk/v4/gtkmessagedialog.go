@@ -7,12 +7,14 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // GtkWidget* _gotk4_gtk_message_dialog_new2(GtkWindow* parent, GtkDialogFlags flags, GtkMessageType type, GtkButtonsType buttons) {
 // 	return gtk_message_dialog_new_with_markup(parent, flags, type, buttons, NULL);
 // }
@@ -20,8 +22,8 @@ import "C"
 
 // GType values.
 var (
-	GTypeButtonsType   = coreglib.Type(C.gtk_buttons_type_get_type())
-	GTypeMessageDialog = coreglib.Type(C.gtk_message_dialog_get_type())
+	GTypeButtonsType   = coreglib.Type(girepository.MustFind("Gtk", "ButtonsType").RegisteredGType())
+	GTypeMessageDialog = coreglib.Type(girepository.MustFind("Gtk", "MessageDialog").RegisteredGType())
 )
 
 func init() {
@@ -195,68 +197,6 @@ func wrapMessageDialog(obj *coreglib.Object) *MessageDialog {
 
 func marshalMessageDialog(p uintptr) (interface{}, error) {
 	return wrapMessageDialog(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// MessageArea returns the message area of the dialog.
-//
-// This is the box where the dialog’s primary and secondary labels are packed.
-// You can add your own extra content to that box and it will appear below those
-// labels. See gtk.Dialog.GetContentArea() for the corresponding function in the
-// parent gtk.Dialog.
-//
-// The function returns the following values:
-//
-//    - widget: GtkBox corresponding to the “message area” in the message_dialog.
-//
-func (messageDialog *MessageDialog) MessageArea() Widgetter {
-	var _arg0 *C.GtkMessageDialog // out
-	var _cret *C.GtkWidget        // in
-
-	_arg0 = (*C.GtkMessageDialog)(unsafe.Pointer(coreglib.InternObject(messageDialog).Native()))
-
-	_cret = C.gtk_message_dialog_get_message_area(_arg0)
-	runtime.KeepAlive(messageDialog)
-
-	var _widget Widgetter // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gtk.Widgetter is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Widgetter)
-			return ok
-		})
-		rv, ok := casted.(Widgetter)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-		}
-		_widget = rv
-	}
-
-	return _widget
-}
-
-// SetMarkup sets the text of the message dialog.
-//
-// The function takes the following parameters:
-//
-//    - str: string with Pango markup.
-//
-func (messageDialog *MessageDialog) SetMarkup(str string) {
-	var _arg0 *C.GtkMessageDialog // out
-	var _arg1 *C.char             // out
-
-	_arg0 = (*C.GtkMessageDialog)(unsafe.Pointer(coreglib.InternObject(messageDialog).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(str)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_message_dialog_set_markup(_arg0, _arg1)
-	runtime.KeepAlive(messageDialog)
-	runtime.KeepAlive(str)
 }
 
 // NewMessageDialog creates a new message dialog. This is a simple

@@ -8,10 +8,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_Label_ConnectActivateCurrentLink
@@ -74,34 +74,8 @@ func _gotk4_gtk3_Label_ConnectCopyClipboard(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gtk3_Label_ConnectMoveCursor
-func _gotk4_gtk3_Label_ConnectMoveCursor(arg0 C.gpointer, arg1 C.GtkMovementStep, arg2 C.gint, arg3 C.gboolean, arg4 C.guintptr) {
-	var f func(step MovementStep, count int, extendSelection bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(step MovementStep, count int, extendSelection bool))
-	}
-
-	var _step MovementStep    // out
-	var _count int            // out
-	var _extendSelection bool // out
-
-	_step = MovementStep(arg1)
-	_count = int(arg2)
-	if arg3 != 0 {
-		_extendSelection = true
-	}
-
-	f(_step, _count, _extendSelection)
-}
-
 //export _gotk4_gtk3_Label_ConnectPopulatePopup
-func _gotk4_gtk3_Label_ConnectPopulatePopup(arg0 C.gpointer, arg1 *C.GtkMenu, arg2 C.guintptr) {
+func _gotk4_gtk3_Label_ConnectPopulatePopup(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(menu *Menu)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

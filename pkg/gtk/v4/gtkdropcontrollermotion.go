@@ -3,16 +3,16 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_DropControllerMotion_ConnectMotion(gpointer, gdouble, gdouble, guintptr);
 // extern void _gotk4_gtk4_DropControllerMotion_ConnectLeave(gpointer, guintptr);
 // extern void _gotk4_gtk4_DropControllerMotion_ConnectEnter(gpointer, gdouble, gdouble, guintptr);
@@ -20,7 +20,7 @@ import "C"
 
 // GType values.
 var (
-	GTypeDropControllerMotion = coreglib.Type(C.gtk_drop_controller_motion_get_type())
+	GTypeDropControllerMotion = coreglib.Type(girepository.MustFind("Gtk", "DropControllerMotion").RegisteredGType())
 )
 
 func init() {
@@ -59,124 +59,16 @@ func marshalDropControllerMotion(p uintptr) (interface{}, error) {
 }
 
 // ConnectEnter signals that the pointer has entered the widget.
-func (self *DropControllerMotion) ConnectEnter(f func(x, y float64)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "enter", false, unsafe.Pointer(C._gotk4_gtk4_DropControllerMotion_ConnectEnter), f)
+func (v *DropControllerMotion) ConnectEnter(f func(x, y float64)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "enter", false, unsafe.Pointer(C._gotk4_gtk4_DropControllerMotion_ConnectEnter), f)
 }
 
 // ConnectLeave signals that the pointer has left the widget.
-func (self *DropControllerMotion) ConnectLeave(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "leave", false, unsafe.Pointer(C._gotk4_gtk4_DropControllerMotion_ConnectLeave), f)
+func (v *DropControllerMotion) ConnectLeave(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "leave", false, unsafe.Pointer(C._gotk4_gtk4_DropControllerMotion_ConnectLeave), f)
 }
 
 // ConnectMotion is emitted when the pointer moves inside the widget.
-func (self *DropControllerMotion) ConnectMotion(f func(x, y float64)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "motion", false, unsafe.Pointer(C._gotk4_gtk4_DropControllerMotion_ConnectMotion), f)
-}
-
-// NewDropControllerMotion creates a new event controller that will handle
-// pointer motion events during drag and drop.
-//
-// The function returns the following values:
-//
-//    - dropControllerMotion: new GtkDropControllerMotion.
-//
-func NewDropControllerMotion() *DropControllerMotion {
-	var _cret *C.GtkEventController // in
-
-	_cret = C.gtk_drop_controller_motion_new()
-
-	var _dropControllerMotion *DropControllerMotion // out
-
-	_dropControllerMotion = wrapDropControllerMotion(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _dropControllerMotion
-}
-
-// ContainsPointer returns if a Drag-and-Drop operation is within the widget
-// self or one of its children.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if a dragging pointer is within self or one of its children.
-//
-func (self *DropControllerMotion) ContainsPointer() bool {
-	var _arg0 *C.GtkDropControllerMotion // out
-	var _cret C.gboolean                 // in
-
-	_arg0 = (*C.GtkDropControllerMotion)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_drop_controller_motion_contains_pointer(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Drop returns the GdkDrop of a current Drag-and-Drop operation over the widget
-// of self.
-//
-// The function returns the following values:
-//
-//    - drop (optional): GdkDrop currently happening within self or NULL if none.
-//
-func (self *DropControllerMotion) Drop() gdk.Dropper {
-	var _arg0 *C.GtkDropControllerMotion // out
-	var _cret *C.GdkDrop                 // in
-
-	_arg0 = (*C.GtkDropControllerMotion)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_drop_controller_motion_get_drop(_arg0)
-	runtime.KeepAlive(self)
-
-	var _drop gdk.Dropper // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(gdk.Dropper)
-				return ok
-			})
-			rv, ok := casted.(gdk.Dropper)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Dropper")
-			}
-			_drop = rv
-		}
-	}
-
-	return _drop
-}
-
-// IsPointer returns if a Drag-and-Drop operation is within the widget self, not
-// one of its children.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if a dragging pointer is within self but not one of its
-//      children.
-//
-func (self *DropControllerMotion) IsPointer() bool {
-	var _arg0 *C.GtkDropControllerMotion // out
-	var _cret C.gboolean                 // in
-
-	_arg0 = (*C.GtkDropControllerMotion)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_drop_controller_motion_is_pointer(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
+func (v *DropControllerMotion) ConnectMotion(f func(x, y float64)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "motion", false, unsafe.Pointer(C._gotk4_gtk4_DropControllerMotion_ConnectMotion), f)
 }

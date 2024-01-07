@@ -3,23 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSettings = coreglib.Type(C.gtk_settings_get_type())
+	GTypeSettings = coreglib.Type(girepository.MustFind("Gtk", "Settings").RegisteredGType())
 )
 
 func init() {
@@ -106,157 +105,6 @@ func marshalSettings(p uintptr) (interface{}, error) {
 	return wrapSettings(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ResetProperty undoes the effect of calling g_object_set() to install an
-// application-specific value for a setting. After this call, the setting will
-// again follow the session-wide value for this setting.
-//
-// The function takes the following parameters:
-//
-//    - name of the setting to reset.
-//
-func (settings *Settings) ResetProperty(name string) {
-	var _arg0 *C.GtkSettings // out
-	var _arg1 *C.gchar       // out
-
-	_arg0 = (*C.GtkSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_settings_reset_property(_arg0, _arg1)
-	runtime.KeepAlive(settings)
-	runtime.KeepAlive(name)
-}
-
-// SetDoubleProperty: deprecated: Use g_object_set() instead.
-//
-// The function takes the following parameters:
-//
-//    - name
-//    - vDouble
-//    - origin
-//
-func (settings *Settings) SetDoubleProperty(name string, vDouble float64, origin string) {
-	var _arg0 *C.GtkSettings // out
-	var _arg1 *C.gchar       // out
-	var _arg2 C.gdouble      // out
-	var _arg3 *C.gchar       // out
-
-	_arg0 = (*C.GtkSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.gdouble(vDouble)
-	_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(origin)))
-	defer C.free(unsafe.Pointer(_arg3))
-
-	C.gtk_settings_set_double_property(_arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(settings)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(vDouble)
-	runtime.KeepAlive(origin)
-}
-
-// SetLongProperty: deprecated: Use g_object_set() instead.
-//
-// The function takes the following parameters:
-//
-//    - name
-//    - vLong
-//    - origin
-//
-func (settings *Settings) SetLongProperty(name string, vLong int32, origin string) {
-	var _arg0 *C.GtkSettings // out
-	var _arg1 *C.gchar       // out
-	var _arg2 C.glong        // out
-	var _arg3 *C.gchar       // out
-
-	_arg0 = (*C.GtkSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.glong(vLong)
-	_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(origin)))
-	defer C.free(unsafe.Pointer(_arg3))
-
-	C.gtk_settings_set_long_property(_arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(settings)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(vLong)
-	runtime.KeepAlive(origin)
-}
-
-// SetPropertyValue: deprecated: Use g_object_set() instead.
-//
-// The function takes the following parameters:
-//
-//    - name
-//    - svalue
-//
-func (settings *Settings) SetPropertyValue(name string, svalue *SettingsValue) {
-	var _arg0 *C.GtkSettings      // out
-	var _arg1 *C.gchar            // out
-	var _arg2 *C.GtkSettingsValue // out
-
-	_arg0 = (*C.GtkSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.GtkSettingsValue)(gextras.StructNative(unsafe.Pointer(svalue)))
-
-	C.gtk_settings_set_property_value(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(settings)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(svalue)
-}
-
-// SetStringProperty: deprecated: Use g_object_set() instead.
-//
-// The function takes the following parameters:
-//
-//    - name
-//    - vString
-//    - origin
-//
-func (settings *Settings) SetStringProperty(name, vString, origin string) {
-	var _arg0 *C.GtkSettings // out
-	var _arg1 *C.gchar       // out
-	var _arg2 *C.gchar       // out
-	var _arg3 *C.gchar       // out
-
-	_arg0 = (*C.GtkSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(vString)))
-	defer C.free(unsafe.Pointer(_arg2))
-	_arg3 = (*C.gchar)(unsafe.Pointer(C.CString(origin)))
-	defer C.free(unsafe.Pointer(_arg3))
-
-	C.gtk_settings_set_string_property(_arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(settings)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(vString)
-	runtime.KeepAlive(origin)
-}
-
-// SettingsGetDefault gets the Settings object for the default GDK screen,
-// creating it if necessary. See gtk_settings_get_for_screen().
-//
-// The function returns the following values:
-//
-//    - settings (optional) object. If there is no default screen, then returns
-//      NULL.
-//
-func SettingsGetDefault() *Settings {
-	var _cret *C.GtkSettings // in
-
-	_cret = C.gtk_settings_get_default()
-
-	var _settings *Settings // out
-
-	if _cret != nil {
-		_settings = wrapSettings(coreglib.Take(unsafe.Pointer(_cret)))
-	}
-
-	return _settings
-}
-
 // SettingsClass: instance of this type is always passed by reference.
 type SettingsClass struct {
 	*settingsClass
@@ -264,8 +112,10 @@ type SettingsClass struct {
 
 // settingsClass is the struct that's finalized.
 type settingsClass struct {
-	native *C.GtkSettingsClass
+	native unsafe.Pointer
 }
+
+var GIRInfoSettingsClass = girepository.MustFind("Gtk", "SettingsClass")
 
 // SettingsValue: instance of this type is always passed by reference.
 type SettingsValue struct {
@@ -274,13 +124,16 @@ type SettingsValue struct {
 
 // settingsValue is the struct that's finalized.
 type settingsValue struct {
-	native *C.GtkSettingsValue
+	native unsafe.Pointer
 }
+
+var GIRInfoSettingsValue = girepository.MustFind("Gtk", "SettingsValue")
 
 // Origin should be something like “filename:linenumber” for rc files, or e.g.
 // “XProperty” for other sources.
 func (s *SettingsValue) Origin() string {
-	valptr := &s.native.origin
+	offset := GIRInfoSettingsValue.StructFieldOffset("origin")
+	valptr := (*string)(unsafe.Add(s.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v

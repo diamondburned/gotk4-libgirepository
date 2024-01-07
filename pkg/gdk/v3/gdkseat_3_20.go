@@ -7,17 +7,19 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSeatCapabilities = coreglib.Type(C.gdk_seat_capabilities_get_type())
+	GTypeSeatCapabilities = coreglib.Type(girepository.MustFind("Gdk", "SeatCapabilities").RegisteredGType())
 )
 
 func init() {

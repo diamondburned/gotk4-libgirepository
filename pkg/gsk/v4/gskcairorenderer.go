@@ -5,17 +5,19 @@ package gsk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gsk/gsk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeCairoRenderer = coreglib.Type(C.gsk_cairo_renderer_get_type())
+	GTypeCairoRenderer = coreglib.Type(girepository.MustFind("Gsk", "CairoRenderer").RegisteredGType())
 )
 
 func init() {
@@ -46,28 +48,4 @@ func wrapCairoRenderer(obj *coreglib.Object) *CairoRenderer {
 
 func marshalCairoRenderer(p uintptr) (interface{}, error) {
 	return wrapCairoRenderer(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewCairoRenderer creates a new Cairo renderer.
-//
-// The Cairo renderer is the fallback renderer drawing in ways similar to how
-// GTK 3 drew its content. Its primary use is as comparison tool.
-//
-// The Cairo renderer is incomplete. It cannot render 3D transformed content and
-// will instead render an error marker. Its usage should be avoided.
-//
-// The function returns the following values:
-//
-//    - cairoRenderer: new Cairo renderer.
-//
-func NewCairoRenderer() *CairoRenderer {
-	var _cret *C.GskRenderer // in
-
-	_cret = C.gsk_cairo_renderer_new()
-
-	var _cairoRenderer *CairoRenderer // out
-
-	_cairoRenderer = wrapCairoRenderer(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _cairoRenderer
 }

@@ -3,21 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTextTag = coreglib.Type(C.gtk_text_tag_get_type())
+	GTypeTextTag = coreglib.Type(girepository.MustFind("Gtk", "TextTag").RegisteredGType())
 )
 
 func init() {
@@ -86,111 +87,6 @@ func marshalTextTag(p uintptr) (interface{}, error) {
 	return wrapTextTag(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewTextTag creates a GtkTextTag.
-//
-// The function takes the following parameters:
-//
-//    - name (optional): tag name, or NULL.
-//
-// The function returns the following values:
-//
-//    - textTag: new GtkTextTag.
-//
-func NewTextTag(name string) *TextTag {
-	var _arg1 *C.char       // out
-	var _cret *C.GtkTextTag // in
-
-	if name != "" {
-		_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	_cret = C.gtk_text_tag_new(_arg1)
-	runtime.KeepAlive(name)
-
-	var _textTag *TextTag // out
-
-	_textTag = wrapTextTag(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _textTag
-}
-
-// Changed emits the gtk.TextTagTable::tag-changed signal on the GtkTextTagTable
-// where the tag is included.
-//
-// The signal is already emitted when setting a GtkTextTag property. This
-// function is useful for a GtkTextTag subclass.
-//
-// The function takes the following parameters:
-//
-//    - sizeChanged: whether the change affects the GtkTextView layout.
-//
-func (tag *TextTag) Changed(sizeChanged bool) {
-	var _arg0 *C.GtkTextTag // out
-	var _arg1 C.gboolean    // out
-
-	_arg0 = (*C.GtkTextTag)(unsafe.Pointer(coreglib.InternObject(tag).Native()))
-	if sizeChanged {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_text_tag_changed(_arg0, _arg1)
-	runtime.KeepAlive(tag)
-	runtime.KeepAlive(sizeChanged)
-}
-
-// Priority: get the tag priority.
-//
-// The function returns the following values:
-//
-//    - gint tag’s priority.
-//
-func (tag *TextTag) Priority() int {
-	var _arg0 *C.GtkTextTag // out
-	var _cret C.int         // in
-
-	_arg0 = (*C.GtkTextTag)(unsafe.Pointer(coreglib.InternObject(tag).Native()))
-
-	_cret = C.gtk_text_tag_get_priority(_arg0)
-	runtime.KeepAlive(tag)
-
-	var _gint int // out
-
-	_gint = int(_cret)
-
-	return _gint
-}
-
-// SetPriority sets the priority of a GtkTextTag.
-//
-// Valid priorities start at 0 and go to one less than
-// gtk.TextTagTable.GetSize(). Each tag in a table has a unique priority;
-// setting the priority of one tag shifts the priorities of all the other tags
-// in the table to maintain a unique priority for each tag.
-//
-// Higher priority tags “win” if two tags both set the same text attribute. When
-// adding a tag to a tag table, it will be assigned the highest priority in the
-// table by default; so normally the precedence of a set of tags is the order in
-// which they were added to the table, or created with
-// gtk.TextBuffer.CreateTag(), which adds the tag to the buffer’s table
-// automatically.
-//
-// The function takes the following parameters:
-//
-//    - priority: new priority.
-//
-func (tag *TextTag) SetPriority(priority int) {
-	var _arg0 *C.GtkTextTag // out
-	var _arg1 C.int         // out
-
-	_arg0 = (*C.GtkTextTag)(unsafe.Pointer(coreglib.InternObject(tag).Native()))
-	_arg1 = C.int(priority)
-
-	C.gtk_text_tag_set_priority(_arg0, _arg1)
-	runtime.KeepAlive(tag)
-	runtime.KeepAlive(priority)
-}
-
 // TextTagClass: instance of this type is always passed by reference.
 type TextTagClass struct {
 	*textTagClass
@@ -198,5 +94,7 @@ type TextTagClass struct {
 
 // textTagClass is the struct that's finalized.
 type textTagClass struct {
-	native *C.GtkTextTagClass
+	native unsafe.Pointer
 }
+
+var GIRInfoTextTagClass = girepository.MustFind("Gtk", "TextTagClass")

@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeNotebookAccessible = coreglib.Type(C.gtk_notebook_accessible_get_type())
+	GTypeNotebookAccessible = coreglib.Type(girepository.MustFind("Gtk", "NotebookAccessible").RegisteredGType())
 )
 
 func init() {
@@ -94,12 +94,7 @@ type NotebookAccessibleClass struct {
 
 // notebookAccessibleClass is the struct that's finalized.
 type notebookAccessibleClass struct {
-	native *C.GtkNotebookAccessibleClass
+	native unsafe.Pointer
 }
 
-func (n *NotebookAccessibleClass) ParentClass() *ContainerAccessibleClass {
-	valptr := &n.native.parent_class
-	var _v *ContainerAccessibleClass // out
-	_v = (*ContainerAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoNotebookAccessibleClass = girepository.MustFind("Gtk", "NotebookAccessibleClass")

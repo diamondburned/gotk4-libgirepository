@@ -9,14 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_FlowBoxCreateWidgetFunc
-func _gotk4_gtk3_FlowBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret *C.GtkWidget) {
+func _gotk4_gtk3_FlowBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret *C.void) {
 	var fn FlowBoxCreateWidgetFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -34,7 +34,7 @@ func _gotk4_gtk3_FlowBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret
 
 	var _ Widgetter
 
-	cret = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
+	cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
 	C.g_object_ref(C.gpointer(coreglib.InternObject(widget).Native()))
 
 	return cret

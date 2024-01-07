@@ -6,19 +6,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeCellRendererSpinner = coreglib.Type(C.gtk_cell_renderer_spinner_get_type())
+	GTypeCellRendererSpinner = coreglib.Type(girepository.MustFind("Gtk", "CellRendererSpinner").RegisteredGType())
 )
 
 func init() {
@@ -83,25 +83,6 @@ func marshalCellRendererSpinner(p uintptr) (interface{}, error) {
 	return wrapCellRendererSpinner(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewCellRendererSpinner returns a new cell renderer which will show a spinner
-// to indicate activity.
-//
-// The function returns the following values:
-//
-//    - cellRendererSpinner: new CellRenderer.
-//
-func NewCellRendererSpinner() *CellRendererSpinner {
-	var _cret *C.GtkCellRenderer // in
-
-	_cret = C.gtk_cell_renderer_spinner_new()
-
-	var _cellRendererSpinner *CellRendererSpinner // out
-
-	_cellRendererSpinner = wrapCellRendererSpinner(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _cellRendererSpinner
-}
-
 // CellRendererSpinnerClass: instance of this type is always passed by
 // reference.
 type CellRendererSpinnerClass struct {
@@ -110,12 +91,7 @@ type CellRendererSpinnerClass struct {
 
 // cellRendererSpinnerClass is the struct that's finalized.
 type cellRendererSpinnerClass struct {
-	native *C.GtkCellRendererSpinnerClass
+	native unsafe.Pointer
 }
 
-func (c *CellRendererSpinnerClass) ParentClass() *CellRendererClass {
-	valptr := &c.native.parent_class
-	var _v *CellRendererClass // out
-	_v = (*CellRendererClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoCellRendererSpinnerClass = girepository.MustFind("Gtk", "CellRendererSpinnerClass")

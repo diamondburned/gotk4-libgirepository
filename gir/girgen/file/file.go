@@ -32,6 +32,12 @@ func ApplyHeader(dst Headerer, srcs ...Headerer) {
 	}
 }
 
+// Value wraps a value of any type to add header to it.
+type Value[T any] struct {
+	Value  T
+	Header Header
+}
+
 // Marshaler describes a marshaler.
 type Marshaler struct {
 	GLibGetType string

@@ -9,12 +9,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_EventControllerLegacy_ConnectEvent
-func _gotk4_gtk4_EventControllerLegacy_ConnectEvent(arg0 C.gpointer, arg1 *C.GdkEvent, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_EventControllerLegacy_ConnectEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event gdk.Eventer) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

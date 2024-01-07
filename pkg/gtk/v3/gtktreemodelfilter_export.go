@@ -10,15 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 //export _gotk4_gtk3_TreeModelFilterModifyFunc
-func _gotk4_gtk3_TreeModelFilterModifyFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreeIter, arg3 *C.GValue, arg4 C.gint, arg5 C.gpointer) {
+func _gotk4_gtk3_TreeModelFilterModifyFunc(arg1 *C.void, arg2 *C.void, arg3 *C.GValue, arg4 C.gint, arg5 C.gpointer) {
 	var fn TreeModelFilterModifyFunc
 	{
 		v := gbox.Get(uintptr(arg5))
@@ -56,11 +55,11 @@ func _gotk4_gtk3_TreeModelFilterModifyFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTree
 
 	var _ coreglib.Value
 
-	*arg3 = *(*C.GValue)(unsafe.Pointer((&value).Native()))
+	*arg3 = (*C.GValue)(unsafe.Pointer((&value).Native()))
 }
 
 //export _gotk4_gtk3_TreeModelFilterVisibleFunc
-func _gotk4_gtk3_TreeModelFilterVisibleFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreeIter, arg3 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk3_TreeModelFilterVisibleFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) (cret C.gboolean) {
 	var fn TreeModelFilterVisibleFunc
 	{
 		v := gbox.Get(uintptr(arg3))

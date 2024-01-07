@@ -2,8 +2,10 @@
 
 package atk
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // VERSION_MIN_REQUIRED: macro that should be defined by the user prior to

@@ -2,8 +2,16 @@
 
 package gdk
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // EventOwnerChange: generated when the owner of a selection changes. On X11,
@@ -17,5 +25,7 @@ type EventOwnerChange struct {
 
 // eventOwnerChange is the struct that's finalized.
 type eventOwnerChange struct {
-	native *C.GdkEventOwnerChange
+	native unsafe.Pointer
 }
+
+var GIRInfoEventOwnerChange = girepository.MustFind("Gdk", "EventOwnerChange")

@@ -3,36 +3,31 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// GObject* _gotk4_gio2_AsyncResult_virtual_get_source_object(void* fnptr, GAsyncResult* arg0) {
-//   return ((GObject* (*)(GAsyncResult*))(fnptr))(arg0);
-// };
-// gboolean _gotk4_gio2_AsyncResult_virtual_is_tagged(void* fnptr, GAsyncResult* arg0, gpointer arg1) {
-//   return ((gboolean (*)(GAsyncResult*, gpointer))(fnptr))(arg0, arg1);
-// };
-// gpointer _gotk4_gio2_AsyncResult_virtual_get_user_data(void* fnptr, GAsyncResult* arg0) {
-//   return ((gpointer (*)(GAsyncResult*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeAsyncResult = coreglib.Type(C.g_async_result_get_type())
+	GTypeAsyncResult = coreglib.Type(girepository.MustFind("Gio", "AsyncResult").RegisteredGType())
 )
 
 func init() {
 	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
 		coreglib.TypeMarshaler{T: GTypeAsyncResult, F: marshalAsyncResult},
 	})
+}
+
+// AsyncResultOverrider contains methods that are overridable.
+type AsyncResultOverrider interface {
 }
 
 // AsyncResult provides a base class for implementing asynchronous function
@@ -131,19 +126,13 @@ var (
 type AsyncResulter interface {
 	coreglib.Objector
 
-	// SourceObject gets the source object from a Result.
-	SourceObject() *coreglib.Object
-	// UserData gets the user data from a Result.
-	UserData() unsafe.Pointer
-	// IsTagged checks if res has the given source_tag (generally a function
-	// pointer indicating the function res was created by).
-	IsTagged(sourceTag unsafe.Pointer) bool
-	// LegacyPropagateError: if res is a AsyncResult, this is equivalent to
-	// g_simple_async_result_propagate_error().
-	LegacyPropagateError() error
+	baseAsyncResult() *AsyncResult
 }
 
 var _ AsyncResulter = (*AsyncResult)(nil)
+
+func ifaceInitAsyncResulter(gifacePtr, data C.gpointer) {
+}
 
 func wrapAsyncResult(obj *coreglib.Object) *AsyncResult {
 	return &AsyncResult{
@@ -155,197 +144,13 @@ func marshalAsyncResult(p uintptr) (interface{}, error) {
 	return wrapAsyncResult(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// SourceObject gets the source object from a Result.
-//
-// The function returns the following values:
-//
-//    - object (optional): new reference to the source object for the res, or
-//      NULL if there is none.
-//
-func (res *AsyncResult) SourceObject() *coreglib.Object {
-	var _arg0 *C.GAsyncResult // out
-	var _cret *C.GObject      // in
-
-	_arg0 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(res).Native()))
-
-	_cret = C.g_async_result_get_source_object(_arg0)
-	runtime.KeepAlive(res)
-
-	var _object *coreglib.Object // out
-
-	if _cret != nil {
-		_object = coreglib.AssumeOwnership(unsafe.Pointer(_cret))
-	}
-
-	return _object
+func (v *AsyncResult) baseAsyncResult() *AsyncResult {
+	return v
 }
 
-// UserData gets the user data from a Result.
-//
-// The function returns the following values:
-//
-//    - gpointer (optional): user data for res.
-//
-func (res *AsyncResult) UserData() unsafe.Pointer {
-	var _arg0 *C.GAsyncResult // out
-	var _cret C.gpointer      // in
-
-	_arg0 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(res).Native()))
-
-	_cret = C.g_async_result_get_user_data(_arg0)
-	runtime.KeepAlive(res)
-
-	var _gpointer unsafe.Pointer // out
-
-	_gpointer = (unsafe.Pointer)(unsafe.Pointer(_cret))
-
-	return _gpointer
-}
-
-// IsTagged checks if res has the given source_tag (generally a function pointer
-// indicating the function res was created by).
-//
-// The function takes the following parameters:
-//
-//    - sourceTag (optional): application-defined tag.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if res has the indicated source_tag, FALSE if not.
-//
-func (res *AsyncResult) IsTagged(sourceTag unsafe.Pointer) bool {
-	var _arg0 *C.GAsyncResult // out
-	var _arg1 C.gpointer      // out
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(res).Native()))
-	_arg1 = (C.gpointer)(unsafe.Pointer(sourceTag))
-
-	_cret = C.g_async_result_is_tagged(_arg0, _arg1)
-	runtime.KeepAlive(res)
-	runtime.KeepAlive(sourceTag)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// LegacyPropagateError: if res is a AsyncResult, this is equivalent to
-// g_simple_async_result_propagate_error(). Otherwise it returns FALSE.
-//
-// This can be used for legacy error handling in async *_finish() wrapper
-// functions that traditionally handled AsyncResult error returns themselves
-// rather than calling into the virtual method. This should not be used in new
-// code; Result errors that are set by virtual methods should also be extracted
-// by virtual methods, to enable subclasses to chain up correctly.
-func (res *AsyncResult) LegacyPropagateError() error {
-	var _arg0 *C.GAsyncResult // out
-	var _cerr *C.GError       // in
-
-	_arg0 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(res).Native()))
-
-	C.g_async_result_legacy_propagate_error(_arg0, &_cerr)
-	runtime.KeepAlive(res)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// sourceObject gets the source object from a Result.
-//
-// The function returns the following values:
-//
-//    - object (optional): new reference to the source object for the res, or
-//      NULL if there is none.
-//
-func (res *AsyncResult) sourceObject() *coreglib.Object {
-	gclass := (*C.GAsyncResultIface)(coreglib.PeekParentClass(res))
-	fnarg := gclass.get_source_object
-
-	var _arg0 *C.GAsyncResult // out
-	var _cret *C.GObject      // in
-
-	_arg0 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(res).Native()))
-
-	_cret = C._gotk4_gio2_AsyncResult_virtual_get_source_object(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(res)
-
-	var _object *coreglib.Object // out
-
-	if _cret != nil {
-		_object = coreglib.AssumeOwnership(unsafe.Pointer(_cret))
-	}
-
-	return _object
-}
-
-// userData gets the user data from a Result.
-//
-// The function returns the following values:
-//
-//    - gpointer (optional): user data for res.
-//
-func (res *AsyncResult) userData() unsafe.Pointer {
-	gclass := (*C.GAsyncResultIface)(coreglib.PeekParentClass(res))
-	fnarg := gclass.get_user_data
-
-	var _arg0 *C.GAsyncResult // out
-	var _cret C.gpointer      // in
-
-	_arg0 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(res).Native()))
-
-	_cret = C._gotk4_gio2_AsyncResult_virtual_get_user_data(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(res)
-
-	var _gpointer unsafe.Pointer // out
-
-	_gpointer = (unsafe.Pointer)(unsafe.Pointer(_cret))
-
-	return _gpointer
-}
-
-// isTagged checks if res has the given source_tag (generally a function pointer
-// indicating the function res was created by).
-//
-// The function takes the following parameters:
-//
-//    - sourceTag (optional): application-defined tag.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if res has the indicated source_tag, FALSE if not.
-//
-func (res *AsyncResult) isTagged(sourceTag unsafe.Pointer) bool {
-	gclass := (*C.GAsyncResultIface)(coreglib.PeekParentClass(res))
-	fnarg := gclass.is_tagged
-
-	var _arg0 *C.GAsyncResult // out
-	var _arg1 C.gpointer      // out
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GAsyncResult)(unsafe.Pointer(coreglib.InternObject(res).Native()))
-	_arg1 = (C.gpointer)(unsafe.Pointer(sourceTag))
-
-	_cret = C._gotk4_gio2_AsyncResult_virtual_is_tagged(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(res)
-	runtime.KeepAlive(sourceTag)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
+// BaseAsyncResult returns the underlying base object.
+func BaseAsyncResult(obj AsyncResulter) *AsyncResult {
+	return obj.baseAsyncResult()
 }
 
 // AsyncResultIface: interface definition for Result.
@@ -357,5 +162,7 @@ type AsyncResultIface struct {
 
 // asyncResultIface is the struct that's finalized.
 type asyncResultIface struct {
-	native *C.GAsyncResultIface
+	native unsafe.Pointer
 }
+
+var GIRInfoAsyncResultIface = girepository.MustFind("Gio", "AsyncResultIface")

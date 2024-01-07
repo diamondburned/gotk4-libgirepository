@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeHButtonBox = coreglib.Type(C.gtk_hbutton_box_get_type())
+	GTypeHButtonBox = coreglib.Type(girepository.MustFind("Gtk", "HButtonBox").RegisteredGType())
 )
 
 func init() {
@@ -93,26 +93,6 @@ func marshalHButtonBox(p uintptr) (interface{}, error) {
 	return wrapHButtonBox(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewHButtonBox creates a new horizontal button box.
-//
-// Deprecated: Use gtk_button_box_new() with GTK_ORIENTATION_HORIZONTAL instead.
-//
-// The function returns the following values:
-//
-//    - hButtonBox: new button box Widget.
-//
-func NewHButtonBox() *HButtonBox {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_hbutton_box_new()
-
-	var _hButtonBox *HButtonBox // out
-
-	_hButtonBox = wrapHButtonBox(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _hButtonBox
-}
-
 // HButtonBoxClass: instance of this type is always passed by reference.
 type HButtonBoxClass struct {
 	*hButtonBoxClass
@@ -120,12 +100,7 @@ type HButtonBoxClass struct {
 
 // hButtonBoxClass is the struct that's finalized.
 type hButtonBoxClass struct {
-	native *C.GtkHButtonBoxClass
+	native unsafe.Pointer
 }
 
-func (h *HButtonBoxClass) ParentClass() *ButtonBoxClass {
-	valptr := &h.native.parent_class
-	var _v *ButtonBoxClass // out
-	_v = (*ButtonBoxClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoHButtonBoxClass = girepository.MustFind("Gtk", "HButtonBoxClass")

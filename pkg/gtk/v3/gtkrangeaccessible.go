@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeRangeAccessible = coreglib.Type(C.gtk_range_accessible_get_type())
+	GTypeRangeAccessible = coreglib.Type(girepository.MustFind("Gtk", "RangeAccessible").RegisteredGType())
 )
 
 func init() {
@@ -92,12 +92,7 @@ type RangeAccessibleClass struct {
 
 // rangeAccessibleClass is the struct that's finalized.
 type rangeAccessibleClass struct {
-	native *C.GtkRangeAccessibleClass
+	native unsafe.Pointer
 }
 
-func (r *RangeAccessibleClass) ParentClass() *WidgetAccessibleClass {
-	valptr := &r.native.parent_class
-	var _v *WidgetAccessibleClass // out
-	_v = (*WidgetAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoRangeAccessibleClass = girepository.MustFind("Gtk", "RangeAccessibleClass")

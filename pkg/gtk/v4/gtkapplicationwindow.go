@@ -3,22 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeApplicationWindow = coreglib.Type(C.gtk_application_window_get_type())
+	GTypeApplicationWindow = coreglib.Type(girepository.MustFind("Gtk", "ApplicationWindow").RegisteredGType())
 )
 
 func init() {
@@ -187,154 +188,6 @@ func marshalApplicationWindow(p uintptr) (interface{}, error) {
 	return wrapApplicationWindow(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewApplicationWindow creates a new GtkApplicationWindow.
-//
-// The function takes the following parameters:
-//
-//    - application: GtkApplication.
-//
-// The function returns the following values:
-//
-//    - applicationWindow: newly created GtkApplicationWindow.
-//
-func NewApplicationWindow(application *Application) *ApplicationWindow {
-	var _arg1 *C.GtkApplication // out
-	var _cret *C.GtkWidget      // in
-
-	_arg1 = (*C.GtkApplication)(unsafe.Pointer(coreglib.InternObject(application).Native()))
-
-	_cret = C.gtk_application_window_new(_arg1)
-	runtime.KeepAlive(application)
-
-	var _applicationWindow *ApplicationWindow // out
-
-	_applicationWindow = wrapApplicationWindow(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _applicationWindow
-}
-
-// HelpOverlay gets the GtkShortcutsWindow that is associated with window.
-//
-// See gtk.ApplicationWindow.SetHelpOverlay().
-//
-// The function returns the following values:
-//
-//    - shortcutsWindow (optional): help overlay associated with window, or NULL.
-//
-func (window *ApplicationWindow) HelpOverlay() *ShortcutsWindow {
-	var _arg0 *C.GtkApplicationWindow // out
-	var _cret *C.GtkShortcutsWindow   // in
-
-	_arg0 = (*C.GtkApplicationWindow)(unsafe.Pointer(coreglib.InternObject(window).Native()))
-
-	_cret = C.gtk_application_window_get_help_overlay(_arg0)
-	runtime.KeepAlive(window)
-
-	var _shortcutsWindow *ShortcutsWindow // out
-
-	if _cret != nil {
-		_shortcutsWindow = wrapShortcutsWindow(coreglib.Take(unsafe.Pointer(_cret)))
-	}
-
-	return _shortcutsWindow
-}
-
-// ID returns the unique ID of the window.
-//
-//    If the window has not yet been added to a GtkApplication, returns 0.
-//
-// The function returns the following values:
-//
-//    - guint: unique ID for window, or 0 if the window has not yet been added to
-//      a GtkApplication.
-//
-func (window *ApplicationWindow) ID() uint {
-	var _arg0 *C.GtkApplicationWindow // out
-	var _cret C.guint                 // in
-
-	_arg0 = (*C.GtkApplicationWindow)(unsafe.Pointer(coreglib.InternObject(window).Native()))
-
-	_cret = C.gtk_application_window_get_id(_arg0)
-	runtime.KeepAlive(window)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// ShowMenubar returns whether the window will display a menubar for the app
-// menu and menubar as needed.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if window will display a menubar when needed.
-//
-func (window *ApplicationWindow) ShowMenubar() bool {
-	var _arg0 *C.GtkApplicationWindow // out
-	var _cret C.gboolean              // in
-
-	_arg0 = (*C.GtkApplicationWindow)(unsafe.Pointer(coreglib.InternObject(window).Native()))
-
-	_cret = C.gtk_application_window_get_show_menubar(_arg0)
-	runtime.KeepAlive(window)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetHelpOverlay associates a shortcuts window with the application window.
-//
-// Additionally, sets up an action with the name win.show-help-overlay to
-// present it.
-//
-// window takes responsibility for destroying help_overlay.
-//
-// The function takes the following parameters:
-//
-//    - helpOverlay (optional): GtkShortcutsWindow.
-//
-func (window *ApplicationWindow) SetHelpOverlay(helpOverlay *ShortcutsWindow) {
-	var _arg0 *C.GtkApplicationWindow // out
-	var _arg1 *C.GtkShortcutsWindow   // out
-
-	_arg0 = (*C.GtkApplicationWindow)(unsafe.Pointer(coreglib.InternObject(window).Native()))
-	if helpOverlay != nil {
-		_arg1 = (*C.GtkShortcutsWindow)(unsafe.Pointer(coreglib.InternObject(helpOverlay).Native()))
-	}
-
-	C.gtk_application_window_set_help_overlay(_arg0, _arg1)
-	runtime.KeepAlive(window)
-	runtime.KeepAlive(helpOverlay)
-}
-
-// SetShowMenubar sets whether the window will display a menubar for the app
-// menu and menubar as needed.
-//
-// The function takes the following parameters:
-//
-//    - showMenubar: whether to show a menubar when needed.
-//
-func (window *ApplicationWindow) SetShowMenubar(showMenubar bool) {
-	var _arg0 *C.GtkApplicationWindow // out
-	var _arg1 C.gboolean              // out
-
-	_arg0 = (*C.GtkApplicationWindow)(unsafe.Pointer(coreglib.InternObject(window).Native()))
-	if showMenubar {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_application_window_set_show_menubar(_arg0, _arg1)
-	runtime.KeepAlive(window)
-	runtime.KeepAlive(showMenubar)
-}
-
 // ApplicationWindowClass: instance of this type is always passed by reference.
 type ApplicationWindowClass struct {
 	*applicationWindowClass
@@ -342,13 +195,7 @@ type ApplicationWindowClass struct {
 
 // applicationWindowClass is the struct that's finalized.
 type applicationWindowClass struct {
-	native *C.GtkApplicationWindowClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (a *ApplicationWindowClass) ParentClass() *WindowClass {
-	valptr := &a.native.parent_class
-	var _v *WindowClass // out
-	_v = (*WindowClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoApplicationWindowClass = girepository.MustFind("Gtk", "ApplicationWindowClass")

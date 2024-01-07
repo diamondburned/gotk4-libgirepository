@@ -12,8 +12,9 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
@@ -33,11 +34,14 @@ func _gotk4_gio2_SettingsBindGetMapping(arg1 *C.GValue, arg2 *C.GVariant, arg3 C
 
 	_value = coreglib.ValueFromNative(unsafe.Pointer(arg1))
 	_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg2)))
-	C.g_variant_ref(arg2)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_variant)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 
@@ -92,11 +96,14 @@ func _gotk4_gio2_SettingsGetMapping(arg1 *C.GVariant, arg2 *C.gpointer, arg3 C.g
 	var _value *glib.Variant // out
 
 	_value = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	C.g_variant_ref(arg1)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_value)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 
@@ -105,7 +112,7 @@ func _gotk4_gio2_SettingsGetMapping(arg1 *C.GVariant, arg2 *C.gpointer, arg3 C.g
 	var _ unsafe.Pointer
 	var _ bool
 
-	*arg2 = (C.gpointer)(unsafe.Pointer(result))
+	*arg2 = (*C.gpointer)(unsafe.Pointer(result))
 	if ok {
 		cret = C.TRUE
 	}

@@ -7,36 +7,38 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDataStreamByteOrder     = coreglib.Type(C.g_data_stream_byte_order_get_type())
-	GTypeDataStreamNewlineType   = coreglib.Type(C.g_data_stream_newline_type_get_type())
-	GTypeFileAttributeStatus     = coreglib.Type(C.g_file_attribute_status_get_type())
-	GTypeFileAttributeType       = coreglib.Type(C.g_file_attribute_type_get_type())
-	GTypeFileMonitorEvent        = coreglib.Type(C.g_file_monitor_event_get_type())
-	GTypeFileType                = coreglib.Type(C.g_file_type_get_type())
-	GTypeFilesystemPreviewType   = coreglib.Type(C.g_filesystem_preview_type_get_type())
-	GTypeIOErrorEnum             = coreglib.Type(C.g_io_error_enum_get_type())
-	GTypeMountOperationResult    = coreglib.Type(C.g_mount_operation_result_get_type())
-	GTypePasswordSave            = coreglib.Type(C.g_password_save_get_type())
-	GTypeAppInfoCreateFlags      = coreglib.Type(C.g_app_info_create_flags_get_type())
-	GTypeAskPasswordFlags        = coreglib.Type(C.g_ask_password_flags_get_type())
-	GTypeFileAttributeInfoFlags  = coreglib.Type(C.g_file_attribute_info_flags_get_type())
-	GTypeFileCopyFlags           = coreglib.Type(C.g_file_copy_flags_get_type())
-	GTypeFileCreateFlags         = coreglib.Type(C.g_file_create_flags_get_type())
-	GTypeFileMonitorFlags        = coreglib.Type(C.g_file_monitor_flags_get_type())
-	GTypeFileQueryInfoFlags      = coreglib.Type(C.g_file_query_info_flags_get_type())
-	GTypeMountMountFlags         = coreglib.Type(C.g_mount_mount_flags_get_type())
-	GTypeMountUnmountFlags       = coreglib.Type(C.g_mount_unmount_flags_get_type())
-	GTypeOutputStreamSpliceFlags = coreglib.Type(C.g_output_stream_splice_flags_get_type())
+	GTypeDataStreamByteOrder     = coreglib.Type(girepository.MustFind("Gio", "DataStreamByteOrder").RegisteredGType())
+	GTypeDataStreamNewlineType   = coreglib.Type(girepository.MustFind("Gio", "DataStreamNewlineType").RegisteredGType())
+	GTypeFileAttributeStatus     = coreglib.Type(girepository.MustFind("Gio", "FileAttributeStatus").RegisteredGType())
+	GTypeFileAttributeType       = coreglib.Type(girepository.MustFind("Gio", "FileAttributeType").RegisteredGType())
+	GTypeFileMonitorEvent        = coreglib.Type(girepository.MustFind("Gio", "FileMonitorEvent").RegisteredGType())
+	GTypeFileType                = coreglib.Type(girepository.MustFind("Gio", "FileType").RegisteredGType())
+	GTypeFilesystemPreviewType   = coreglib.Type(girepository.MustFind("Gio", "FilesystemPreviewType").RegisteredGType())
+	GTypeIOErrorEnum             = coreglib.Type(girepository.MustFind("Gio", "IOErrorEnum").RegisteredGType())
+	GTypeMountOperationResult    = coreglib.Type(girepository.MustFind("Gio", "MountOperationResult").RegisteredGType())
+	GTypePasswordSave            = coreglib.Type(girepository.MustFind("Gio", "PasswordSave").RegisteredGType())
+	GTypeAppInfoCreateFlags      = coreglib.Type(girepository.MustFind("Gio", "AppInfoCreateFlags").RegisteredGType())
+	GTypeAskPasswordFlags        = coreglib.Type(girepository.MustFind("Gio", "AskPasswordFlags").RegisteredGType())
+	GTypeFileAttributeInfoFlags  = coreglib.Type(girepository.MustFind("Gio", "FileAttributeInfoFlags").RegisteredGType())
+	GTypeFileCopyFlags           = coreglib.Type(girepository.MustFind("Gio", "FileCopyFlags").RegisteredGType())
+	GTypeFileCreateFlags         = coreglib.Type(girepository.MustFind("Gio", "FileCreateFlags").RegisteredGType())
+	GTypeFileMonitorFlags        = coreglib.Type(girepository.MustFind("Gio", "FileMonitorFlags").RegisteredGType())
+	GTypeFileQueryInfoFlags      = coreglib.Type(girepository.MustFind("Gio", "FileQueryInfoFlags").RegisteredGType())
+	GTypeMountMountFlags         = coreglib.Type(girepository.MustFind("Gio", "MountMountFlags").RegisteredGType())
+	GTypeMountUnmountFlags       = coreglib.Type(girepository.MustFind("Gio", "MountUnmountFlags").RegisteredGType())
+	GTypeOutputStreamSpliceFlags = coreglib.Type(girepository.MustFind("Gio", "OutputStreamSpliceFlags").RegisteredGType())
 )
 
 func init() {

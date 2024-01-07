@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSeparatorMenuItem = coreglib.Type(C.gtk_separator_menu_item_get_type())
+	GTypeSeparatorMenuItem = coreglib.Type(girepository.MustFind("Gtk", "SeparatorMenuItem").RegisteredGType())
 )
 
 func init() {
@@ -115,24 +115,6 @@ func marshalSeparatorMenuItem(p uintptr) (interface{}, error) {
 	return wrapSeparatorMenuItem(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewSeparatorMenuItem creates a new SeparatorMenuItem.
-//
-// The function returns the following values:
-//
-//    - separatorMenuItem: new SeparatorMenuItem.
-//
-func NewSeparatorMenuItem() *SeparatorMenuItem {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_separator_menu_item_new()
-
-	var _separatorMenuItem *SeparatorMenuItem // out
-
-	_separatorMenuItem = wrapSeparatorMenuItem(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _separatorMenuItem
-}
-
 // SeparatorMenuItemClass: instance of this type is always passed by reference.
 type SeparatorMenuItemClass struct {
 	*separatorMenuItemClass
@@ -140,13 +122,7 @@ type SeparatorMenuItemClass struct {
 
 // separatorMenuItemClass is the struct that's finalized.
 type separatorMenuItemClass struct {
-	native *C.GtkSeparatorMenuItemClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (s *SeparatorMenuItemClass) ParentClass() *MenuItemClass {
-	valptr := &s.native.parent_class
-	var _v *MenuItemClass // out
-	_v = (*MenuItemClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoSeparatorMenuItemClass = girepository.MustFind("Gtk", "SeparatorMenuItemClass")

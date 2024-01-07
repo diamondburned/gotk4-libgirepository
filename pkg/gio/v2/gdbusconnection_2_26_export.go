@@ -7,54 +7,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
-//export _gotk4_gio2_DBusInterfaceGetPropertyFunc
-func _gotk4_gio2_DBusInterfaceGetPropertyFunc(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.gchar, arg6 **C.GError, arg7 C.gpointer) (cret *C.GVariant) {
-	var fn DBusInterfaceGetPropertyFunc
-	{
-		v := gbox.Get(uintptr(arg7))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(DBusInterfaceGetPropertyFunc)
-	}
-
-	var _connection *DBusConnection // out
-	var _sender string              // out
-	var _objectPath string          // out
-	var _interfaceName string       // out
-	var _propertyName string        // out
-
-	_connection = wrapDBusConnection(coreglib.Take(unsafe.Pointer(arg1)))
-	_sender = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	_objectPath = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
-	_interfaceName = C.GoString((*C.gchar)(unsafe.Pointer(arg4)))
-	_propertyName = C.GoString((*C.gchar)(unsafe.Pointer(arg5)))
-
-	err, variant := fn(_connection, _sender, _objectPath, _interfaceName, _propertyName)
-
-	var _ error
-	var _ *glib.Variant
-
-	if err != nil && arg6 != nil {
-		*arg6 = (*C.GError)(gerror.New(err))
-	}
-	cret = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(variant)))
-
-	return cret
-}
-
 //export _gotk4_gio2_DBusInterfaceMethodCallFunc
-func _gotk4_gio2_DBusInterfaceMethodCallFunc(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.gchar, arg6 *C.GVariant, arg7 *C.GDBusMethodInvocation, arg8 C.gpointer) {
+func _gotk4_gio2_DBusInterfaceMethodCallFunc(arg1 *C.void, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.gchar, arg6 *C.GVariant, arg7 *C.void, arg8 C.gpointer) {
 	var fn DBusInterfaceMethodCallFunc
 	{
 		v := gbox.Get(uintptr(arg8))
@@ -78,11 +43,14 @@ func _gotk4_gio2_DBusInterfaceMethodCallFunc(arg1 *C.GDBusConnection, arg2 *C.gc
 	_interfaceName = C.GoString((*C.gchar)(unsafe.Pointer(arg4)))
 	_methodName = C.GoString((*C.gchar)(unsafe.Pointer(arg5)))
 	_parameters = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg6)))
-	C.g_variant_ref(arg6)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_parameters)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 	_invocation = wrapDBusMethodInvocation(coreglib.AssumeOwnership(unsafe.Pointer(arg7)))
@@ -90,55 +58,8 @@ func _gotk4_gio2_DBusInterfaceMethodCallFunc(arg1 *C.GDBusConnection, arg2 *C.gc
 	fn(_connection, _sender, _objectPath, _interfaceName, _methodName, _parameters, _invocation)
 }
 
-//export _gotk4_gio2_DBusInterfaceSetPropertyFunc
-func _gotk4_gio2_DBusInterfaceSetPropertyFunc(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.gchar, arg6 *C.GVariant, arg7 **C.GError, arg8 C.gpointer) (cret C.gboolean) {
-	var fn DBusInterfaceSetPropertyFunc
-	{
-		v := gbox.Get(uintptr(arg8))
-		if v == nil {
-			panic(`callback not found`)
-		}
-		fn = v.(DBusInterfaceSetPropertyFunc)
-	}
-
-	var _connection *DBusConnection // out
-	var _sender string              // out
-	var _objectPath string          // out
-	var _interfaceName string       // out
-	var _propertyName string        // out
-	var _value *glib.Variant        // out
-
-	_connection = wrapDBusConnection(coreglib.Take(unsafe.Pointer(arg1)))
-	_sender = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	_objectPath = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
-	_interfaceName = C.GoString((*C.gchar)(unsafe.Pointer(arg4)))
-	_propertyName = C.GoString((*C.gchar)(unsafe.Pointer(arg5)))
-	_value = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg6)))
-	C.g_variant_ref(arg6)
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_value)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
-		},
-	)
-
-	err, ok := fn(_connection, _sender, _objectPath, _interfaceName, _propertyName, _value)
-
-	var _ error
-	var _ bool
-
-	if err != nil && arg7 != nil {
-		*arg7 = (*C.GError)(gerror.New(err))
-	}
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
 //export _gotk4_gio2_DBusMessageFilterFunction
-func _gotk4_gio2_DBusMessageFilterFunction(arg1 *C.GDBusConnection, arg2 *C.GDBusMessage, arg3 C.gboolean, arg4 C.gpointer) (cret *C.GDBusMessage) {
+func _gotk4_gio2_DBusMessageFilterFunction(arg1 *C.void, arg2 *C.void, arg3 C.gboolean, arg4 C.gpointer) (cret *C.void) {
 	var fn DBusMessageFilterFunction
 	{
 		v := gbox.Get(uintptr(arg4))
@@ -163,7 +84,7 @@ func _gotk4_gio2_DBusMessageFilterFunction(arg1 *C.GDBusConnection, arg2 *C.GDBu
 	var _ *DBusMessage
 
 	if dBusMessage != nil {
-		cret = (*C.GDBusMessage)(unsafe.Pointer(coreglib.InternObject(dBusMessage).Native()))
+		cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(dBusMessage).Native()))
 		C.g_object_ref(C.gpointer(coreglib.InternObject(dBusMessage).Native()))
 	}
 
@@ -171,7 +92,7 @@ func _gotk4_gio2_DBusMessageFilterFunction(arg1 *C.GDBusConnection, arg2 *C.GDBu
 }
 
 //export _gotk4_gio2_DBusSignalCallback
-func _gotk4_gio2_DBusSignalCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.gchar, arg6 *C.GVariant, arg7 C.gpointer) {
+func _gotk4_gio2_DBusSignalCallback(arg1 *C.void, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.gchar, arg6 *C.GVariant, arg7 C.gpointer) {
 	var fn DBusSignalCallback
 	{
 		v := gbox.Get(uintptr(arg7))
@@ -196,11 +117,14 @@ func _gotk4_gio2_DBusSignalCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3
 	_interfaceName = C.GoString((*C.gchar)(unsafe.Pointer(arg4)))
 	_signalName = C.GoString((*C.gchar)(unsafe.Pointer(arg5)))
 	_parameters = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg6)))
-	C.g_variant_ref(arg6)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_parameters)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 
@@ -208,7 +132,7 @@ func _gotk4_gio2_DBusSignalCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3
 }
 
 //export _gotk4_gio2_DBusSubtreeDispatchFunc
-func _gotk4_gio2_DBusSubtreeDispatchFunc(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.gchar, arg6 *C.gpointer, arg7 C.gpointer) (cret *C.GDBusInterfaceVTable) {
+func _gotk4_gio2_DBusSubtreeDispatchFunc(arg1 *C.void, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.gchar, arg6 *C.gpointer, arg7 C.gpointer) (cret *C.void) {
 	var fn DBusSubtreeDispatchFunc
 	{
 		v := gbox.Get(uintptr(arg7))
@@ -235,16 +159,16 @@ func _gotk4_gio2_DBusSubtreeDispatchFunc(arg1 *C.GDBusConnection, arg2 *C.gchar,
 	var _ unsafe.Pointer
 	var _ *DBusInterfaceVTable
 
-	*arg6 = (C.gpointer)(unsafe.Pointer(outUserData))
+	*arg6 = (*C.gpointer)(unsafe.Pointer(outUserData))
 	if dBusInterfaceVTable != nil {
-		cret = (*C.GDBusInterfaceVTable)(gextras.StructNative(unsafe.Pointer(dBusInterfaceVTable)))
+		cret = (*C.void)(gextras.StructNative(unsafe.Pointer(dBusInterfaceVTable)))
 	}
 
 	return cret
 }
 
 //export _gotk4_gio2_DBusSubtreeEnumerateFunc
-func _gotk4_gio2_DBusSubtreeEnumerateFunc(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 *C.gchar, arg4 C.gpointer) (cret **C.gchar) {
+func _gotk4_gio2_DBusSubtreeEnumerateFunc(arg1 *C.void, arg2 *C.gchar, arg3 *C.gchar, arg4 C.gpointer) (cret **C.gchar) {
 	var fn DBusSubtreeEnumerateFunc
 	{
 		v := gbox.Get(uintptr(arg4))
@@ -267,7 +191,7 @@ func _gotk4_gio2_DBusSubtreeEnumerateFunc(arg1 *C.GDBusConnection, arg2 *C.gchar
 	var _ []string
 
 	{
-		cret = (**C.gchar)(C.calloc(C.size_t((len(utf8s) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
+		cret = (*C.gchar)(C.calloc(C.size_t((len(utf8s) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 		{
 			out := unsafe.Slice(cret, len(utf8s)+1)
 			var zero *C.gchar
@@ -282,7 +206,7 @@ func _gotk4_gio2_DBusSubtreeEnumerateFunc(arg1 *C.GDBusConnection, arg2 *C.gchar
 }
 
 //export _gotk4_gio2_DBusSubtreeIntrospectFunc
-func _gotk4_gio2_DBusSubtreeIntrospectFunc(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 C.gpointer) (cret **C.GDBusInterfaceInfo) {
+func _gotk4_gio2_DBusSubtreeIntrospectFunc(arg1 *C.void, arg2 *C.gchar, arg3 *C.gchar, arg4 *C.gchar, arg5 C.gpointer) (cret **C.void) {
 	var fn DBusSubtreeIntrospectFunc
 	{
 		v := gbox.Get(uintptr(arg5))
@@ -308,13 +232,13 @@ func _gotk4_gio2_DBusSubtreeIntrospectFunc(arg1 *C.GDBusConnection, arg2 *C.gcha
 
 	if dBusInterfaceInfos != nil {
 		{
-			cret = (**C.GDBusInterfaceInfo)(C.calloc(C.size_t((len(dBusInterfaceInfos) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
+			cret = (**C.void)(C.calloc(C.size_t((len(dBusInterfaceInfos) + 1)), C.size_t(unsafe.Sizeof(uint(0)))))
 			{
 				out := unsafe.Slice(cret, len(dBusInterfaceInfos)+1)
-				var zero *C.GDBusInterfaceInfo
+				var zero *C.void
 				out[len(dBusInterfaceInfos)] = zero
 				for i := range dBusInterfaceInfos {
-					out[i] = (*C.GDBusInterfaceInfo)(gextras.StructNative(unsafe.Pointer(dBusInterfaceInfos[i])))
+					out[i] = (*C.void)(gextras.StructNative(unsafe.Pointer(dBusInterfaceInfos[i])))
 				}
 			}
 		}

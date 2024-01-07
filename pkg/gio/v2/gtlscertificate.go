@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // TLSCertificateClass: instance of this type is always passed by reference.
@@ -13,5 +21,7 @@ type TLSCertificateClass struct {
 
 // tlsCertificateClass is the struct that's finalized.
 type tlsCertificateClass struct {
-	native *C.GTlsCertificateClass
+	native unsafe.Pointer
 }
+
+var GIRInfoTLSCertificateClass = girepository.MustFind("Gio", "TlsCertificateClass")

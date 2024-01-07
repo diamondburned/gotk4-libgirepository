@@ -3,17 +3,16 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 // extern void _gotk4_gtk3_EventControllerMotion_ConnectMotion(gpointer, gdouble, gdouble, guintptr);
 // extern void _gotk4_gtk3_EventControllerMotion_ConnectLeave(gpointer, guintptr);
 // extern void _gotk4_gtk3_EventControllerMotion_ConnectEnter(gpointer, gdouble, gdouble, guintptr);
@@ -21,7 +20,7 @@ import "C"
 
 // GType values.
 var (
-	GTypeEventControllerMotion = coreglib.Type(C.gtk_event_controller_motion_get_type())
+	GTypeEventControllerMotion = coreglib.Type(girepository.MustFind("Gtk", "EventControllerMotion").RegisteredGType())
 )
 
 func init() {
@@ -68,31 +67,4 @@ func (v *EventControllerMotion) ConnectLeave(f func()) coreglib.SignalHandle {
 // ConnectMotion is emitted when the pointer moves inside the widget.
 func (v *EventControllerMotion) ConnectMotion(f func(x, y float64)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "motion", false, unsafe.Pointer(C._gotk4_gtk3_EventControllerMotion_ConnectMotion), f)
-}
-
-// NewEventControllerMotion creates a new event controller that will handle
-// motion events for the given widget.
-//
-// The function takes the following parameters:
-//
-//    - widget: Widget.
-//
-// The function returns the following values:
-//
-//    - eventControllerMotion: new EventControllerMotion.
-//
-func NewEventControllerMotion(widget Widgetter) *EventControllerMotion {
-	var _arg1 *C.GtkWidget          // out
-	var _cret *C.GtkEventController // in
-
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-
-	_cret = C.gtk_event_controller_motion_new(_arg1)
-	runtime.KeepAlive(widget)
-
-	var _eventControllerMotion *EventControllerMotion // out
-
-	_eventControllerMotion = wrapEventControllerMotion(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _eventControllerMotion
 }

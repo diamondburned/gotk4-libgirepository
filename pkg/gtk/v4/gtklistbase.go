@@ -5,17 +5,19 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeListBase = coreglib.Type(C.gtk_list_base_get_type())
+	GTypeListBase = coreglib.Type(girepository.MustFind("Gtk", "ListBase").RegisteredGType())
 )
 
 func init() {

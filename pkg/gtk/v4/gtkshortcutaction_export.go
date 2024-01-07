@@ -12,12 +12,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_ShortcutFunc
-func _gotk4_gtk4_ShortcutFunc(arg1 *C.GtkWidget, arg2 *C.GVariant, arg3 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_ShortcutFunc(arg1 *C.void, arg2 *C.GVariant, arg3 C.gpointer) (cret C.gboolean) {
 	var fn ShortcutFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -49,11 +51,14 @@ func _gotk4_gtk4_ShortcutFunc(arg1 *C.GtkWidget, arg2 *C.GVariant, arg3 C.gpoint
 	}
 	if arg2 != nil {
 		_args = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg2)))
-		C.g_variant_ref(arg2)
 		runtime.SetFinalizer(
 			gextras.StructIntern(unsafe.Pointer(_args)),
 			func(intern *struct{ C unsafe.Pointer }) {
-				C.g_variant_unref((*C.GVariant)(intern.C))
+				{
+					var args [1]girepository.Argument
+					*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+					GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+				}
 			},
 		)
 	}

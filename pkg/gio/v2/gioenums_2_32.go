@@ -7,20 +7,22 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeResourceError       = coreglib.Type(C.g_resource_error_get_type())
-	GTypeSocketClientEvent   = coreglib.Type(C.g_socket_client_event_get_type())
-	GTypeResourceFlags       = coreglib.Type(C.g_resource_flags_get_type())
-	GTypeResourceLookupFlags = coreglib.Type(C.g_resource_lookup_flags_get_type())
+	GTypeResourceError       = coreglib.Type(girepository.MustFind("Gio", "ResourceError").RegisteredGType())
+	GTypeSocketClientEvent   = coreglib.Type(girepository.MustFind("Gio", "SocketClientEvent").RegisteredGType())
+	GTypeResourceFlags       = coreglib.Type(girepository.MustFind("Gio", "ResourceFlags").RegisteredGType())
+	GTypeResourceLookupFlags = coreglib.Type(girepository.MustFind("Gio", "ResourceLookupFlags").RegisteredGType())
 )
 
 func init() {

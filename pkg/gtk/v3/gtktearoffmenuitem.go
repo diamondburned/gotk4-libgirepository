@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTearoffMenuItem = coreglib.Type(C.gtk_tearoff_menu_item_get_type())
+	GTypeTearoffMenuItem = coreglib.Type(girepository.MustFind("Gtk", "TearoffMenuItem").RegisteredGType())
 )
 
 func init() {
@@ -121,27 +121,6 @@ func marshalTearoffMenuItem(p uintptr) (interface{}, error) {
 	return wrapTearoffMenuItem(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewTearoffMenuItem creates a new TearoffMenuItem.
-//
-// Deprecated: TearoffMenuItem is deprecated and should not be used in newly
-// written code.
-//
-// The function returns the following values:
-//
-//    - tearoffMenuItem: new TearoffMenuItem.
-//
-func NewTearoffMenuItem() *TearoffMenuItem {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_tearoff_menu_item_new()
-
-	var _tearoffMenuItem *TearoffMenuItem // out
-
-	_tearoffMenuItem = wrapTearoffMenuItem(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _tearoffMenuItem
-}
-
 // TearoffMenuItemClass: instance of this type is always passed by reference.
 type TearoffMenuItemClass struct {
 	*tearoffMenuItemClass
@@ -149,13 +128,7 @@ type TearoffMenuItemClass struct {
 
 // tearoffMenuItemClass is the struct that's finalized.
 type tearoffMenuItemClass struct {
-	native *C.GtkTearoffMenuItemClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (t *TearoffMenuItemClass) ParentClass() *MenuItemClass {
-	valptr := &t.native.parent_class
-	var _v *MenuItemClass // out
-	_v = (*MenuItemClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoTearoffMenuItemClass = girepository.MustFind("Gtk", "TearoffMenuItemClass")

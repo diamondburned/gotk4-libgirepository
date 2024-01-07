@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_FlowBoxCreateWidgetFunc
-func _gotk4_gtk4_FlowBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret *C.GtkWidget) {
+func _gotk4_gtk4_FlowBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret *C.void) {
 	var fn FlowBoxCreateWidgetFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -32,14 +34,14 @@ func _gotk4_gtk4_FlowBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret
 
 	var _ Widgetter
 
-	cret = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
+	cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
 	C.g_object_ref(C.gpointer(coreglib.InternObject(widget).Native()))
 
 	return cret
 }
 
 //export _gotk4_gtk4_FlowBoxFilterFunc
-func _gotk4_gtk4_FlowBoxFilterFunc(arg1 *C.GtkFlowBoxChild, arg2 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_FlowBoxFilterFunc(arg1 *C.void, arg2 C.gpointer) (cret C.gboolean) {
 	var fn FlowBoxFilterFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -65,7 +67,7 @@ func _gotk4_gtk4_FlowBoxFilterFunc(arg1 *C.GtkFlowBoxChild, arg2 C.gpointer) (cr
 }
 
 //export _gotk4_gtk4_FlowBoxForEachFunc
-func _gotk4_gtk4_FlowBoxForEachFunc(arg1 *C.GtkFlowBox, arg2 *C.GtkFlowBoxChild, arg3 C.gpointer) {
+func _gotk4_gtk4_FlowBoxForEachFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) {
 	var fn FlowBoxForEachFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -85,7 +87,7 @@ func _gotk4_gtk4_FlowBoxForEachFunc(arg1 *C.GtkFlowBox, arg2 *C.GtkFlowBoxChild,
 }
 
 //export _gotk4_gtk4_FlowBoxSortFunc
-func _gotk4_gtk4_FlowBoxSortFunc(arg1 *C.GtkFlowBoxChild, arg2 *C.GtkFlowBoxChild, arg3 C.gpointer) (cret C.int) {
+func _gotk4_gtk4_FlowBoxSortFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) (cret C.int) {
 	var fn FlowBoxSortFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -127,7 +129,7 @@ func _gotk4_gtk4_FlowBox_ConnectActivateCursorChild(arg0 C.gpointer, arg1 C.guin
 }
 
 //export _gotk4_gtk4_FlowBox_ConnectChildActivated
-func _gotk4_gtk4_FlowBox_ConnectChildActivated(arg0 C.gpointer, arg1 *C.GtkFlowBoxChild, arg2 C.guintptr) {
+func _gotk4_gtk4_FlowBox_ConnectChildActivated(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(child *FlowBoxChild)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -144,44 +146,6 @@ func _gotk4_gtk4_FlowBox_ConnectChildActivated(arg0 C.gpointer, arg1 *C.GtkFlowB
 	_child = wrapFlowBoxChild(coreglib.Take(unsafe.Pointer(arg1)))
 
 	f(_child)
-}
-
-//export _gotk4_gtk4_FlowBox_ConnectMoveCursor
-func _gotk4_gtk4_FlowBox_ConnectMoveCursor(arg0 C.gpointer, arg1 C.GtkMovementStep, arg2 C.gint, arg3 C.gboolean, arg4 C.gboolean, arg5 C.guintptr) (cret C.gboolean) {
-	var f func(step MovementStep, count int, extend, modify bool) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(step MovementStep, count int, extend, modify bool) (ok bool))
-	}
-
-	var _step MovementStep // out
-	var _count int         // out
-	var _extend bool       // out
-	var _modify bool       // out
-
-	_step = MovementStep(arg1)
-	_count = int(arg2)
-	if arg3 != 0 {
-		_extend = true
-	}
-	if arg4 != 0 {
-		_modify = true
-	}
-
-	ok := f(_step, _count, _extend, _modify)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
 }
 
 //export _gotk4_gtk4_FlowBox_ConnectSelectAll

@@ -4,22 +4,19 @@ package gtk
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
-// extern void callbackDelete(gpointer);
 // extern void _gotk4_gtk3_Calendar_ConnectPrevYear(gpointer, guintptr);
 // extern void _gotk4_gtk3_Calendar_ConnectPrevMonth(gpointer, guintptr);
 // extern void _gotk4_gtk3_Calendar_ConnectNextYear(gpointer, guintptr);
@@ -27,41 +24,12 @@ import (
 // extern void _gotk4_gtk3_Calendar_ConnectMonthChanged(gpointer, guintptr);
 // extern void _gotk4_gtk3_Calendar_ConnectDaySelectedDoubleClick(gpointer, guintptr);
 // extern void _gotk4_gtk3_Calendar_ConnectDaySelected(gpointer, guintptr);
-// extern void _gotk4_gtk3_CalendarClass_prev_year(GtkCalendar*);
-// extern void _gotk4_gtk3_CalendarClass_prev_month(GtkCalendar*);
-// extern void _gotk4_gtk3_CalendarClass_next_year(GtkCalendar*);
-// extern void _gotk4_gtk3_CalendarClass_next_month(GtkCalendar*);
-// extern void _gotk4_gtk3_CalendarClass_month_changed(GtkCalendar*);
-// extern void _gotk4_gtk3_CalendarClass_day_selected_double_click(GtkCalendar*);
-// extern void _gotk4_gtk3_CalendarClass_day_selected(GtkCalendar*);
-// extern gchar* _gotk4_gtk3_CalendarDetailFunc(GtkCalendar*, guint, guint, guint, gpointer);
-// void _gotk4_gtk3_Calendar_virtual_day_selected(void* fnptr, GtkCalendar* arg0) {
-//   ((void (*)(GtkCalendar*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_Calendar_virtual_day_selected_double_click(void* fnptr, GtkCalendar* arg0) {
-//   ((void (*)(GtkCalendar*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_Calendar_virtual_month_changed(void* fnptr, GtkCalendar* arg0) {
-//   ((void (*)(GtkCalendar*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_Calendar_virtual_next_month(void* fnptr, GtkCalendar* arg0) {
-//   ((void (*)(GtkCalendar*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_Calendar_virtual_next_year(void* fnptr, GtkCalendar* arg0) {
-//   ((void (*)(GtkCalendar*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_Calendar_virtual_prev_month(void* fnptr, GtkCalendar* arg0) {
-//   ((void (*)(GtkCalendar*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_Calendar_virtual_prev_year(void* fnptr, GtkCalendar* arg0) {
-//   ((void (*)(GtkCalendar*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeCalendarDisplayOptions = coreglib.Type(C.gtk_calendar_display_options_get_type())
-	GTypeCalendar               = coreglib.Type(C.gtk_calendar_get_type())
+	GTypeCalendarDisplayOptions = coreglib.Type(girepository.MustFind("Gtk", "CalendarDisplayOptions").RegisteredGType())
+	GTypeCalendar               = coreglib.Type(girepository.MustFind("Gtk", "Calendar").RegisteredGType())
 )
 
 func init() {
@@ -138,25 +106,10 @@ func (c CalendarDisplayOptions) Has(other CalendarDisplayOptions) bool {
 
 // CalendarOverrides contains methods that are overridable.
 type CalendarOverrides struct {
-	DaySelected            func()
-	DaySelectedDoubleClick func()
-	MonthChanged           func()
-	NextMonth              func()
-	NextYear               func()
-	PrevMonth              func()
-	PrevYear               func()
 }
 
 func defaultCalendarOverrides(v *Calendar) CalendarOverrides {
-	return CalendarOverrides{
-		DaySelected:            v.daySelected,
-		DaySelectedDoubleClick: v.daySelectedDoubleClick,
-		MonthChanged:           v.monthChanged,
-		NextMonth:              v.nextMonth,
-		NextYear:               v.nextYear,
-		PrevMonth:              v.prevMonth,
-		PrevYear:               v.prevYear,
-	}
+	return CalendarOverrides{}
 }
 
 // Calendar is a widget that displays a Gregorian calendar, one month at a time.
@@ -198,36 +151,6 @@ func init() {
 }
 
 func initCalendarClass(gclass unsafe.Pointer, overrides CalendarOverrides, classInitFunc func(*CalendarClass)) {
-	pclass := (*C.GtkCalendarClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeCalendar))))
-
-	if overrides.DaySelected != nil {
-		pclass.day_selected = (*[0]byte)(C._gotk4_gtk3_CalendarClass_day_selected)
-	}
-
-	if overrides.DaySelectedDoubleClick != nil {
-		pclass.day_selected_double_click = (*[0]byte)(C._gotk4_gtk3_CalendarClass_day_selected_double_click)
-	}
-
-	if overrides.MonthChanged != nil {
-		pclass.month_changed = (*[0]byte)(C._gotk4_gtk3_CalendarClass_month_changed)
-	}
-
-	if overrides.NextMonth != nil {
-		pclass.next_month = (*[0]byte)(C._gotk4_gtk3_CalendarClass_next_month)
-	}
-
-	if overrides.NextYear != nil {
-		pclass.next_year = (*[0]byte)(C._gotk4_gtk3_CalendarClass_next_year)
-	}
-
-	if overrides.PrevMonth != nil {
-		pclass.prev_month = (*[0]byte)(C._gotk4_gtk3_CalendarClass_prev_month)
-	}
-
-	if overrides.PrevYear != nil {
-		pclass.prev_year = (*[0]byte)(C._gotk4_gtk3_CalendarClass_prev_year)
-	}
-
 	if classInitFunc != nil {
 		class := (*CalendarClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -256,446 +179,39 @@ func marshalCalendar(p uintptr) (interface{}, error) {
 }
 
 // ConnectDaySelected is emitted when the user selects a day.
-func (calendar *Calendar) ConnectDaySelected(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(calendar, "day-selected", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectDaySelected), f)
+func (v *Calendar) ConnectDaySelected(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "day-selected", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectDaySelected), f)
 }
 
 // ConnectDaySelectedDoubleClick is emitted when the user double-clicks a day.
-func (calendar *Calendar) ConnectDaySelectedDoubleClick(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(calendar, "day-selected-double-click", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectDaySelectedDoubleClick), f)
+func (v *Calendar) ConnectDaySelectedDoubleClick(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "day-selected-double-click", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectDaySelectedDoubleClick), f)
 }
 
 // ConnectMonthChanged is emitted when the user clicks a button to change the
 // selected month on a calendar.
-func (calendar *Calendar) ConnectMonthChanged(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(calendar, "month-changed", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectMonthChanged), f)
+func (v *Calendar) ConnectMonthChanged(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "month-changed", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectMonthChanged), f)
 }
 
 // ConnectNextMonth is emitted when the user switched to the next month.
-func (calendar *Calendar) ConnectNextMonth(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(calendar, "next-month", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectNextMonth), f)
+func (v *Calendar) ConnectNextMonth(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "next-month", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectNextMonth), f)
 }
 
 // ConnectNextYear is emitted when user switched to the next year.
-func (calendar *Calendar) ConnectNextYear(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(calendar, "next-year", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectNextYear), f)
+func (v *Calendar) ConnectNextYear(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "next-year", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectNextYear), f)
 }
 
 // ConnectPrevMonth is emitted when the user switched to the previous month.
-func (calendar *Calendar) ConnectPrevMonth(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(calendar, "prev-month", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectPrevMonth), f)
+func (v *Calendar) ConnectPrevMonth(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "prev-month", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectPrevMonth), f)
 }
 
 // ConnectPrevYear is emitted when user switched to the previous year.
-func (calendar *Calendar) ConnectPrevYear(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(calendar, "prev-year", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectPrevYear), f)
-}
-
-// NewCalendar creates a new calendar, with the current date being selected.
-//
-// The function returns the following values:
-//
-//    - calendar: newly Calendar widget.
-//
-func NewCalendar() *Calendar {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_calendar_new()
-
-	var _calendar *Calendar // out
-
-	_calendar = wrapCalendar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _calendar
-}
-
-// ClearMarks: remove all visual markers.
-func (calendar *Calendar) ClearMarks() {
-	var _arg0 *C.GtkCalendar // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C.gtk_calendar_clear_marks(_arg0)
-	runtime.KeepAlive(calendar)
-}
-
-// Date obtains the selected date from a Calendar.
-//
-// The function returns the following values:
-//
-//    - year (optional): location to store the year as a decimal number (e.g.
-//      2011), or NULL.
-//    - month (optional): location to store the month number (between 0 and 11),
-//      or NULL.
-//    - day (optional): location to store the day number (between 1 and 31), or
-//      NULL.
-//
-func (calendar *Calendar) Date() (year, month, day uint) {
-	var _arg0 *C.GtkCalendar // out
-	var _arg1 C.guint        // in
-	var _arg2 C.guint        // in
-	var _arg3 C.guint        // in
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C.gtk_calendar_get_date(_arg0, &_arg1, &_arg2, &_arg3)
-	runtime.KeepAlive(calendar)
-
-	var _year uint  // out
-	var _month uint // out
-	var _day uint   // out
-
-	_year = uint(_arg1)
-	_month = uint(_arg2)
-	_day = uint(_arg3)
-
-	return _year, _month, _day
-}
-
-// DayIsMarked returns if the day of the calendar is already marked.
-//
-// The function takes the following parameters:
-//
-//    - day number between 1 and 31.
-//
-// The function returns the following values:
-//
-//    - ok: whether the day is marked.
-//
-func (calendar *Calendar) DayIsMarked(day uint) bool {
-	var _arg0 *C.GtkCalendar // out
-	var _arg1 C.guint        // out
-	var _cret C.gboolean     // in
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = C.guint(day)
-
-	_cret = C.gtk_calendar_get_day_is_marked(_arg0, _arg1)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(day)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// DetailHeightRows queries the height of detail cells, in rows. See
-// Calendar:detail-width-chars.
-//
-// The function returns the following values:
-//
-//    - gint: height of detail cells, in rows.
-//
-func (calendar *Calendar) DetailHeightRows() int {
-	var _arg0 *C.GtkCalendar // out
-	var _cret C.gint         // in
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	_cret = C.gtk_calendar_get_detail_height_rows(_arg0)
-	runtime.KeepAlive(calendar)
-
-	var _gint int // out
-
-	_gint = int(_cret)
-
-	return _gint
-}
-
-// DetailWidthChars queries the width of detail cells, in characters. See
-// Calendar:detail-width-chars.
-//
-// The function returns the following values:
-//
-//    - gint: width of detail cells, in characters.
-//
-func (calendar *Calendar) DetailWidthChars() int {
-	var _arg0 *C.GtkCalendar // out
-	var _cret C.gint         // in
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	_cret = C.gtk_calendar_get_detail_width_chars(_arg0)
-	runtime.KeepAlive(calendar)
-
-	var _gint int // out
-
-	_gint = int(_cret)
-
-	return _gint
-}
-
-// DisplayOptions returns the current display options of calendar.
-//
-// The function returns the following values:
-//
-//    - calendarDisplayOptions: display options.
-//
-func (calendar *Calendar) DisplayOptions() CalendarDisplayOptions {
-	var _arg0 *C.GtkCalendar              // out
-	var _cret C.GtkCalendarDisplayOptions // in
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	_cret = C.gtk_calendar_get_display_options(_arg0)
-	runtime.KeepAlive(calendar)
-
-	var _calendarDisplayOptions CalendarDisplayOptions // out
-
-	_calendarDisplayOptions = CalendarDisplayOptions(_cret)
-
-	return _calendarDisplayOptions
-}
-
-// MarkDay places a visual marker on a particular day.
-//
-// The function takes the following parameters:
-//
-//    - day number to mark between 1 and 31.
-//
-func (calendar *Calendar) MarkDay(day uint) {
-	var _arg0 *C.GtkCalendar // out
-	var _arg1 C.guint        // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = C.guint(day)
-
-	C.gtk_calendar_mark_day(_arg0, _arg1)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(day)
-}
-
-// SelectDay selects a day from the current month.
-//
-// The function takes the following parameters:
-//
-//    - day number between 1 and 31, or 0 to unselect the currently selected day.
-//
-func (calendar *Calendar) SelectDay(day uint) {
-	var _arg0 *C.GtkCalendar // out
-	var _arg1 C.guint        // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = C.guint(day)
-
-	C.gtk_calendar_select_day(_arg0, _arg1)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(day)
-}
-
-// SelectMonth shifts the calendar to a different month.
-//
-// The function takes the following parameters:
-//
-//    - month number between 0 and 11.
-//    - year the month is in.
-//
-func (calendar *Calendar) SelectMonth(month, year uint) {
-	var _arg0 *C.GtkCalendar // out
-	var _arg1 C.guint        // out
-	var _arg2 C.guint        // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = C.guint(month)
-	_arg2 = C.guint(year)
-
-	C.gtk_calendar_select_month(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(month)
-	runtime.KeepAlive(year)
-}
-
-// SetDetailFunc installs a function which provides Pango markup with detail
-// information for each day. Examples for such details are holidays or
-// appointments. That information is shown below each day when
-// Calendar:show-details is set. A tooltip containing with full detail
-// information is provided, if the entire text should not fit into the details
-// area, or if Calendar:show-details is not set.
-//
-// The size of the details area can be restricted by setting the
-// Calendar:detail-width-chars and Calendar:detail-height-rows properties.
-//
-// The function takes the following parameters:
-//
-//    - fn: function providing details for each day.
-//
-func (calendar *Calendar) SetDetailFunc(fn CalendarDetailFunc) {
-	var _arg0 *C.GtkCalendar          // out
-	var _arg1 C.GtkCalendarDetailFunc // out
-	var _arg2 C.gpointer
-	var _arg3 C.GDestroyNotify
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = (*[0]byte)(C._gotk4_gtk3_CalendarDetailFunc)
-	_arg2 = C.gpointer(gbox.Assign(fn))
-	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-
-	C.gtk_calendar_set_detail_func(_arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(fn)
-}
-
-// SetDetailHeightRows updates the height of detail cells. See
-// Calendar:detail-height-rows.
-//
-// The function takes the following parameters:
-//
-//    - rows: detail height in rows.
-//
-func (calendar *Calendar) SetDetailHeightRows(rows int) {
-	var _arg0 *C.GtkCalendar // out
-	var _arg1 C.gint         // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = C.gint(rows)
-
-	C.gtk_calendar_set_detail_height_rows(_arg0, _arg1)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(rows)
-}
-
-// SetDetailWidthChars updates the width of detail cells. See
-// Calendar:detail-width-chars.
-//
-// The function takes the following parameters:
-//
-//    - chars: detail width in characters.
-//
-func (calendar *Calendar) SetDetailWidthChars(chars int) {
-	var _arg0 *C.GtkCalendar // out
-	var _arg1 C.gint         // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = C.gint(chars)
-
-	C.gtk_calendar_set_detail_width_chars(_arg0, _arg1)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(chars)
-}
-
-// SetDisplayOptions sets display options (whether to display the heading and
-// the month headings).
-//
-// The function takes the following parameters:
-//
-//    - flags: display options to set.
-//
-func (calendar *Calendar) SetDisplayOptions(flags CalendarDisplayOptions) {
-	var _arg0 *C.GtkCalendar              // out
-	var _arg1 C.GtkCalendarDisplayOptions // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = C.GtkCalendarDisplayOptions(flags)
-
-	C.gtk_calendar_set_display_options(_arg0, _arg1)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(flags)
-}
-
-// UnmarkDay removes the visual marker from a particular day.
-//
-// The function takes the following parameters:
-//
-//    - day number to unmark between 1 and 31.
-//
-func (calendar *Calendar) UnmarkDay(day uint) {
-	var _arg0 *C.GtkCalendar // out
-	var _arg1 C.guint        // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-	_arg1 = C.guint(day)
-
-	C.gtk_calendar_unmark_day(_arg0, _arg1)
-	runtime.KeepAlive(calendar)
-	runtime.KeepAlive(day)
-}
-
-func (calendar *Calendar) daySelected() {
-	gclass := (*C.GtkCalendarClass)(coreglib.PeekParentClass(calendar))
-	fnarg := gclass.day_selected
-
-	var _arg0 *C.GtkCalendar // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C._gotk4_gtk3_Calendar_virtual_day_selected(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(calendar)
-}
-
-func (calendar *Calendar) daySelectedDoubleClick() {
-	gclass := (*C.GtkCalendarClass)(coreglib.PeekParentClass(calendar))
-	fnarg := gclass.day_selected_double_click
-
-	var _arg0 *C.GtkCalendar // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C._gotk4_gtk3_Calendar_virtual_day_selected_double_click(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(calendar)
-}
-
-func (calendar *Calendar) monthChanged() {
-	gclass := (*C.GtkCalendarClass)(coreglib.PeekParentClass(calendar))
-	fnarg := gclass.month_changed
-
-	var _arg0 *C.GtkCalendar // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C._gotk4_gtk3_Calendar_virtual_month_changed(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(calendar)
-}
-
-func (calendar *Calendar) nextMonth() {
-	gclass := (*C.GtkCalendarClass)(coreglib.PeekParentClass(calendar))
-	fnarg := gclass.next_month
-
-	var _arg0 *C.GtkCalendar // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C._gotk4_gtk3_Calendar_virtual_next_month(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(calendar)
-}
-
-func (calendar *Calendar) nextYear() {
-	gclass := (*C.GtkCalendarClass)(coreglib.PeekParentClass(calendar))
-	fnarg := gclass.next_year
-
-	var _arg0 *C.GtkCalendar // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C._gotk4_gtk3_Calendar_virtual_next_year(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(calendar)
-}
-
-func (calendar *Calendar) prevMonth() {
-	gclass := (*C.GtkCalendarClass)(coreglib.PeekParentClass(calendar))
-	fnarg := gclass.prev_month
-
-	var _arg0 *C.GtkCalendar // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C._gotk4_gtk3_Calendar_virtual_prev_month(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(calendar)
-}
-
-func (calendar *Calendar) prevYear() {
-	gclass := (*C.GtkCalendarClass)(coreglib.PeekParentClass(calendar))
-	fnarg := gclass.prev_year
-
-	var _arg0 *C.GtkCalendar // out
-
-	_arg0 = (*C.GtkCalendar)(unsafe.Pointer(coreglib.InternObject(calendar).Native()))
-
-	C._gotk4_gtk3_Calendar_virtual_prev_year(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(calendar)
+func (v *Calendar) ConnectPrevYear(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "prev-year", false, unsafe.Pointer(C._gotk4_gtk3_Calendar_ConnectPrevYear), f)
 }
 
 // CalendarClass: instance of this type is always passed by reference.
@@ -705,12 +221,7 @@ type CalendarClass struct {
 
 // calendarClass is the struct that's finalized.
 type calendarClass struct {
-	native *C.GtkCalendarClass
+	native unsafe.Pointer
 }
 
-func (c *CalendarClass) ParentClass() *WidgetClass {
-	valptr := &c.native.parent_class
-	var _v *WidgetClass // out
-	_v = (*WidgetClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoCalendarClass = girepository.MustFind("Gtk", "CalendarClass")

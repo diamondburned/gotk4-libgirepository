@@ -2,8 +2,10 @@
 
 package gio
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // SETTINGS_BACKEND_EXTENSION_POINT_NAME: extension point for Backend

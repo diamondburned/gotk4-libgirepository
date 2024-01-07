@@ -659,11 +659,12 @@ func (conv *Converter) gocConverter(value *ValueConverted) bool {
 		// ownership, we can't do that, since the Finalizer won't know that and
 		// free the record. Instead, if we cannot free the data once we're done,
 		// then we detach the finalizer so Go can't.
-		if !value.ShouldFree() && types.RecordHasRef(v) == nil {
+		if !value.ShouldFree() && RecordHasRef(v) == nil {
 			value.header.Import("runtime")
-			value.vtmpl(
-				"runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(<.InNamePtr 1>)), nil)",
-			)
+			value.vtmpl(`
+				// !!!: potential memory leak
+				runtime.SetFinalizer(gextras.StructIntern(unsafe.Pointer(<.InNamePtr 1>)), nil)
+			`)
 		}
 		return true
 

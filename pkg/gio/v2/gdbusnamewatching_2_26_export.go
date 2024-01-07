@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gio2_BusNameAppearedCallback
-func _gotk4_gio2_BusNameAppearedCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 *C.gchar, arg4 C.gpointer) {
+func _gotk4_gio2_BusNameAppearedCallback(arg1 *C.void, arg2 *C.gchar, arg3 *C.gchar, arg4 C.gpointer) {
 	var fn BusNameAppearedCallback
 	{
 		v := gbox.Get(uintptr(arg4))
@@ -36,7 +38,7 @@ func _gotk4_gio2_BusNameAppearedCallback(arg1 *C.GDBusConnection, arg2 *C.gchar,
 }
 
 //export _gotk4_gio2_BusNameVanishedCallback
-func _gotk4_gio2_BusNameVanishedCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 C.gpointer) {
+func _gotk4_gio2_BusNameVanishedCallback(arg1 *C.void, arg2 *C.gchar, arg3 C.gpointer) {
 	var fn BusNameVanishedCallback
 	{
 		v := gbox.Get(uintptr(arg3))

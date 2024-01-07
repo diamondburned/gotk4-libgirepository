@@ -3,29 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
-// extern void _gotk4_gtk3_FrameClass_compute_child_allocation(GtkFrame*, GtkAllocation*);
-// void _gotk4_gtk3_Frame_virtual_compute_child_allocation(void* fnptr, GtkFrame* arg0, GtkAllocation* arg1) {
-//   ((void (*)(GtkFrame*, GtkAllocation*))(fnptr))(arg0, arg1);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeFrame = coreglib.Type(C.gtk_frame_get_type())
+	GTypeFrame = coreglib.Type(girepository.MustFind("Gtk", "Frame").RegisteredGType())
 )
 
 func init() {
@@ -36,15 +30,10 @@ func init() {
 
 // FrameOverrides contains methods that are overridable.
 type FrameOverrides struct {
-	// The function takes the following parameters:
-	//
-	ComputeChildAllocation func(allocation *Allocation)
 }
 
 func defaultFrameOverrides(v *Frame) FrameOverrides {
-	return FrameOverrides{
-		ComputeChildAllocation: v.computeChildAllocation,
-	}
+	return FrameOverrides{}
 }
 
 // Frame: frame widget is a bin that surrounds its child with a decorative frame
@@ -105,12 +94,6 @@ func init() {
 }
 
 func initFrameClass(gclass unsafe.Pointer, overrides FrameOverrides, classInitFunc func(*FrameClass)) {
-	pclass := (*C.GtkFrameClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeFrame))))
-
-	if overrides.ComputeChildAllocation != nil {
-		pclass.compute_child_allocation = (*[0]byte)(C._gotk4_gtk3_FrameClass_compute_child_allocation)
-	}
-
 	if classInitFunc != nil {
 		class := (*FrameClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -142,265 +125,6 @@ func marshalFrame(p uintptr) (interface{}, error) {
 	return wrapFrame(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewFrame creates a new Frame, with optional label label. If label is NULL,
-// the label is omitted.
-//
-// The function takes the following parameters:
-//
-//    - label (optional): text to use as the label of the frame.
-//
-// The function returns the following values:
-//
-//    - frame: new Frame widget.
-//
-func NewFrame(label string) *Frame {
-	var _arg1 *C.gchar     // out
-	var _cret *C.GtkWidget // in
-
-	if label != "" {
-		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	_cret = C.gtk_frame_new(_arg1)
-	runtime.KeepAlive(label)
-
-	var _frame *Frame // out
-
-	_frame = wrapFrame(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _frame
-}
-
-// Label: if the frame’s label widget is a Label, returns the text in the label
-// widget. (The frame will have a Label for the label widget if a non-NULL
-// argument was passed to gtk_frame_new().).
-//
-// The function returns the following values:
-//
-//    - utf8 (optional): text in the label, or NULL if there was no label widget
-//      or the lable widget was not a Label. This string is owned by GTK+ and
-//      must not be modified or freed.
-//
-func (frame *Frame) Label() string {
-	var _arg0 *C.GtkFrame // out
-	var _cret *C.gchar    // in
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-
-	_cret = C.gtk_frame_get_label(_arg0)
-	runtime.KeepAlive(frame)
-
-	var _utf8 string // out
-
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	}
-
-	return _utf8
-}
-
-// LabelAlign retrieves the X and Y alignment of the frame’s label. See
-// gtk_frame_set_label_align().
-//
-// The function returns the following values:
-//
-//    - xalign (optional): location to store X alignment of frame’s label, or
-//      NULL.
-//    - yalign (optional): location to store X alignment of frame’s label, or
-//      NULL.
-//
-func (frame *Frame) LabelAlign() (xalign, yalign float32) {
-	var _arg0 *C.GtkFrame // out
-	var _arg1 C.gfloat    // in
-	var _arg2 C.gfloat    // in
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-
-	C.gtk_frame_get_label_align(_arg0, &_arg1, &_arg2)
-	runtime.KeepAlive(frame)
-
-	var _xalign float32 // out
-	var _yalign float32 // out
-
-	_xalign = float32(_arg1)
-	_yalign = float32(_arg2)
-
-	return _xalign, _yalign
-}
-
-// LabelWidget retrieves the label widget for the frame. See
-// gtk_frame_set_label_widget().
-//
-// The function returns the following values:
-//
-//    - widget (optional): label widget, or NULL if there is none.
-//
-func (frame *Frame) LabelWidget() Widgetter {
-	var _arg0 *C.GtkFrame  // out
-	var _cret *C.GtkWidget // in
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-
-	_cret = C.gtk_frame_get_label_widget(_arg0)
-	runtime.KeepAlive(frame)
-
-	var _widget Widgetter // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Widgetter)
-				return ok
-			})
-			rv, ok := casted.(Widgetter)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-			}
-			_widget = rv
-		}
-	}
-
-	return _widget
-}
-
-// ShadowType retrieves the shadow type of the frame. See
-// gtk_frame_set_shadow_type().
-//
-// The function returns the following values:
-//
-//    - shadowType: current shadow type of the frame.
-//
-func (frame *Frame) ShadowType() ShadowType {
-	var _arg0 *C.GtkFrame     // out
-	var _cret C.GtkShadowType // in
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-
-	_cret = C.gtk_frame_get_shadow_type(_arg0)
-	runtime.KeepAlive(frame)
-
-	var _shadowType ShadowType // out
-
-	_shadowType = ShadowType(_cret)
-
-	return _shadowType
-}
-
-// SetLabel removes the current Frame:label-widget. If label is not NULL,
-// creates a new Label with that text and adds it as the Frame:label-widget.
-//
-// The function takes the following parameters:
-//
-//    - label (optional): text to use as the label of the frame.
-//
-func (frame *Frame) SetLabel(label string) {
-	var _arg0 *C.GtkFrame // out
-	var _arg1 *C.gchar    // out
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-	if label != "" {
-		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	C.gtk_frame_set_label(_arg0, _arg1)
-	runtime.KeepAlive(frame)
-	runtime.KeepAlive(label)
-}
-
-// SetLabelAlign sets the alignment of the frame widget’s label. The default
-// values for a newly created frame are 0.0 and 0.5.
-//
-// The function takes the following parameters:
-//
-//    - xalign: position of the label along the top edge of the widget. A value
-//      of 0.0 represents left alignment; 1.0 represents right alignment.
-//    - yalign: y alignment of the label. A value of 0.0 aligns under the frame;
-//      1.0 aligns above the frame. If the values are exactly 0.0 or 1.0 the gap
-//      in the frame won’t be painted because the label will be completely above
-//      or below the frame.
-//
-func (frame *Frame) SetLabelAlign(xalign, yalign float32) {
-	var _arg0 *C.GtkFrame // out
-	var _arg1 C.gfloat    // out
-	var _arg2 C.gfloat    // out
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-	_arg1 = C.gfloat(xalign)
-	_arg2 = C.gfloat(yalign)
-
-	C.gtk_frame_set_label_align(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(frame)
-	runtime.KeepAlive(xalign)
-	runtime.KeepAlive(yalign)
-}
-
-// SetLabelWidget sets the Frame:label-widget for the frame. This is the widget
-// that will appear embedded in the top edge of the frame as a title.
-//
-// The function takes the following parameters:
-//
-//    - labelWidget (optional): new label widget.
-//
-func (frame *Frame) SetLabelWidget(labelWidget Widgetter) {
-	var _arg0 *C.GtkFrame  // out
-	var _arg1 *C.GtkWidget // out
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-	if labelWidget != nil {
-		_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(labelWidget).Native()))
-	}
-
-	C.gtk_frame_set_label_widget(_arg0, _arg1)
-	runtime.KeepAlive(frame)
-	runtime.KeepAlive(labelWidget)
-}
-
-// SetShadowType sets the Frame:shadow-type for frame, i.e. whether it is drawn
-// without (GTK_SHADOW_NONE) or with (other values) a visible border. Values
-// other than GTK_SHADOW_NONE are treated identically by GtkFrame. The chosen
-// type is applied by removing or adding the .flat class to the CSS node named
-// border.
-//
-// The function takes the following parameters:
-//
-//    - typ: new ShadowType.
-//
-func (frame *Frame) SetShadowType(typ ShadowType) {
-	var _arg0 *C.GtkFrame     // out
-	var _arg1 C.GtkShadowType // out
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-	_arg1 = C.GtkShadowType(typ)
-
-	C.gtk_frame_set_shadow_type(_arg0, _arg1)
-	runtime.KeepAlive(frame)
-	runtime.KeepAlive(typ)
-}
-
-// The function takes the following parameters:
-//
-func (frame *Frame) computeChildAllocation(allocation *Allocation) {
-	gclass := (*C.GtkFrameClass)(coreglib.PeekParentClass(frame))
-	fnarg := gclass.compute_child_allocation
-
-	var _arg0 *C.GtkFrame      // out
-	var _arg1 *C.GtkAllocation // out
-
-	_arg0 = (*C.GtkFrame)(unsafe.Pointer(coreglib.InternObject(frame).Native()))
-	_arg1 = (*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(allocation)))
-	type _ = *Allocation
-	type _ = *gdk.Rectangle
-
-	C._gotk4_gtk3_Frame_virtual_compute_child_allocation(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(frame)
-	runtime.KeepAlive(allocation)
-}
-
 // FrameClass: instance of this type is always passed by reference.
 type FrameClass struct {
 	*frameClass
@@ -408,13 +132,7 @@ type FrameClass struct {
 
 // frameClass is the struct that's finalized.
 type frameClass struct {
-	native *C.GtkFrameClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (f *FrameClass) ParentClass() *BinClass {
-	valptr := &f.native.parent_class
-	var _v *BinClass // out
-	_v = (*BinClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoFrameClass = girepository.MustFind("Gtk", "FrameClass")

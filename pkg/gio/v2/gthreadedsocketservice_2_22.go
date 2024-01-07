@@ -3,26 +3,23 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern gboolean _gotk4_gio2_ThreadedSocketService_ConnectRun(gpointer, GSocketConnection*, GObject, guintptr);
-// extern gboolean _gotk4_gio2_ThreadedSocketServiceClass_run(GThreadedSocketService*, GSocketConnection*, GObject*);
-// gboolean _gotk4_gio2_ThreadedSocketService_virtual_run(void* fnptr, GThreadedSocketService* arg0, GSocketConnection* arg1, GObject* arg2) {
-//   return ((gboolean (*)(GThreadedSocketService*, GSocketConnection*, GObject*))(fnptr))(arg0, arg1, arg2);
-// };
+// extern gboolean _gotk4_gio2_ThreadedSocketService_ConnectRun(gpointer, void*, GObject, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeThreadedSocketService = coreglib.Type(C.g_threaded_socket_service_get_type())
+	GTypeThreadedSocketService = coreglib.Type(girepository.MustFind("Gio", "ThreadedSocketService").RegisteredGType())
 )
 
 func init() {
@@ -33,20 +30,10 @@ func init() {
 
 // ThreadedSocketServiceOverrides contains methods that are overridable.
 type ThreadedSocketServiceOverrides struct {
-	// The function takes the following parameters:
-	//
-	//    - connection
-	//    - sourceObject
-	//
-	// The function returns the following values:
-	//
-	Run func(connection *SocketConnection, sourceObject *coreglib.Object) bool
 }
 
 func defaultThreadedSocketServiceOverrides(v *ThreadedSocketService) ThreadedSocketServiceOverrides {
-	return ThreadedSocketServiceOverrides{
-		Run: v.run,
-	}
+	return ThreadedSocketServiceOverrides{}
 }
 
 // ThreadedSocketService is a simple subclass of Service that handles incoming
@@ -81,12 +68,6 @@ func init() {
 }
 
 func initThreadedSocketServiceClass(gclass unsafe.Pointer, overrides ThreadedSocketServiceOverrides, classInitFunc func(*ThreadedSocketServiceClass)) {
-	pclass := (*C.GThreadedSocketServiceClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeThreadedSocketService))))
-
-	if overrides.Run != nil {
-		pclass.run = (*[0]byte)(C._gotk4_gio2_ThreadedSocketServiceClass_run)
-	}
-
 	if classInitFunc != nil {
 		class := (*ThreadedSocketServiceClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -113,66 +94,4 @@ func marshalThreadedSocketService(p uintptr) (interface{}, error) {
 // closed.
 func (v *ThreadedSocketService) ConnectRun(f func(connection *SocketConnection, sourceObject *coreglib.Object) (ok bool)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "run", false, unsafe.Pointer(C._gotk4_gio2_ThreadedSocketService_ConnectRun), f)
-}
-
-// NewThreadedSocketService creates a new SocketService with no listeners.
-// Listeners must be added with one of the Listener "add" methods.
-//
-// The function takes the following parameters:
-//
-//    - maxThreads: maximal number of threads to execute concurrently handling
-//      incoming clients, -1 means no limit.
-//
-// The function returns the following values:
-//
-//    - threadedSocketService: new Service.
-//
-func NewThreadedSocketService(maxThreads int) *ThreadedSocketService {
-	var _arg1 C.int             // out
-	var _cret *C.GSocketService // in
-
-	_arg1 = C.int(maxThreads)
-
-	_cret = C.g_threaded_socket_service_new(_arg1)
-	runtime.KeepAlive(maxThreads)
-
-	var _threadedSocketService *ThreadedSocketService // out
-
-	_threadedSocketService = wrapThreadedSocketService(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _threadedSocketService
-}
-
-// The function takes the following parameters:
-//
-//    - connection
-//    - sourceObject
-//
-// The function returns the following values:
-//
-func (service *ThreadedSocketService) run(connection *SocketConnection, sourceObject *coreglib.Object) bool {
-	gclass := (*C.GThreadedSocketServiceClass)(coreglib.PeekParentClass(service))
-	fnarg := gclass.run
-
-	var _arg0 *C.GThreadedSocketService // out
-	var _arg1 *C.GSocketConnection      // out
-	var _arg2 *C.GObject                // out
-	var _cret C.gboolean                // in
-
-	_arg0 = (*C.GThreadedSocketService)(unsafe.Pointer(coreglib.InternObject(service).Native()))
-	_arg1 = (*C.GSocketConnection)(unsafe.Pointer(coreglib.InternObject(connection).Native()))
-	_arg2 = (*C.GObject)(unsafe.Pointer(sourceObject.Native()))
-
-	_cret = C._gotk4_gio2_ThreadedSocketService_virtual_run(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(service)
-	runtime.KeepAlive(connection)
-	runtime.KeepAlive(sourceObject)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
 }

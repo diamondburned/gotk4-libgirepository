@@ -10,14 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/pango"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_FontFilterFunc
-func _gotk4_gtk3_FontFilterFunc(arg1 *C.PangoFontFamily, arg2 *C.PangoFontFace, arg3 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk3_FontFilterFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) (cret C.gboolean) {
 	var fn FontFilterFunc
 	{
 		v := gbox.Get(uintptr(arg3))

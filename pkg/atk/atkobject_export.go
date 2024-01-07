@@ -10,8 +10,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_atk1_Function
@@ -37,7 +39,7 @@ func _gotk4_atk1_Function(arg1 C.gpointer) (cret C.gboolean) {
 }
 
 //export _gotk4_atk1_Object_ConnectActiveDescendantChanged
-func _gotk4_atk1_Object_ConnectActiveDescendantChanged(arg0 C.gpointer, arg1 *C.gpointer, arg2 C.guintptr) {
+func _gotk4_atk1_Object_ConnectActiveDescendantChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(arg1 *AtkObject)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -57,7 +59,7 @@ func _gotk4_atk1_Object_ConnectActiveDescendantChanged(arg0 C.gpointer, arg1 *C.
 }
 
 //export _gotk4_atk1_Object_ConnectChildrenChanged
-func _gotk4_atk1_Object_ConnectChildrenChanged(arg0 C.gpointer, arg1 C.guint, arg2 *C.gpointer, arg3 C.guintptr) {
+func _gotk4_atk1_Object_ConnectChildrenChanged(arg0 C.gpointer, arg1 C.guint, arg2 *C.void, arg3 C.guintptr) {
 	var f func(arg1 uint, arg2 *AtkObject)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -101,7 +103,7 @@ func _gotk4_atk1_Object_ConnectFocusEvent(arg0 C.gpointer, arg1 C.gboolean, arg2
 }
 
 //export _gotk4_atk1_Object_ConnectPropertyChange
-func _gotk4_atk1_Object_ConnectPropertyChange(arg0 C.gpointer, arg1 *C.gpointer, arg2 C.guintptr) {
+func _gotk4_atk1_Object_ConnectPropertyChange(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(arg1 *PropertyValues)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

@@ -2,8 +2,10 @@
 
 package gio
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // FILE_ATTRIBUTE_DOS_IS_MOUNTPOINT: key in the "dos" namespace for checking if

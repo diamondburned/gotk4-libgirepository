@@ -3,21 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeLayoutChild = coreglib.Type(C.gtk_layout_child_get_type())
+	GTypeLayoutChild = coreglib.Type(girepository.MustFind("Gtk", "LayoutChild").RegisteredGType())
 )
 
 func init() {
@@ -89,90 +90,13 @@ func marshalLayoutChild(p uintptr) (interface{}, error) {
 	return wrapLayoutChild(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-func (layoutChild *LayoutChild) baseLayoutChild() *LayoutChild {
-	return layoutChild
+func (v *LayoutChild) baseLayoutChild() *LayoutChild {
+	return v
 }
 
 // BaseLayoutChild returns the underlying base object.
 func BaseLayoutChild(obj LayoutChilder) *LayoutChild {
 	return obj.baseLayoutChild()
-}
-
-// ChildWidget retrieves the GtkWidget associated to the given layout_child.
-//
-// The function returns the following values:
-//
-//    - widget: Widget.
-//
-func (layoutChild *LayoutChild) ChildWidget() Widgetter {
-	var _arg0 *C.GtkLayoutChild // out
-	var _cret *C.GtkWidget      // in
-
-	_arg0 = (*C.GtkLayoutChild)(unsafe.Pointer(coreglib.InternObject(layoutChild).Native()))
-
-	_cret = C.gtk_layout_child_get_child_widget(_arg0)
-	runtime.KeepAlive(layoutChild)
-
-	var _widget Widgetter // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gtk.Widgetter is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Widgetter)
-			return ok
-		})
-		rv, ok := casted.(Widgetter)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-		}
-		_widget = rv
-	}
-
-	return _widget
-}
-
-// LayoutManager retrieves the GtkLayoutManager instance that created the given
-// layout_child.
-//
-// The function returns the following values:
-//
-//    - layoutManager: GtkLayoutManager.
-//
-func (layoutChild *LayoutChild) LayoutManager() LayoutManagerer {
-	var _arg0 *C.GtkLayoutChild   // out
-	var _cret *C.GtkLayoutManager // in
-
-	_arg0 = (*C.GtkLayoutChild)(unsafe.Pointer(coreglib.InternObject(layoutChild).Native()))
-
-	_cret = C.gtk_layout_child_get_layout_manager(_arg0)
-	runtime.KeepAlive(layoutChild)
-
-	var _layoutManager LayoutManagerer // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gtk.LayoutManagerer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(LayoutManagerer)
-			return ok
-		})
-		rv, ok := casted.(LayoutManagerer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.LayoutManagerer")
-		}
-		_layoutManager = rv
-	}
-
-	return _layoutManager
 }
 
 // LayoutChildClass: instance of this type is always passed by reference.
@@ -182,5 +106,7 @@ type LayoutChildClass struct {
 
 // layoutChildClass is the struct that's finalized.
 type layoutChildClass struct {
-	native *C.GtkLayoutChildClass
+	native unsafe.Pointer
 }
+
+var GIRInfoLayoutChildClass = girepository.MustFind("Gtk", "LayoutChildClass")

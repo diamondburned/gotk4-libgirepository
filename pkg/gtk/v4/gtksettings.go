@@ -3,21 +3,21 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSettings = coreglib.Type(C.gtk_settings_get_type())
+	GTypeSettings = coreglib.Type(girepository.MustFind("Gtk", "Settings").RegisteredGType())
 )
 
 func init() {
@@ -74,78 +74,4 @@ func wrapSettings(obj *coreglib.Object) *Settings {
 
 func marshalSettings(p uintptr) (interface{}, error) {
 	return wrapSettings(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// ResetProperty undoes the effect of calling g_object_set() to install an
-// application-specific value for a setting.
-//
-// After this call, the setting will again follow the session-wide value for
-// this setting.
-//
-// The function takes the following parameters:
-//
-//    - name of the setting to reset.
-//
-func (settings *Settings) ResetProperty(name string) {
-	var _arg0 *C.GtkSettings // out
-	var _arg1 *C.char        // out
-
-	_arg0 = (*C.GtkSettings)(unsafe.Pointer(coreglib.InternObject(settings).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_settings_reset_property(_arg0, _arg1)
-	runtime.KeepAlive(settings)
-	runtime.KeepAlive(name)
-}
-
-// SettingsGetDefault gets the GtkSettings object for the default display,
-// creating it if necessary.
-//
-// See gtk.Settings.GetForDisplay.
-//
-// The function returns the following values:
-//
-//    - settings (optional): GtkSettings object. If there is no default display,
-//      then returns NULL.
-//
-func SettingsGetDefault() *Settings {
-	var _cret *C.GtkSettings // in
-
-	_cret = C.gtk_settings_get_default()
-
-	var _settings *Settings // out
-
-	if _cret != nil {
-		_settings = wrapSettings(coreglib.Take(unsafe.Pointer(_cret)))
-	}
-
-	return _settings
-}
-
-// SettingsGetForDisplay gets the GtkSettings object for display, creating it if
-// necessary.
-//
-// The function takes the following parameters:
-//
-//    - display: GdkDisplay.
-//
-// The function returns the following values:
-//
-//    - settings: GtkSettings object.
-//
-func SettingsGetForDisplay(display *gdk.Display) *Settings {
-	var _arg1 *C.GdkDisplay  // out
-	var _cret *C.GtkSettings // in
-
-	_arg1 = (*C.GdkDisplay)(unsafe.Pointer(coreglib.InternObject(display).Native()))
-
-	_cret = C.gtk_settings_get_for_display(_arg1)
-	runtime.KeepAlive(display)
-
-	var _settings *Settings // out
-
-	_settings = wrapSettings(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _settings
 }

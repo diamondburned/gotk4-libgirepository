@@ -4,22 +4,23 @@ package gtk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeStringFilterMatchMode = coreglib.Type(C.gtk_string_filter_match_mode_get_type())
-	GTypeStringFilter          = coreglib.Type(C.gtk_string_filter_get_type())
+	GTypeStringFilterMatchMode = coreglib.Type(girepository.MustFind("Gtk", "StringFilterMatchMode").RegisteredGType())
+	GTypeStringFilter          = coreglib.Type(girepository.MustFind("Gtk", "StringFilter").RegisteredGType())
 )
 
 func init() {
@@ -118,228 +119,6 @@ func marshalStringFilter(p uintptr) (interface{}, error) {
 	return wrapStringFilter(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewStringFilter creates a new string filter.
-//
-// You will want to set up the filter by providing a string to search for and by
-// providing a property to look up on the item.
-//
-// The function takes the following parameters:
-//
-//    - expression (optional) to evaluate or NULL for none.
-//
-// The function returns the following values:
-//
-//    - stringFilter: new GtkStringFilter.
-//
-func NewStringFilter(expression Expressioner) *StringFilter {
-	var _arg1 *C.GtkExpression   // out
-	var _cret *C.GtkStringFilter // in
-
-	if expression != nil {
-		_arg1 = (*C.GtkExpression)(unsafe.Pointer(coreglib.InternObject(expression).Native()))
-		C.g_object_ref(C.gpointer(coreglib.InternObject(expression).Native()))
-	}
-
-	_cret = C.gtk_string_filter_new(_arg1)
-	runtime.KeepAlive(expression)
-
-	var _stringFilter *StringFilter // out
-
-	_stringFilter = wrapStringFilter(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _stringFilter
-}
-
-// Expression gets the expression that the string filter uses to obtain strings
-// from items.
-//
-// The function returns the following values:
-//
-//    - expression (optional): GtkExpression.
-//
-func (self *StringFilter) Expression() Expressioner {
-	var _arg0 *C.GtkStringFilter // out
-	var _cret *C.GtkExpression   // in
-
-	_arg0 = (*C.GtkStringFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_string_filter_get_expression(_arg0)
-	runtime.KeepAlive(self)
-
-	var _expression Expressioner // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Expressioner)
-				return ok
-			})
-			rv, ok := casted.(Expressioner)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Expressioner")
-			}
-			_expression = rv
-		}
-	}
-
-	return _expression
-}
-
-// IgnoreCase returns whether the filter ignores case differences.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the filter ignores case.
-//
-func (self *StringFilter) IgnoreCase() bool {
-	var _arg0 *C.GtkStringFilter // out
-	var _cret C.gboolean         // in
-
-	_arg0 = (*C.GtkStringFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_string_filter_get_ignore_case(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// MatchMode returns the match mode that the filter is using.
-//
-// The function returns the following values:
-//
-//    - stringFilterMatchMode: match mode of the filter.
-//
-func (self *StringFilter) MatchMode() StringFilterMatchMode {
-	var _arg0 *C.GtkStringFilter         // out
-	var _cret C.GtkStringFilterMatchMode // in
-
-	_arg0 = (*C.GtkStringFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_string_filter_get_match_mode(_arg0)
-	runtime.KeepAlive(self)
-
-	var _stringFilterMatchMode StringFilterMatchMode // out
-
-	_stringFilterMatchMode = StringFilterMatchMode(_cret)
-
-	return _stringFilterMatchMode
-}
-
-// Search gets the search term.
-//
-// The function returns the following values:
-//
-//    - utf8 (optional): search term.
-//
-func (self *StringFilter) Search() string {
-	var _arg0 *C.GtkStringFilter // out
-	var _cret *C.char            // in
-
-	_arg0 = (*C.GtkStringFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_string_filter_get_search(_arg0)
-	runtime.KeepAlive(self)
-
-	var _utf8 string // out
-
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	}
-
-	return _utf8
-}
-
-// SetExpression sets the expression that the string filter uses to obtain
-// strings from items.
-//
-// The expression must have a value type of G_TYPE_STRING.
-//
-// The function takes the following parameters:
-//
-//    - expression (optional): GtkExpression.
-//
-func (self *StringFilter) SetExpression(expression Expressioner) {
-	var _arg0 *C.GtkStringFilter // out
-	var _arg1 *C.GtkExpression   // out
-
-	_arg0 = (*C.GtkStringFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if expression != nil {
-		_arg1 = (*C.GtkExpression)(unsafe.Pointer(coreglib.InternObject(expression).Native()))
-	}
-
-	C.gtk_string_filter_set_expression(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(expression)
-}
-
-// SetIgnoreCase sets whether the filter ignores case differences.
-//
-// The function takes the following parameters:
-//
-//    - ignoreCase: TRUE to ignore case.
-//
-func (self *StringFilter) SetIgnoreCase(ignoreCase bool) {
-	var _arg0 *C.GtkStringFilter // out
-	var _arg1 C.gboolean         // out
-
-	_arg0 = (*C.GtkStringFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if ignoreCase {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_string_filter_set_ignore_case(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(ignoreCase)
-}
-
-// SetMatchMode sets the match mode for the filter.
-//
-// The function takes the following parameters:
-//
-//    - mode: new match mode.
-//
-func (self *StringFilter) SetMatchMode(mode StringFilterMatchMode) {
-	var _arg0 *C.GtkStringFilter         // out
-	var _arg1 C.GtkStringFilterMatchMode // out
-
-	_arg0 = (*C.GtkStringFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = C.GtkStringFilterMatchMode(mode)
-
-	C.gtk_string_filter_set_match_mode(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(mode)
-}
-
-// SetSearch sets the string to search for.
-//
-// The function takes the following parameters:
-//
-//    - search (optional): string to search for or NULL to clear the search.
-//
-func (self *StringFilter) SetSearch(search string) {
-	var _arg0 *C.GtkStringFilter // out
-	var _arg1 *C.char            // out
-
-	_arg0 = (*C.GtkStringFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if search != "" {
-		_arg1 = (*C.char)(unsafe.Pointer(C.CString(search)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	C.gtk_string_filter_set_search(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(search)
-}
-
 // StringFilterClass: instance of this type is always passed by reference.
 type StringFilterClass struct {
 	*stringFilterClass
@@ -347,12 +126,7 @@ type StringFilterClass struct {
 
 // stringFilterClass is the struct that's finalized.
 type stringFilterClass struct {
-	native *C.GtkStringFilterClass
+	native unsafe.Pointer
 }
 
-func (s *StringFilterClass) ParentClass() *FilterClass {
-	valptr := &s.native.parent_class
-	var _v *FilterClass // out
-	_v = (*FilterClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoStringFilterClass = girepository.MustFind("Gtk", "StringFilterClass")

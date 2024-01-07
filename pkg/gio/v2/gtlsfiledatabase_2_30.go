@@ -3,21 +3,21 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTLSFileDatabase = coreglib.Type(C.g_tls_file_database_get_type())
+	GTypeTLSFileDatabase = coreglib.Type(girepository.MustFind("Gio", "TlsFileDatabase").RegisteredGType())
 )
 
 func init() {
@@ -76,39 +76,4 @@ func (v *TLSFileDatabase) baseTLSFileDatabase() *TLSFileDatabase {
 // BaseTLSFileDatabase returns the underlying base object.
 func BaseTLSFileDatabase(obj TLSFileDatabaser) *TLSFileDatabase {
 	return obj.baseTLSFileDatabase()
-}
-
-// NewTLSFileDatabase creates a new FileDatabase which uses anchor certificate
-// authorities in anchors to verify certificate chains.
-//
-// The certificates in anchors must be PEM encoded.
-//
-// The function takes the following parameters:
-//
-//    - anchors: filename of anchor certificate authorities.
-//
-// The function returns the following values:
-//
-//    - tlsFileDatabase: new FileDatabase, or NULL on error.
-//
-func NewTLSFileDatabase(anchors string) (*TLSFileDatabase, error) {
-	var _arg1 *C.gchar        // out
-	var _cret *C.GTlsDatabase // in
-	var _cerr *C.GError       // in
-
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(anchors)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.g_tls_file_database_new(_arg1, &_cerr)
-	runtime.KeepAlive(anchors)
-
-	var _tlsFileDatabase *TLSFileDatabase // out
-	var _goerr error                      // out
-
-	_tlsFileDatabase = wrapTLSFileDatabase(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _tlsFileDatabase, _goerr
 }

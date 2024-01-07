@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // TLSPasswordClass class structure for Password.
@@ -15,5 +23,7 @@ type TLSPasswordClass struct {
 
 // tlsPasswordClass is the struct that's finalized.
 type tlsPasswordClass struct {
-	native *C.GTlsPasswordClass
+	native unsafe.Pointer
 }
+
+var GIRInfoTLSPasswordClass = girepository.MustFind("Gio", "TlsPasswordClass")

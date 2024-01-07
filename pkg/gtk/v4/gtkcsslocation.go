@@ -6,10 +6,13 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // CSSLocation represents a location in a file or other source of data parsed by
@@ -31,8 +34,10 @@ type CSSLocation struct {
 
 // cssLocation is the struct that's finalized.
 type cssLocation struct {
-	native *C.GtkCssLocation
+	native unsafe.Pointer
 }
+
+var GIRInfoCSSLocation = girepository.MustFind("Gtk", "CssLocation")
 
 // NewCSSLocation creates a new CSSLocation instance from the given
 // fields. Beware that this function allocates on the Go heap; be careful
@@ -49,20 +54,37 @@ func NewCSSLocation(bytes, chars, lines, lineBytes, lineChars uint) CSSLocation 
 	var f4 C.gsize // out
 	f4 = C.gsize(lineChars)
 
-	v := C.GtkCssLocation{
-		bytes:      f0,
-		chars:      f1,
-		lines:      f2,
-		line_bytes: f3,
-		line_chars: f4,
-	}
+	size := GIRInfoCSSLocation.StructSize()
+	native := make([]byte, size)
+	gextras.Sink(&native[0])
 
-	return *(*CSSLocation)(gextras.NewStructNative(unsafe.Pointer(&v)))
+	offset0 := GIRInfoCSSLocation.StructFieldOffset("bytes")
+	valptr0 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset0))
+	*valptr0 = f0
+
+	offset1 := GIRInfoCSSLocation.StructFieldOffset("chars")
+	valptr1 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset1))
+	*valptr1 = f1
+
+	offset2 := GIRInfoCSSLocation.StructFieldOffset("lines")
+	valptr2 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset2))
+	*valptr2 = f2
+
+	offset3 := GIRInfoCSSLocation.StructFieldOffset("line_bytes")
+	valptr3 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset3))
+	*valptr3 = f3
+
+	offset4 := GIRInfoCSSLocation.StructFieldOffset("line_chars")
+	valptr4 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset4))
+	*valptr4 = f4
+
+	return *(*CSSLocation)(gextras.NewStructNative(unsafe.Pointer(&native[0])))
 }
 
 // Bytes: number of bytes parsed since the beginning.
 func (c *CSSLocation) Bytes() uint {
-	valptr := &c.native.bytes
+	offset := GIRInfoCSSLocation.StructFieldOffset("bytes")
+	valptr := (*uint)(unsafe.Add(c.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -70,7 +92,8 @@ func (c *CSSLocation) Bytes() uint {
 
 // Chars: number of characters parsed since the beginning.
 func (c *CSSLocation) Chars() uint {
-	valptr := &c.native.chars
+	offset := GIRInfoCSSLocation.StructFieldOffset("chars")
+	valptr := (*uint)(unsafe.Add(c.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -79,7 +102,8 @@ func (c *CSSLocation) Chars() uint {
 // Lines: number of full lines that have been parsed If you want to display this
 // as a line number, you need to add 1 to this.
 func (c *CSSLocation) Lines() uint {
-	valptr := &c.native.lines
+	offset := GIRInfoCSSLocation.StructFieldOffset("lines")
+	valptr := (*uint)(unsafe.Add(c.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -87,7 +111,8 @@ func (c *CSSLocation) Lines() uint {
 
 // LineBytes: number of bytes parsed since the last line break.
 func (c *CSSLocation) LineBytes() uint {
-	valptr := &c.native.line_bytes
+	offset := GIRInfoCSSLocation.StructFieldOffset("line_bytes")
+	valptr := (*uint)(unsafe.Add(c.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -95,7 +120,8 @@ func (c *CSSLocation) LineBytes() uint {
 
 // LineChars: number of characters parsed since the last line break.
 func (c *CSSLocation) LineChars() uint {
-	valptr := &c.native.line_chars
+	offset := GIRInfoCSSLocation.StructFieldOffset("line_chars")
+	valptr := (*uint)(unsafe.Add(c.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -103,31 +129,36 @@ func (c *CSSLocation) LineChars() uint {
 
 // Bytes: number of bytes parsed since the beginning.
 func (c *CSSLocation) SetBytes(bytes uint) {
-	valptr := &c.native.bytes
+	offset := GIRInfoCSSLocation.StructFieldOffset("bytes")
+	valptr := (*C.gsize)(unsafe.Add(c.native, offset))
 	*valptr = C.gsize(bytes)
 }
 
 // Chars: number of characters parsed since the beginning.
 func (c *CSSLocation) SetChars(chars uint) {
-	valptr := &c.native.chars
+	offset := GIRInfoCSSLocation.StructFieldOffset("chars")
+	valptr := (*C.gsize)(unsafe.Add(c.native, offset))
 	*valptr = C.gsize(chars)
 }
 
 // Lines: number of full lines that have been parsed If you want to display this
 // as a line number, you need to add 1 to this.
 func (c *CSSLocation) SetLines(lines uint) {
-	valptr := &c.native.lines
+	offset := GIRInfoCSSLocation.StructFieldOffset("lines")
+	valptr := (*C.gsize)(unsafe.Add(c.native, offset))
 	*valptr = C.gsize(lines)
 }
 
 // LineBytes: number of bytes parsed since the last line break.
 func (c *CSSLocation) SetLineBytes(lineBytes uint) {
-	valptr := &c.native.line_bytes
+	offset := GIRInfoCSSLocation.StructFieldOffset("line_bytes")
+	valptr := (*C.gsize)(unsafe.Add(c.native, offset))
 	*valptr = C.gsize(lineBytes)
 }
 
 // LineChars: number of characters parsed since the last line break.
 func (c *CSSLocation) SetLineChars(lineChars uint) {
-	valptr := &c.native.line_chars
+	offset := GIRInfoCSSLocation.StructFieldOffset("line_chars")
+	valptr := (*C.gsize)(unsafe.Add(c.native, offset))
 	*valptr = C.gsize(lineChars)
 }

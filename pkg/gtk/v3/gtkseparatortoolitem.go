@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSeparatorToolItem = coreglib.Type(C.gtk_separator_tool_item_get_type())
+	GTypeSeparatorToolItem = coreglib.Type(girepository.MustFind("Gtk", "SeparatorToolItem").RegisteredGType())
 )
 
 func init() {
@@ -108,71 +107,6 @@ func marshalSeparatorToolItem(p uintptr) (interface{}, error) {
 	return wrapSeparatorToolItem(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewSeparatorToolItem: create a new SeparatorToolItem.
-//
-// The function returns the following values:
-//
-//    - separatorToolItem: new SeparatorToolItem.
-//
-func NewSeparatorToolItem() *SeparatorToolItem {
-	var _cret *C.GtkToolItem // in
-
-	_cret = C.gtk_separator_tool_item_new()
-
-	var _separatorToolItem *SeparatorToolItem // out
-
-	_separatorToolItem = wrapSeparatorToolItem(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _separatorToolItem
-}
-
-// Draw returns whether item is drawn as a line, or just blank. See
-// gtk_separator_tool_item_set_draw().
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if item is drawn as a line, or just blank.
-//
-func (item *SeparatorToolItem) Draw() bool {
-	var _arg0 *C.GtkSeparatorToolItem // out
-	var _cret C.gboolean              // in
-
-	_arg0 = (*C.GtkSeparatorToolItem)(unsafe.Pointer(coreglib.InternObject(item).Native()))
-
-	_cret = C.gtk_separator_tool_item_get_draw(_arg0)
-	runtime.KeepAlive(item)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetDraw: whether item is drawn as a vertical line, or just blank. Setting
-// this to FALSE along with gtk_tool_item_set_expand() is useful to create an
-// item that forces following items to the end of the toolbar.
-//
-// The function takes the following parameters:
-//
-//    - draw: whether item is drawn as a vertical line.
-//
-func (item *SeparatorToolItem) SetDraw(draw bool) {
-	var _arg0 *C.GtkSeparatorToolItem // out
-	var _arg1 C.gboolean              // out
-
-	_arg0 = (*C.GtkSeparatorToolItem)(unsafe.Pointer(coreglib.InternObject(item).Native()))
-	if draw {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_separator_tool_item_set_draw(_arg0, _arg1)
-	runtime.KeepAlive(item)
-	runtime.KeepAlive(draw)
-}
-
 // SeparatorToolItemClass: instance of this type is always passed by reference.
 type SeparatorToolItemClass struct {
 	*separatorToolItemClass
@@ -180,13 +114,7 @@ type SeparatorToolItemClass struct {
 
 // separatorToolItemClass is the struct that's finalized.
 type separatorToolItemClass struct {
-	native *C.GtkSeparatorToolItemClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (s *SeparatorToolItemClass) ParentClass() *ToolItemClass {
-	valptr := &s.native.parent_class
-	var _v *ToolItemClass // out
-	_v = (*ToolItemClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoSeparatorToolItemClass = girepository.MustFind("Gtk", "SeparatorToolItemClass")

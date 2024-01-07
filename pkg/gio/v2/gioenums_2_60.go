@@ -6,17 +6,19 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypePollableReturn = coreglib.Type(C.g_pollable_return_get_type())
+	GTypePollableReturn = coreglib.Type(girepository.MustFind("Gio", "PollableReturn").RegisteredGType())
 )
 
 func init() {

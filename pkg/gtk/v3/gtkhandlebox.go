@@ -3,34 +3,25 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
-// extern void _gotk4_gtk3_HandleBox_ConnectChildDetached(gpointer, GtkWidget*, guintptr);
-// extern void _gotk4_gtk3_HandleBox_ConnectChildAttached(gpointer, GtkWidget*, guintptr);
-// extern void _gotk4_gtk3_HandleBoxClass_child_detached(GtkHandleBox*, GtkWidget*);
-// extern void _gotk4_gtk3_HandleBoxClass_child_attached(GtkHandleBox*, GtkWidget*);
-// void _gotk4_gtk3_HandleBox_virtual_child_attached(void* fnptr, GtkHandleBox* arg0, GtkWidget* arg1) {
-//   ((void (*)(GtkHandleBox*, GtkWidget*))(fnptr))(arg0, arg1);
-// };
-// void _gotk4_gtk3_HandleBox_virtual_child_detached(void* fnptr, GtkHandleBox* arg0, GtkWidget* arg1) {
-//   ((void (*)(GtkHandleBox*, GtkWidget*))(fnptr))(arg0, arg1);
-// };
+// extern void _gotk4_gtk3_HandleBox_ConnectChildDetached(gpointer, void*, guintptr);
+// extern void _gotk4_gtk3_HandleBox_ConnectChildAttached(gpointer, void*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeHandleBox = coreglib.Type(C.gtk_handle_box_get_type())
+	GTypeHandleBox = coreglib.Type(girepository.MustFind("Gtk", "HandleBox").RegisteredGType())
 )
 
 func init() {
@@ -41,19 +32,10 @@ func init() {
 
 // HandleBoxOverrides contains methods that are overridable.
 type HandleBoxOverrides struct {
-	// The function takes the following parameters:
-	//
-	ChildAttached func(child Widgetter)
-	// The function takes the following parameters:
-	//
-	ChildDetached func(child Widgetter)
 }
 
 func defaultHandleBoxOverrides(v *HandleBox) HandleBoxOverrides {
-	return HandleBoxOverrides{
-		ChildAttached: v.childAttached,
-		ChildDetached: v.childDetached,
-	}
+	return HandleBoxOverrides{}
 }
 
 // HandleBox widget allows a portion of a window to be "torn off". It is a bin
@@ -97,16 +79,6 @@ func init() {
 }
 
 func initHandleBoxClass(gclass unsafe.Pointer, overrides HandleBoxOverrides, classInitFunc func(*HandleBoxClass)) {
-	pclass := (*C.GtkHandleBoxClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeHandleBox))))
-
-	if overrides.ChildAttached != nil {
-		pclass.child_attached = (*[0]byte)(C._gotk4_gtk3_HandleBoxClass_child_attached)
-	}
-
-	if overrides.ChildDetached != nil {
-		pclass.child_detached = (*[0]byte)(C._gotk4_gtk3_HandleBoxClass_child_detached)
-	}
-
 	if classInitFunc != nil {
 		class := (*HandleBoxClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -140,241 +112,14 @@ func marshalHandleBox(p uintptr) (interface{}, error) {
 
 // ConnectChildAttached: this signal is emitted when the contents of the
 // handlebox are reattached to the main window.
-func (handleBox *HandleBox) ConnectChildAttached(f func(widget Widgetter)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(handleBox, "child-attached", false, unsafe.Pointer(C._gotk4_gtk3_HandleBox_ConnectChildAttached), f)
+func (v *HandleBox) ConnectChildAttached(f func(widget Widgetter)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "child-attached", false, unsafe.Pointer(C._gotk4_gtk3_HandleBox_ConnectChildAttached), f)
 }
 
 // ConnectChildDetached: this signal is emitted when the contents of the
 // handlebox are detached from the main window.
-func (handleBox *HandleBox) ConnectChildDetached(f func(widget Widgetter)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(handleBox, "child-detached", false, unsafe.Pointer(C._gotk4_gtk3_HandleBox_ConnectChildDetached), f)
-}
-
-// NewHandleBox: create a new handle box.
-//
-// Deprecated: HandleBox has been deprecated.
-//
-// The function returns the following values:
-//
-//    - handleBox: new HandleBox.
-//
-func NewHandleBox() *HandleBox {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_handle_box_new()
-
-	var _handleBox *HandleBox // out
-
-	_handleBox = wrapHandleBox(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _handleBox
-}
-
-// ChildDetached: whether the handlebox’s child is currently detached.
-//
-// Deprecated: HandleBox has been deprecated.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the child is currently detached, otherwise FALSE.
-//
-func (handleBox *HandleBox) ChildDetached() bool {
-	var _arg0 *C.GtkHandleBox // out
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-
-	_cret = C.gtk_handle_box_get_child_detached(_arg0)
-	runtime.KeepAlive(handleBox)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// HandlePosition gets the handle position of the handle box. See
-// gtk_handle_box_set_handle_position().
-//
-// Deprecated: HandleBox has been deprecated.
-//
-// The function returns the following values:
-//
-//    - positionType: current handle position.
-//
-func (handleBox *HandleBox) HandlePosition() PositionType {
-	var _arg0 *C.GtkHandleBox   // out
-	var _cret C.GtkPositionType // in
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-
-	_cret = C.gtk_handle_box_get_handle_position(_arg0)
-	runtime.KeepAlive(handleBox)
-
-	var _positionType PositionType // out
-
-	_positionType = PositionType(_cret)
-
-	return _positionType
-}
-
-// ShadowType gets the type of shadow drawn around the handle box. See
-// gtk_handle_box_set_shadow_type().
-//
-// Deprecated: HandleBox has been deprecated.
-//
-// The function returns the following values:
-//
-//    - shadowType: type of shadow currently drawn around the handle box.
-//
-func (handleBox *HandleBox) ShadowType() ShadowType {
-	var _arg0 *C.GtkHandleBox // out
-	var _cret C.GtkShadowType // in
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-
-	_cret = C.gtk_handle_box_get_shadow_type(_arg0)
-	runtime.KeepAlive(handleBox)
-
-	var _shadowType ShadowType // out
-
-	_shadowType = ShadowType(_cret)
-
-	return _shadowType
-}
-
-// SnapEdge gets the edge used for determining reattachment of the handle box.
-// See gtk_handle_box_set_snap_edge().
-//
-// Deprecated: HandleBox has been deprecated.
-//
-// The function returns the following values:
-//
-//    - positionType: edge used for determining reattachment, or
-//      (GtkPositionType)-1 if this is determined (as per default) from the
-//      handle position.
-//
-func (handleBox *HandleBox) SnapEdge() PositionType {
-	var _arg0 *C.GtkHandleBox   // out
-	var _cret C.GtkPositionType // in
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-
-	_cret = C.gtk_handle_box_get_snap_edge(_arg0)
-	runtime.KeepAlive(handleBox)
-
-	var _positionType PositionType // out
-
-	_positionType = PositionType(_cret)
-
-	return _positionType
-}
-
-// SetHandlePosition sets the side of the handlebox where the handle is drawn.
-//
-// Deprecated: HandleBox has been deprecated.
-//
-// The function takes the following parameters:
-//
-//    - position: side of the handlebox where the handle should be drawn.
-//
-func (handleBox *HandleBox) SetHandlePosition(position PositionType) {
-	var _arg0 *C.GtkHandleBox   // out
-	var _arg1 C.GtkPositionType // out
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-	_arg1 = C.GtkPositionType(position)
-
-	C.gtk_handle_box_set_handle_position(_arg0, _arg1)
-	runtime.KeepAlive(handleBox)
-	runtime.KeepAlive(position)
-}
-
-// SetShadowType sets the type of shadow to be drawn around the border of the
-// handle box.
-//
-// Deprecated: HandleBox has been deprecated.
-//
-// The function takes the following parameters:
-//
-//    - typ: shadow type.
-//
-func (handleBox *HandleBox) SetShadowType(typ ShadowType) {
-	var _arg0 *C.GtkHandleBox // out
-	var _arg1 C.GtkShadowType // out
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-	_arg1 = C.GtkShadowType(typ)
-
-	C.gtk_handle_box_set_shadow_type(_arg0, _arg1)
-	runtime.KeepAlive(handleBox)
-	runtime.KeepAlive(typ)
-}
-
-// SetSnapEdge sets the snap edge of a handlebox. The snap edge is the edge of
-// the detached child that must be aligned with the corresponding edge of the
-// “ghost” left behind when the child was detached to reattach the torn-off
-// window. Usually, the snap edge should be chosen so that it stays in the same
-// place on the screen when the handlebox is torn off.
-//
-// If the snap edge is not set, then an appropriate value will be guessed from
-// the handle position. If the handle position is GTK_POS_RIGHT or GTK_POS_LEFT,
-// then the snap edge will be GTK_POS_TOP, otherwise it will be GTK_POS_LEFT.
-//
-// Deprecated: HandleBox has been deprecated.
-//
-// The function takes the following parameters:
-//
-//    - edge: snap edge, or -1 to unset the value; in which case GTK+ will try to
-//      guess an appropriate value in the future.
-//
-func (handleBox *HandleBox) SetSnapEdge(edge PositionType) {
-	var _arg0 *C.GtkHandleBox   // out
-	var _arg1 C.GtkPositionType // out
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-	_arg1 = C.GtkPositionType(edge)
-
-	C.gtk_handle_box_set_snap_edge(_arg0, _arg1)
-	runtime.KeepAlive(handleBox)
-	runtime.KeepAlive(edge)
-}
-
-// The function takes the following parameters:
-//
-func (handleBox *HandleBox) childAttached(child Widgetter) {
-	gclass := (*C.GtkHandleBoxClass)(coreglib.PeekParentClass(handleBox))
-	fnarg := gclass.child_attached
-
-	var _arg0 *C.GtkHandleBox // out
-	var _arg1 *C.GtkWidget    // out
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	C._gotk4_gtk3_HandleBox_virtual_child_attached(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(handleBox)
-	runtime.KeepAlive(child)
-}
-
-// The function takes the following parameters:
-//
-func (handleBox *HandleBox) childDetached(child Widgetter) {
-	gclass := (*C.GtkHandleBoxClass)(coreglib.PeekParentClass(handleBox))
-	fnarg := gclass.child_detached
-
-	var _arg0 *C.GtkHandleBox // out
-	var _arg1 *C.GtkWidget    // out
-
-	_arg0 = (*C.GtkHandleBox)(unsafe.Pointer(coreglib.InternObject(handleBox).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	C._gotk4_gtk3_HandleBox_virtual_child_detached(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(handleBox)
-	runtime.KeepAlive(child)
+func (v *HandleBox) ConnectChildDetached(f func(widget Widgetter)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "child-detached", false, unsafe.Pointer(C._gotk4_gtk3_HandleBox_ConnectChildDetached), f)
 }
 
 // HandleBoxClass: instance of this type is always passed by reference.
@@ -384,13 +129,7 @@ type HandleBoxClass struct {
 
 // handleBoxClass is the struct that's finalized.
 type handleBoxClass struct {
-	native *C.GtkHandleBoxClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (h *HandleBoxClass) ParentClass() *BinClass {
-	valptr := &h.native.parent_class
-	var _v *BinClass // out
-	_v = (*BinClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoHandleBoxClass = girepository.MustFind("Gtk", "HandleBoxClass")

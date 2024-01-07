@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeStatusbarAccessible = coreglib.Type(C.gtk_statusbar_accessible_get_type())
+	GTypeStatusbarAccessible = coreglib.Type(girepository.MustFind("Gtk", "StatusbarAccessible").RegisteredGType())
 )
 
 func init() {
@@ -90,12 +90,7 @@ type StatusbarAccessibleClass struct {
 
 // statusbarAccessibleClass is the struct that's finalized.
 type statusbarAccessibleClass struct {
-	native *C.GtkStatusbarAccessibleClass
+	native unsafe.Pointer
 }
 
-func (s *StatusbarAccessibleClass) ParentClass() *ContainerAccessibleClass {
-	valptr := &s.native.parent_class
-	var _v *ContainerAccessibleClass // out
-	_v = (*ContainerAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoStatusbarAccessibleClass = girepository.MustFind("Gtk", "StatusbarAccessibleClass")

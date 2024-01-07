@@ -9,14 +9,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_FileFilterFunc
-func _gotk4_gtk3_FileFilterFunc(arg1 *C.GtkFileFilterInfo, arg2 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk3_FileFilterFunc(arg1 *C.void, arg2 C.gpointer) (cret C.gboolean) {
 	var fn FileFilterFunc
 	{
 		v := gbox.Get(uintptr(arg2))

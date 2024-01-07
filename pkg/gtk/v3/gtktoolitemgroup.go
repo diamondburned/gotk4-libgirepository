@@ -5,13 +5,13 @@ package gtk
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ToolItemGroupClass: instance of this type is always passed by reference.
@@ -21,13 +21,7 @@ type ToolItemGroupClass struct {
 
 // toolItemGroupClass is the struct that's finalized.
 type toolItemGroupClass struct {
-	native *C.GtkToolItemGroupClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (t *ToolItemGroupClass) ParentClass() *ContainerClass {
-	valptr := &t.native.parent_class
-	var _v *ContainerClass // out
-	_v = (*ContainerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoToolItemGroupClass = girepository.MustFind("Gtk", "ToolItemGroupClass")

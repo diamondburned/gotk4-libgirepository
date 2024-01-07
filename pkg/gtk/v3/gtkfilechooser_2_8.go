@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFileChooserConfirmation = coreglib.Type(C.gtk_file_chooser_confirmation_get_type())
+	GTypeFileChooserConfirmation = coreglib.Type(girepository.MustFind("Gtk", "FileChooserConfirmation").RegisteredGType())
 )
 
 func init() {

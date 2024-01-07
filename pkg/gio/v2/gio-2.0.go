@@ -3,16 +3,16 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 // extern void _gotk4_gio2_SimpleAction_ConnectChangeState(gpointer, GVariant*, guintptr);
 // extern void _gotk4_gio2_SimpleAction_ConnectActivate(gpointer, GVariant*, guintptr);
@@ -20,10 +20,10 @@ import "C"
 
 // GType values.
 var (
-	GTypeDBusActionGroup  = coreglib.Type(C.g_dbus_action_group_get_type())
-	GTypeDBusMenuModel    = coreglib.Type(C.g_dbus_menu_model_get_type())
-	GTypeSimpleAction     = coreglib.Type(C.g_simple_action_get_type())
-	GTypeSimplePermission = coreglib.Type(C.g_simple_permission_get_type())
+	GTypeDBusActionGroup  = coreglib.Type(girepository.MustFind("Gio", "DBusActionGroup").RegisteredGType())
+	GTypeDBusMenuModel    = coreglib.Type(girepository.MustFind("Gio", "DBusMenuModel").RegisteredGType())
+	GTypeSimpleAction     = coreglib.Type(girepository.MustFind("Gio", "SimpleAction").RegisteredGType())
+	GTypeSimplePermission = coreglib.Type(girepository.MustFind("Gio", "SimplePermission").RegisteredGType())
 )
 
 func init() {
@@ -33,26 +33,6 @@ func init() {
 		coreglib.TypeMarshaler{T: GTypeSimpleAction, F: marshalSimpleAction},
 		coreglib.TypeMarshaler{T: GTypeSimplePermission, F: marshalSimplePermission},
 	})
-}
-
-// IOErrorQuark gets the GIO Error Quark.
-//
-// The function returns the following values:
-//
-//    - quark: #GQuark.
-//
-func IOErrorQuark() glib.Quark {
-	var _cret C.GQuark // in
-
-	_cret = C.g_io_error_quark()
-
-	var _quark glib.Quark // out
-
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
-
-	return _quark
 }
 
 // DBusActionGroup is an implementation of the Group interface that can be used
@@ -149,8 +129,8 @@ func marshalSimpleAction(p uintptr) (interface{}, error) {
 // state type is equal to the parameter type, the default is to forward them
 // directly to Action::change-state. This should allow almost all users of
 // Action to connect only one handler or the other.
-func (simple *SimpleAction) ConnectActivate(f func(parameter *glib.Variant)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(simple, "activate", false, unsafe.Pointer(C._gotk4_gio2_SimpleAction_ConnectActivate), f)
+func (v *SimpleAction) ConnectActivate(f func(parameter *glib.Variant)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "activate", false, unsafe.Pointer(C._gotk4_gio2_SimpleAction_ConnectActivate), f)
 }
 
 // ConnectChangeState indicates that the action just received a request to
@@ -184,161 +164,8 @@ func (simple *SimpleAction) ConnectActivate(f func(parameter *glib.Variant)) cor
 //
 // The handler need not set the state to the requested value. It could set it to
 // any value at all, or take some other action.
-func (simple *SimpleAction) ConnectChangeState(f func(value *glib.Variant)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(simple, "change-state", false, unsafe.Pointer(C._gotk4_gio2_SimpleAction_ConnectChangeState), f)
-}
-
-// NewSimpleAction creates a new action.
-//
-// The created action is stateless. See g_simple_action_new_stateful() to create
-// an action that has state.
-//
-// The function takes the following parameters:
-//
-//    - name of the action.
-//    - parameterType (optional): type of parameter that will be passed to
-//      handlers for the Action::activate signal, or NULL for no parameter.
-//
-// The function returns the following values:
-//
-//    - simpleAction: new Action.
-//
-func NewSimpleAction(name string, parameterType *glib.VariantType) *SimpleAction {
-	var _arg1 *C.gchar         // out
-	var _arg2 *C.GVariantType  // out
-	var _cret *C.GSimpleAction // in
-
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if parameterType != nil {
-		_arg2 = (*C.GVariantType)(gextras.StructNative(unsafe.Pointer(parameterType)))
-	}
-
-	_cret = C.g_simple_action_new(_arg1, _arg2)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(parameterType)
-
-	var _simpleAction *SimpleAction // out
-
-	_simpleAction = wrapSimpleAction(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _simpleAction
-}
-
-// NewSimpleActionStateful creates a new stateful action.
-//
-// All future state values must have the same Type as the initial state.
-//
-// If the state #GVariant is floating, it is consumed.
-//
-// The function takes the following parameters:
-//
-//    - name of the action.
-//    - parameterType (optional): type of the parameter that will be passed to
-//      handlers for the Action::activate signal, or NULL for no parameter.
-//    - state: initial state of the action.
-//
-// The function returns the following values:
-//
-//    - simpleAction: new Action.
-//
-func NewSimpleActionStateful(name string, parameterType *glib.VariantType, state *glib.Variant) *SimpleAction {
-	var _arg1 *C.gchar         // out
-	var _arg2 *C.GVariantType  // out
-	var _arg3 *C.GVariant      // out
-	var _cret *C.GSimpleAction // in
-
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if parameterType != nil {
-		_arg2 = (*C.GVariantType)(gextras.StructNative(unsafe.Pointer(parameterType)))
-	}
-	_arg3 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(state)))
-
-	_cret = C.g_simple_action_new_stateful(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(parameterType)
-	runtime.KeepAlive(state)
-
-	var _simpleAction *SimpleAction // out
-
-	_simpleAction = wrapSimpleAction(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _simpleAction
-}
-
-// SetEnabled sets the action as enabled or not.
-//
-// An action must be enabled in order to be activated or in order to have its
-// state changed from outside callers.
-//
-// This should only be called by the implementor of the action. Users of the
-// action should not attempt to modify its enabled flag.
-//
-// The function takes the following parameters:
-//
-//    - enabled: whether the action is enabled.
-//
-func (simple *SimpleAction) SetEnabled(enabled bool) {
-	var _arg0 *C.GSimpleAction // out
-	var _arg1 C.gboolean       // out
-
-	_arg0 = (*C.GSimpleAction)(unsafe.Pointer(coreglib.InternObject(simple).Native()))
-	if enabled {
-		_arg1 = C.TRUE
-	}
-
-	C.g_simple_action_set_enabled(_arg0, _arg1)
-	runtime.KeepAlive(simple)
-	runtime.KeepAlive(enabled)
-}
-
-// SetState sets the state of the action.
-//
-// This directly updates the 'state' property to the given value.
-//
-// This should only be called by the implementor of the action. Users of the
-// action should not attempt to directly modify the 'state' property. Instead,
-// they should call g_action_change_state() to request the change.
-//
-// If the value GVariant is floating, it is consumed.
-//
-// The function takes the following parameters:
-//
-//    - value: new #GVariant for the state.
-//
-func (simple *SimpleAction) SetState(value *glib.Variant) {
-	var _arg0 *C.GSimpleAction // out
-	var _arg1 *C.GVariant      // out
-
-	_arg0 = (*C.GSimpleAction)(unsafe.Pointer(coreglib.InternObject(simple).Native()))
-	_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(value)))
-
-	C.g_simple_action_set_state(_arg0, _arg1)
-	runtime.KeepAlive(simple)
-	runtime.KeepAlive(value)
-}
-
-// SetStateHint sets the state hint for the action.
-//
-// See g_action_get_state_hint() for more information about action state hints.
-//
-// The function takes the following parameters:
-//
-//    - stateHint (optional) representing the state hint.
-//
-func (simple *SimpleAction) SetStateHint(stateHint *glib.Variant) {
-	var _arg0 *C.GSimpleAction // out
-	var _arg1 *C.GVariant      // out
-
-	_arg0 = (*C.GSimpleAction)(unsafe.Pointer(coreglib.InternObject(simple).Native()))
-	if stateHint != nil {
-		_arg1 = (*C.GVariant)(gextras.StructNative(unsafe.Pointer(stateHint)))
-	}
-
-	C.g_simple_action_set_state_hint(_arg0, _arg1)
-	runtime.KeepAlive(simple)
-	runtime.KeepAlive(stateHint)
+func (v *SimpleAction) ConnectChangeState(f func(value *glib.Variant)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "change-state", false, unsafe.Pointer(C._gotk4_gio2_SimpleAction_ConnectChangeState), f)
 }
 
 // SimplePermission is a trivial implementation of #GPermission that represents
@@ -365,33 +192,4 @@ func wrapSimplePermission(obj *coreglib.Object) *SimplePermission {
 
 func marshalSimplePermission(p uintptr) (interface{}, error) {
 	return wrapSimplePermission(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewSimplePermission creates a new #GPermission instance that represents an
-// action that is either always or never allowed.
-//
-// The function takes the following parameters:
-//
-//    - allowed: TRUE if the action is allowed.
-//
-// The function returns the following values:
-//
-//    - simplePermission as a #GPermission.
-//
-func NewSimplePermission(allowed bool) *SimplePermission {
-	var _arg1 C.gboolean     // out
-	var _cret *C.GPermission // in
-
-	if allowed {
-		_arg1 = C.TRUE
-	}
-
-	_cret = C.g_simple_permission_new(_arg1)
-	runtime.KeepAlive(allowed)
-
-	var _simplePermission *SimplePermission // out
-
-	_simplePermission = wrapSimplePermission(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _simplePermission
 }

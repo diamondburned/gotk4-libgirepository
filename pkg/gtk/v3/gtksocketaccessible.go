@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSocketAccessible = coreglib.Type(C.gtk_socket_accessible_get_type())
+	GTypeSocketAccessible = coreglib.Type(girepository.MustFind("Gtk", "SocketAccessible").RegisteredGType())
 )
 
 func init() {
@@ -83,21 +82,6 @@ func marshalSocketAccessible(p uintptr) (interface{}, error) {
 	return wrapSocketAccessible(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// The function takes the following parameters:
-//
-func (socket *SocketAccessible) Embed(path string) {
-	var _arg0 *C.GtkSocketAccessible // out
-	var _arg1 *C.gchar               // out
-
-	_arg0 = (*C.GtkSocketAccessible)(unsafe.Pointer(coreglib.InternObject(socket).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(path)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_socket_accessible_embed(_arg0, _arg1)
-	runtime.KeepAlive(socket)
-	runtime.KeepAlive(path)
-}
-
 // SocketAccessibleClass: instance of this type is always passed by reference.
 type SocketAccessibleClass struct {
 	*socketAccessibleClass
@@ -105,12 +89,7 @@ type SocketAccessibleClass struct {
 
 // socketAccessibleClass is the struct that's finalized.
 type socketAccessibleClass struct {
-	native *C.GtkSocketAccessibleClass
+	native unsafe.Pointer
 }
 
-func (s *SocketAccessibleClass) ParentClass() *ContainerAccessibleClass {
-	valptr := &s.native.parent_class
-	var _v *ContainerAccessibleClass // out
-	_v = (*ContainerAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoSocketAccessibleClass = girepository.MustFind("Gtk", "SocketAccessibleClass")

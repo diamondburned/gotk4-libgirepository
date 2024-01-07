@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeVButtonBox = coreglib.Type(C.gtk_vbutton_box_get_type())
+	GTypeVButtonBox = coreglib.Type(girepository.MustFind("Gtk", "VButtonBox").RegisteredGType())
 )
 
 func init() {
@@ -93,26 +93,6 @@ func marshalVButtonBox(p uintptr) (interface{}, error) {
 	return wrapVButtonBox(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewVButtonBox creates a new vertical button box.
-//
-// Deprecated: Use gtk_button_box_new() with GTK_ORIENTATION_VERTICAL instead.
-//
-// The function returns the following values:
-//
-//    - vButtonBox: new button box Widget.
-//
-func NewVButtonBox() *VButtonBox {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_vbutton_box_new()
-
-	var _vButtonBox *VButtonBox // out
-
-	_vButtonBox = wrapVButtonBox(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _vButtonBox
-}
-
 // VButtonBoxClass: instance of this type is always passed by reference.
 type VButtonBoxClass struct {
 	*vButtonBoxClass
@@ -120,12 +100,7 @@ type VButtonBoxClass struct {
 
 // vButtonBoxClass is the struct that's finalized.
 type vButtonBoxClass struct {
-	native *C.GtkVButtonBoxClass
+	native unsafe.Pointer
 }
 
-func (v *VButtonBoxClass) ParentClass() *ButtonBoxClass {
-	valptr := &v.native.parent_class
-	var _v *ButtonBoxClass // out
-	_v = (*ButtonBoxClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoVButtonBoxClass = girepository.MustFind("Gtk", "VButtonBoxClass")

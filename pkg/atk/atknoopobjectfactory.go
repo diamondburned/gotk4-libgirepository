@@ -6,17 +6,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeNoOpObjectFactory = coreglib.Type(C.atk_no_op_object_factory_get_type())
+	GTypeNoOpObjectFactory = coreglib.Type(girepository.MustFind("Atk", "NoOpObjectFactory").RegisteredGType())
 )
 
 func init() {
@@ -73,25 +75,6 @@ func marshalNoOpObjectFactory(p uintptr) (interface{}, error) {
 	return wrapNoOpObjectFactory(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewNoOpObjectFactory creates an instance of an ObjectFactory which generates
-// primitive (non-functioning) Objects.
-//
-// The function returns the following values:
-//
-//    - noOpObjectFactory: instance of an ObjectFactory.
-//
-func NewNoOpObjectFactory() *NoOpObjectFactory {
-	var _cret *C.AtkObjectFactory // in
-
-	_cret = C.atk_no_op_object_factory_new()
-
-	var _noOpObjectFactory *NoOpObjectFactory // out
-
-	_noOpObjectFactory = wrapNoOpObjectFactory(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _noOpObjectFactory
-}
-
 // NoOpObjectFactoryClass: instance of this type is always passed by reference.
 type NoOpObjectFactoryClass struct {
 	*noOpObjectFactoryClass
@@ -99,12 +82,7 @@ type NoOpObjectFactoryClass struct {
 
 // noOpObjectFactoryClass is the struct that's finalized.
 type noOpObjectFactoryClass struct {
-	native *C.AtkNoOpObjectFactoryClass
+	native unsafe.Pointer
 }
 
-func (n *NoOpObjectFactoryClass) ParentClass() *ObjectFactoryClass {
-	valptr := &n.native.parent_class
-	var _v *ObjectFactoryClass // out
-	_v = (*ObjectFactoryClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoNoOpObjectFactoryClass = girepository.MustFind("Atk", "NoOpObjectFactoryClass")

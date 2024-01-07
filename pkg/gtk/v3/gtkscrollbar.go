@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeScrollbar = coreglib.Type(C.gtk_scrollbar_get_type())
+	GTypeScrollbar = coreglib.Type(girepository.MustFind("Gtk", "Scrollbar").RegisteredGType())
 )
 
 func init() {
@@ -127,38 +126,6 @@ func marshalScrollbar(p uintptr) (interface{}, error) {
 	return wrapScrollbar(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewScrollbar creates a new scrollbar with the given orientation.
-//
-// The function takes the following parameters:
-//
-//    - orientation scrollbar’s orientation.
-//    - adjustment (optional) to use, or NULL to create a new adjustment.
-//
-// The function returns the following values:
-//
-//    - scrollbar: new Scrollbar.
-//
-func NewScrollbar(orientation Orientation, adjustment *Adjustment) *Scrollbar {
-	var _arg1 C.GtkOrientation // out
-	var _arg2 *C.GtkAdjustment // out
-	var _cret *C.GtkWidget     // in
-
-	_arg1 = C.GtkOrientation(orientation)
-	if adjustment != nil {
-		_arg2 = (*C.GtkAdjustment)(unsafe.Pointer(coreglib.InternObject(adjustment).Native()))
-	}
-
-	_cret = C.gtk_scrollbar_new(_arg1, _arg2)
-	runtime.KeepAlive(orientation)
-	runtime.KeepAlive(adjustment)
-
-	var _scrollbar *Scrollbar // out
-
-	_scrollbar = wrapScrollbar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _scrollbar
-}
-
 // ScrollbarClass: instance of this type is always passed by reference.
 type ScrollbarClass struct {
 	*scrollbarClass
@@ -166,12 +133,7 @@ type ScrollbarClass struct {
 
 // scrollbarClass is the struct that's finalized.
 type scrollbarClass struct {
-	native *C.GtkScrollbarClass
+	native unsafe.Pointer
 }
 
-func (s *ScrollbarClass) ParentClass() *RangeClass {
-	valptr := &s.native.parent_class
-	var _v *RangeClass // out
-	_v = (*RangeClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoScrollbarClass = girepository.MustFind("Gtk", "ScrollbarClass")

@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeLabelAccessible = coreglib.Type(C.gtk_label_accessible_get_type())
+	GTypeLabelAccessible = coreglib.Type(girepository.MustFind("Gtk", "LabelAccessible").RegisteredGType())
 )
 
 func init() {
@@ -98,12 +98,7 @@ type LabelAccessibleClass struct {
 
 // labelAccessibleClass is the struct that's finalized.
 type labelAccessibleClass struct {
-	native *C.GtkLabelAccessibleClass
+	native unsafe.Pointer
 }
 
-func (l *LabelAccessibleClass) ParentClass() *WidgetAccessibleClass {
-	valptr := &l.native.parent_class
-	var _v *WidgetAccessibleClass // out
-	_v = (*WidgetAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoLabelAccessibleClass = girepository.MustFind("Gtk", "LabelAccessibleClass")

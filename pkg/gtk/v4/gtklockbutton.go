@@ -3,21 +3,21 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeLockButton = coreglib.Type(C.gtk_lock_button_get_type())
+	GTypeLockButton = coreglib.Type(girepository.MustFind("Gtk", "LockButton").RegisteredGType())
 )
 
 func init() {
@@ -113,90 +113,4 @@ func wrapLockButton(obj *coreglib.Object) *LockButton {
 
 func marshalLockButton(p uintptr) (interface{}, error) {
 	return wrapLockButton(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewLockButton creates a new lock button which reflects the permission.
-//
-// The function takes the following parameters:
-//
-//    - permission (optional): GPermission.
-//
-// The function returns the following values:
-//
-//    - lockButton: new GtkLockButton.
-//
-func NewLockButton(permission gio.Permissioner) *LockButton {
-	var _arg1 *C.GPermission // out
-	var _cret *C.GtkWidget   // in
-
-	if permission != nil {
-		_arg1 = (*C.GPermission)(unsafe.Pointer(coreglib.InternObject(permission).Native()))
-	}
-
-	_cret = C.gtk_lock_button_new(_arg1)
-	runtime.KeepAlive(permission)
-
-	var _lockButton *LockButton // out
-
-	_lockButton = wrapLockButton(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _lockButton
-}
-
-// Permission obtains the GPermission object that controls button.
-//
-// The function returns the following values:
-//
-//    - permission: GPermission of button.
-//
-func (button *LockButton) Permission() gio.Permissioner {
-	var _arg0 *C.GtkLockButton // out
-	var _cret *C.GPermission   // in
-
-	_arg0 = (*C.GtkLockButton)(unsafe.Pointer(coreglib.InternObject(button).Native()))
-
-	_cret = C.gtk_lock_button_get_permission(_arg0)
-	runtime.KeepAlive(button)
-
-	var _permission gio.Permissioner // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gio.Permissioner is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(gio.Permissioner)
-			return ok
-		})
-		rv, ok := casted.(gio.Permissioner)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.Permissioner")
-		}
-		_permission = rv
-	}
-
-	return _permission
-}
-
-// SetPermission sets the GPermission object that controls button.
-//
-// The function takes the following parameters:
-//
-//    - permission (optional): GPermission object, or NULL.
-//
-func (button *LockButton) SetPermission(permission gio.Permissioner) {
-	var _arg0 *C.GtkLockButton // out
-	var _arg1 *C.GPermission   // out
-
-	_arg0 = (*C.GtkLockButton)(unsafe.Pointer(coreglib.InternObject(button).Native()))
-	if permission != nil {
-		_arg1 = (*C.GPermission)(unsafe.Pointer(coreglib.InternObject(permission).Native()))
-	}
-
-	C.gtk_lock_button_set_permission(_arg0, _arg1)
-	runtime.KeepAlive(button)
-	runtime.KeepAlive(permission)
 }

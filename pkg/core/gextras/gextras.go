@@ -54,6 +54,16 @@ func NewStructNative(native unsafe.Pointer) unsafe.Pointer {
 	return unsafe.Pointer(&r)
 }
 
+var never bool
+var never_ any
+
+// Sink ensures that v is allocated on the heap.
+func Sink(v any) {
+	if never {
+		never_ = v
+	}
+}
+
 // HashTableSize returns the size of the *GHashTable.
 func HashTableSize(ptr unsafe.Pointer) int {
 	return int(C.g_hash_table_size((*C.GHashTable)(ptr)))

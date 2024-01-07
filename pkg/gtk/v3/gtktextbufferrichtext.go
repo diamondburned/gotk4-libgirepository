@@ -4,16 +4,11 @@ package gtk
 
 import ()
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
-
-// TextBufferDeserializeFunc: function that is called to deserialize rich text
-// that has been serialized with gtk_text_buffer_serialize(), and insert it at
-// iter.
-type TextBufferDeserializeFunc func(registerBuffer, contentBuffer *TextBuffer, iter *TextIter, data []byte, createTags bool) (_goerr error)
 
 // TextBufferSerializeFunc: function that is called to serialize the content of
 // a text buffer. It must return the serialized form of the content.

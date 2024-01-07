@@ -114,7 +114,7 @@ func GenerateUnion(gen FileGeneratorWriter, union *gir.Union) bool {
 
 	if gtype, ok := GenerateGType(gen, union.Name, union.GLibGetType); ok {
 		unionGen.Marshaler = true
-		writer.Header().AddMarshaler(gtype.GetType, unionGen.GoName)
+		gtype.AddToHeader(writer.Header(), unionGen.GoName)
 	}
 
 	writer.Pen().WriteTmpl(unionTmpl, &unionGen)
@@ -161,13 +161,11 @@ func (ug *UnionGenerator) Use(union *gir.Union) bool {
 		Type:                union,
 	}
 
-	typRecord := gir.TypeFindResult{
-		NamespaceFindResult: typ.NamespaceFindResult,
-		Type: &gir.Record{
-			Name:    union.Name,
-			Methods: union.Methods,
-		},
-	}
+	recordType := types.TypeFromResult(ug.gen, &gir.Record{
+		Name:    union.Name,
+		CType:   union.CType,
+		Methods: union.Methods,
+	})
 
 	// Can we copy? Exit if not. We want the finalizer to work properly.
 	copyMethod := types.FindMethodName(union.Methods, "copy")
@@ -183,6 +181,9 @@ func (ug *UnionGenerator) Use(union *gir.Union) bool {
 		ug.hdr.Import("unsafe")
 		ug.hdr.ImportCore("gextras")
 
+		free := typeconv.RecordPrintFree(ug.gen, recordType, "intern.C")
+		free.Header.ApplyFrom(&ug.hdr)
+
 		p := pen.NewBlock()
 		p.Linef("original := (*C.%s)(%s.underlying%s())", union.CType, ug.Recv(), ug.GoName)
 		p.Linef("copied := C.%s(original)", copyMethod.CIdentifier)
@@ -190,7 +191,7 @@ func (ug *UnionGenerator) Use(union *gir.Union) bool {
 		p.Linef("runtime.SetFinalizer(")
 		p.Linef("  gextras.StructIntern(unsafe.Pointer(dst)),")
 		p.Linef("  func(intern *struct{ C unsafe.Pointer }) {")
-		p.Linef(types.RecordPrintFree(ug.gen, &typRecord, "intern.C"))
+		p.Linef(free.Value)
 		p.Linef("},")
 		p.Linef(")")
 		p.Linef("return dst")
@@ -240,38 +241,43 @@ func (ug *UnionGenerator) Use(union *gir.Union) bool {
 		p := pen.NewBlock()
 		ug.hdr.Import("runtime")
 
-		// We only need to copy if this is a record, because a record is passed
-		// by reference. Since enums/bitfields are copied, we don't need to copy
-		// the original value.
-		if srcRes.Resolved.IsRecord() {
-			p.Linef(
-				// The type conversion helps us ensure that copy() actually returns
-				// the type that we expect it to. Otherwise, unsafe.Pointer is
-				// potentialy dangerous.
-				"cpy := (*C.%s)(C.%s(%s.%s.native))",
-				ug.CType, copyMethod.CIdentifier, ug.Recv(), ug.ImplName,
-			)
-		} else {
-			p.Linef("cpy := %s.%s.native", ug.Recv(), ug.ImplName)
-		}
+		// // We only need to copy if this is a record, because a record is passed
+		// // by reference. Since enums/bitfields are copied, we don't need to copy
+		// // the original value.
+		// if srcRes.Resolved.IsRecord() {
+		// 	p.Linef(
+		// 		// The type conversion helps us ensure that copy() actually returns
+		// 		// the type that we expect it to. Otherwise, unsafe.Pointer is
+		// 		// potentialy dangerous.
+		// 		"cpy := (*C.%s)(C.%s(%s.%s.native))",
+		// 		ug.CType, copyMethod.CIdentifier, ug.Recv(), ug.ImplName,
+		// 	)
+		// } else {
+		// 	p.Linef("cpy := %s.%s.native", ug.Recv(), ug.ImplName)
+		// }
+
+		p.Linef("cpy := %s.%s.native", ug.Recv(), ug.ImplName)
 
 		p.Linef("var dst %s", srcRes.Out.Type)
 		p.Linef(srcRes.Conversion)
 
-		// We should free the copy when we're done if this is a record, since we
-		// copied it earlier.
-		if srcRes.Resolved.IsRecord() {
-			ug.hdr.Import("unsafe")
-			ug.hdr.ImportCore("gextras")
-
-			p.Linef("runtime.SetFinalizer(")
-			// dst is ASSUMED TO BE A POINTER.
-			p.Linef("  gextras.StructIntern(unsafe.Pointer(dst)),")
-			p.Linef("  func(intern *struct{ C unsafe.Pointer }) {")
-			p.Linef(types.RecordPrintFree(ug.gen, &typRecord, "intern.C"))
-			p.Linef("},")
-			p.Linef(")")
-		}
+		// // We should free the copy when we're done if this is a record, since we
+		// // copied it earlier.
+		// if srcRes.Resolved.IsRecord() {
+		// 	ug.hdr.Import("unsafe")
+		// 	ug.hdr.ImportCore("gextras")
+		//
+		// 	free := typeconv.RecordPrintFree(ug.gen, recordType, "intern.C")
+		// 	free.Header.ApplyFrom(&ug.hdr)
+		//
+		// 	p.Linef("runtime.SetFinalizer(")
+		// 	// dst is ASSUMED TO BE A POINTER.
+		// 	p.Linef("  gextras.StructIntern(unsafe.Pointer(dst)),")
+		// 	p.Linef("    func(intern *struct{ C unsafe.Pointer }) {")
+		// 	p.Linef(free.Value)
+		// 	p.Linef("    },")
+		// 	p.Linef("))")
+		// }
 
 		p.Linef("runtime.KeepAlive(%s.%s)", ug.Recv(), ug.ImplName)
 		p.Linef("return dst")

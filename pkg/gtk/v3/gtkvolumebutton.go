@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeVolumeButton = coreglib.Type(C.gtk_volume_button_get_type())
+	GTypeVolumeButton = coreglib.Type(girepository.MustFind("Gtk", "VolumeButton").RegisteredGType())
 )
 
 func init() {
@@ -115,26 +115,6 @@ func marshalVolumeButton(p uintptr) (interface{}, error) {
 	return wrapVolumeButton(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewVolumeButton creates a VolumeButton, with a range between 0.0 and 1.0,
-// with a stepping of 0.02. Volume values can be obtained and modified using the
-// functions from ScaleButton.
-//
-// The function returns the following values:
-//
-//    - volumeButton: new VolumeButton.
-//
-func NewVolumeButton() *VolumeButton {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_volume_button_new()
-
-	var _volumeButton *VolumeButton // out
-
-	_volumeButton = wrapVolumeButton(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _volumeButton
-}
-
 // VolumeButtonClass: instance of this type is always passed by reference.
 type VolumeButtonClass struct {
 	*volumeButtonClass
@@ -142,12 +122,7 @@ type VolumeButtonClass struct {
 
 // volumeButtonClass is the struct that's finalized.
 type volumeButtonClass struct {
-	native *C.GtkVolumeButtonClass
+	native unsafe.Pointer
 }
 
-func (v *VolumeButtonClass) ParentClass() *ScaleButtonClass {
-	valptr := &v.native.parent_class
-	var _v *ScaleButtonClass // out
-	_v = (*ScaleButtonClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoVolumeButtonClass = girepository.MustFind("Gtk", "VolumeButtonClass")

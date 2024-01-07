@@ -12,6 +12,24 @@ import (
 	"github.com/diamondburned/gotk4/gir/girgen/types"
 )
 
+type ValuesConverted []ValueConverted
+
+func (vs ValuesConverted) EachGoToC(f func(i int, r ValueConverted)) {
+	for i, v := range vs {
+		if v.Direction == ConvertGoToC {
+			f(i, v)
+		}
+	}
+}
+
+func (vs ValuesConverted) EachCToGo(f func(i int, r ValueConverted)) {
+	for i, v := range vs {
+		if v.Direction == ConvertCToGo {
+			f(i, v)
+		}
+	}
+}
+
 // ValueConverted is the result of conversion for a single value.
 //
 // Quick convention note:
@@ -247,17 +265,15 @@ func (value *ValueConverted) resolveType(conv *Converter) bool {
 		// Runtime-linking means we do not have access to any of the actual C
 		// types, since we intentionally don't want to import them.
 		// Instead, we must mask those types into primitive GLib types.
-		if ptr := types.CountPtr(cgoType); ptr > 0 {
+		// Also, Is the type that we're checking within a dynamically linked
+		// package? If yes, then we can just directly use it. If not, then we
+		// need this.
+		if ptr := types.CountPtr(cgoType); ptr > 0 && !value.Resolved.DynamicLinked(conv.fgen) {
 			// Check on the C type, NOT the Cgo type.
 			if !types.GIRIsPrimitive(types.CleanCType(cType, true)) {
-				// Is the type that we're checking within a dynamically linked
-				// package? If yes, then we can just directly use it. If not,
-				// then we need this.
-				if !value.Resolved.DynamicLinked(conv.fgen) {
-					// Using gpointer doesn't quite work right here, so we just
-					// use C.void.
-					cgoType = types.MovePtr(cgoType, "C.void")
-				}
+				// Using gpointer doesn't quite work right here, so we just use
+				// C.void.
+				cgoType = types.MovePtr(cgoType, "C.void")
 			}
 		} else if types.GIRIsPrimitive(cType) {
 			// cgoType OK as it is.

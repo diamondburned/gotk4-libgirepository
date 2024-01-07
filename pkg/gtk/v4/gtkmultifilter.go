@@ -3,23 +3,24 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeAnyFilter   = coreglib.Type(C.gtk_any_filter_get_type())
-	GTypeEveryFilter = coreglib.Type(C.gtk_every_filter_get_type())
-	GTypeMultiFilter = coreglib.Type(C.gtk_multi_filter_get_type())
+	GTypeAnyFilter   = coreglib.Type(girepository.MustFind("Gtk", "AnyFilter").RegisteredGType())
+	GTypeEveryFilter = coreglib.Type(girepository.MustFind("Gtk", "EveryFilter").RegisteredGType())
+	GTypeMultiFilter = coreglib.Type(girepository.MustFind("Gtk", "MultiFilter").RegisteredGType())
 )
 
 func init() {
@@ -64,30 +65,6 @@ func marshalAnyFilter(p uintptr) (interface{}, error) {
 	return wrapAnyFilter(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewAnyFilter creates a new empty "any" filter.
-//
-// Use gtk.MultiFilter.Append() to add filters to it.
-//
-// This filter matches an item if any of the filters added to it matches the
-// item. In particular, this means that if no filter has been added to it, the
-// filter matches no item.
-//
-// The function returns the following values:
-//
-//    - anyFilter: new GtkAnyFilter.
-//
-func NewAnyFilter() *AnyFilter {
-	var _cret *C.GtkAnyFilter // in
-
-	_cret = C.gtk_any_filter_new()
-
-	var _anyFilter *AnyFilter // out
-
-	_anyFilter = wrapAnyFilter(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _anyFilter
-}
-
 // EveryFilter: GtkEveryFilter matches an item when each of its filters matches.
 //
 // To add filters to a GtkEveryFilter, use gtk.MultiFilter.Append().
@@ -119,30 +96,6 @@ func wrapEveryFilter(obj *coreglib.Object) *EveryFilter {
 
 func marshalEveryFilter(p uintptr) (interface{}, error) {
 	return wrapEveryFilter(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewEveryFilter creates a new empty "every" filter.
-//
-// Use gtk.MultiFilter.Append() to add filters to it.
-//
-// This filter matches an item if each of the filters added to it matches the
-// item. In particular, this means that if no filter has been added to it, the
-// filter matches every item.
-//
-// The function returns the following values:
-//
-//    - everyFilter: new GtkEveryFilter.
-//
-func NewEveryFilter() *EveryFilter {
-	var _cret *C.GtkEveryFilter // in
-
-	_cret = C.gtk_every_filter_new()
-
-	var _everyFilter *EveryFilter // out
-
-	_everyFilter = wrapEveryFilter(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _everyFilter
 }
 
 // MultiFilter: GtkMultiFilter is the base class for filters that combine
@@ -190,52 +143,11 @@ func marshalMultiFilter(p uintptr) (interface{}, error) {
 	return wrapMultiFilter(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-func (self *MultiFilter) baseMultiFilter() *MultiFilter {
-	return self
+func (v *MultiFilter) baseMultiFilter() *MultiFilter {
+	return v
 }
 
 // BaseMultiFilter returns the underlying base object.
 func BaseMultiFilter(obj MultiFilterer) *MultiFilter {
 	return obj.baseMultiFilter()
-}
-
-// Append adds a filter to self to use for matching.
-//
-// The function takes the following parameters:
-//
-//    - filter: new filter to use.
-//
-func (self *MultiFilter) Append(filter *Filter) {
-	var _arg0 *C.GtkMultiFilter // out
-	var _arg1 *C.GtkFilter      // out
-
-	_arg0 = (*C.GtkMultiFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = (*C.GtkFilter)(unsafe.Pointer(coreglib.InternObject(filter).Native()))
-	C.g_object_ref(C.gpointer(coreglib.InternObject(filter).Native()))
-
-	C.gtk_multi_filter_append(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(filter)
-}
-
-// Remove removes the filter at the given position from the list of filters used
-// by self.
-//
-// If position is larger than the number of filters, nothing happens and the
-// function returns.
-//
-// The function takes the following parameters:
-//
-//    - position of filter to remove.
-//
-func (self *MultiFilter) Remove(position uint) {
-	var _arg0 *C.GtkMultiFilter // out
-	var _arg1 C.guint           // out
-
-	_arg0 = (*C.GtkMultiFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = C.guint(position)
-
-	C.gtk_multi_filter_remove(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(position)
 }

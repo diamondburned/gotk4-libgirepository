@@ -3,24 +3,24 @@
 package gdk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern void _gotk4_gdk3_DeviceManager_ConnectDeviceRemoved(gpointer, GdkDevice*, guintptr);
-// extern void _gotk4_gdk3_DeviceManager_ConnectDeviceChanged(gpointer, GdkDevice*, guintptr);
-// extern void _gotk4_gdk3_DeviceManager_ConnectDeviceAdded(gpointer, GdkDevice*, guintptr);
+// extern void _gotk4_gdk3_DeviceManager_ConnectDeviceRemoved(gpointer, void*, guintptr);
+// extern void _gotk4_gdk3_DeviceManager_ConnectDeviceChanged(gpointer, void*, guintptr);
+// extern void _gotk4_gdk3_DeviceManager_ConnectDeviceAdded(gpointer, void*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeDeviceManager = coreglib.Type(C.gdk_device_manager_get_type())
+	GTypeDeviceManager = coreglib.Type(girepository.MustFind("Gdk", "DeviceManager").RegisteredGType())
 )
 
 func init() {
@@ -163,8 +163,8 @@ func marshalDeviceManager(p uintptr) (interface{}, error) {
 	return wrapDeviceManager(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-func (deviceManager *DeviceManager) baseDeviceManager() *DeviceManager {
-	return deviceManager
+func (v *DeviceManager) baseDeviceManager() *DeviceManager {
+	return v
 }
 
 // BaseDeviceManager returns the underlying base object.
@@ -174,8 +174,8 @@ func BaseDeviceManager(obj DeviceManagerer) *DeviceManager {
 
 // ConnectDeviceAdded signal is emitted either when a new master pointer is
 // created, or when a slave (Hardware) input device is plugged in.
-func (deviceManager *DeviceManager) ConnectDeviceAdded(f func(device Devicer)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(deviceManager, "device-added", false, unsafe.Pointer(C._gotk4_gdk3_DeviceManager_ConnectDeviceAdded), f)
+func (v *DeviceManager) ConnectDeviceAdded(f func(device Devicer)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "device-added", false, unsafe.Pointer(C._gotk4_gdk3_DeviceManager_ConnectDeviceAdded), f)
 }
 
 // ConnectDeviceChanged signal is emitted whenever a device has changed in the
@@ -187,140 +187,12 @@ func (deviceManager *DeviceManager) ConnectDeviceAdded(f func(device Devicer)) c
 // (gdk_device_get_associated_device() returns NULL), its DeviceType will change
 // to GDK_DEVICE_TYPE_FLOATING, if it's attached, it will change to
 // GDK_DEVICE_TYPE_SLAVE.
-func (deviceManager *DeviceManager) ConnectDeviceChanged(f func(device Devicer)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(deviceManager, "device-changed", false, unsafe.Pointer(C._gotk4_gdk3_DeviceManager_ConnectDeviceChanged), f)
+func (v *DeviceManager) ConnectDeviceChanged(f func(device Devicer)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "device-changed", false, unsafe.Pointer(C._gotk4_gdk3_DeviceManager_ConnectDeviceChanged), f)
 }
 
 // ConnectDeviceRemoved signal is emitted either when a master pointer is
 // removed, or when a slave (Hardware) input device is unplugged.
-func (deviceManager *DeviceManager) ConnectDeviceRemoved(f func(device Devicer)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(deviceManager, "device-removed", false, unsafe.Pointer(C._gotk4_gdk3_DeviceManager_ConnectDeviceRemoved), f)
-}
-
-// ClientPointer returns the client pointer, that is, the master pointer that
-// acts as the core pointer for this application. In X11, window managers may
-// change this depending on the interaction pattern under the presence of
-// several pointers.
-//
-// You should use this function seldomly, only in code that isn’t triggered by a
-// Event and there aren’t other means to get a meaningful Device to operate on.
-//
-// Deprecated: Use gdk_seat_get_pointer() instead.
-//
-// The function returns the following values:
-//
-//    - device: client pointer. This memory is owned by GDK and must not be freed
-//      or unreferenced.
-//
-func (deviceManager *DeviceManager) ClientPointer() Devicer {
-	var _arg0 *C.GdkDeviceManager // out
-	var _cret *C.GdkDevice        // in
-
-	_arg0 = (*C.GdkDeviceManager)(unsafe.Pointer(coreglib.InternObject(deviceManager).Native()))
-
-	_cret = C.gdk_device_manager_get_client_pointer(_arg0)
-	runtime.KeepAlive(deviceManager)
-
-	var _device Devicer // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gdk.Devicer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Devicer)
-			return ok
-		})
-		rv, ok := casted.(Devicer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Devicer")
-		}
-		_device = rv
-	}
-
-	return _device
-}
-
-// Display gets the Display associated to device_manager.
-//
-// The function returns the following values:
-//
-//    - display (optional) to which device_manager is associated to, or NULL.
-//      This memory is owned by GDK and must not be freed or unreferenced.
-//
-func (deviceManager *DeviceManager) Display() *Display {
-	var _arg0 *C.GdkDeviceManager // out
-	var _cret *C.GdkDisplay       // in
-
-	_arg0 = (*C.GdkDeviceManager)(unsafe.Pointer(coreglib.InternObject(deviceManager).Native()))
-
-	_cret = C.gdk_device_manager_get_display(_arg0)
-	runtime.KeepAlive(deviceManager)
-
-	var _display *Display // out
-
-	if _cret != nil {
-		_display = wrapDisplay(coreglib.Take(unsafe.Pointer(_cret)))
-	}
-
-	return _display
-}
-
-// ListDevices returns the list of devices of type type currently attached to
-// device_manager.
-//
-// Deprecated: , use gdk_seat_get_pointer(), gdk_seat_get_keyboard() and
-// gdk_seat_get_slaves() instead.
-//
-// The function takes the following parameters:
-//
-//    - typ: device type to get.
-//
-// The function returns the following values:
-//
-//    - list of Devices. The returned list must be freed with g_list_free (). The
-//      list elements are owned by GTK+ and must not be freed or unreffed.
-//
-func (deviceManager *DeviceManager) ListDevices(typ DeviceType) []Devicer {
-	var _arg0 *C.GdkDeviceManager // out
-	var _arg1 C.GdkDeviceType     // out
-	var _cret *C.GList            // in
-
-	_arg0 = (*C.GdkDeviceManager)(unsafe.Pointer(coreglib.InternObject(deviceManager).Native()))
-	_arg1 = C.GdkDeviceType(typ)
-
-	_cret = C.gdk_device_manager_list_devices(_arg0, _arg1)
-	runtime.KeepAlive(deviceManager)
-	runtime.KeepAlive(typ)
-
-	var _list []Devicer // out
-
-	_list = make([]Devicer, 0, gextras.ListSize(unsafe.Pointer(_cret)))
-	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
-		src := (*C.GdkDevice)(v)
-		var dst Devicer // out
-		{
-			objptr := unsafe.Pointer(src)
-			if objptr == nil {
-				panic("object of type gdk.Devicer is nil")
-			}
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Devicer)
-				return ok
-			})
-			rv, ok := casted.(Devicer)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Devicer")
-			}
-			dst = rv
-		}
-		_list = append(_list, dst)
-	})
-
-	return _list
+func (v *DeviceManager) ConnectDeviceRemoved(f func(device Devicer)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "device-removed", false, unsafe.Pointer(C._gotk4_gdk3_DeviceManager_ConnectDeviceRemoved), f)
 }

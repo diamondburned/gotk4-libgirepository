@@ -2,8 +2,10 @@
 
 package pango
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <pango/pango.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ATTR_INDEX_FROM_TEXT_BEGINNING: value for start_index in PangoAttribute that

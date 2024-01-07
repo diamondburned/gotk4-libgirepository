@@ -10,14 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_ColorChooser_ConnectColorActivated
-func _gotk4_gtk3_ColorChooser_ConnectColorActivated(arg0 C.gpointer, arg1 *C.GdkRGBA, arg2 C.guintptr) {
+func _gotk4_gtk3_ColorChooser_ConnectColorActivated(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(color *gdk.RGBA)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

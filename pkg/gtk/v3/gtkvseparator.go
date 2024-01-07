@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeVSeparator = coreglib.Type(C.gtk_vseparator_get_type())
+	GTypeVSeparator = coreglib.Type(girepository.MustFind("Gtk", "VSeparator").RegisteredGType())
 )
 
 func init() {
@@ -94,26 +94,6 @@ func marshalVSeparator(p uintptr) (interface{}, error) {
 	return wrapVSeparator(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewVSeparator creates a new VSeparator.
-//
-// Deprecated: Use gtk_separator_new() with GTK_ORIENTATION_VERTICAL instead.
-//
-// The function returns the following values:
-//
-//    - vSeparator: new VSeparator.
-//
-func NewVSeparator() *VSeparator {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_vseparator_new()
-
-	var _vSeparator *VSeparator // out
-
-	_vSeparator = wrapVSeparator(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _vSeparator
-}
-
 // VSeparatorClass: instance of this type is always passed by reference.
 type VSeparatorClass struct {
 	*vSeparatorClass
@@ -121,12 +101,7 @@ type VSeparatorClass struct {
 
 // vSeparatorClass is the struct that's finalized.
 type vSeparatorClass struct {
-	native *C.GtkVSeparatorClass
+	native unsafe.Pointer
 }
 
-func (v *VSeparatorClass) ParentClass() *SeparatorClass {
-	valptr := &v.native.parent_class
-	var _v *SeparatorClass // out
-	_v = (*SeparatorClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoVSeparatorClass = girepository.MustFind("Gtk", "VSeparatorClass")

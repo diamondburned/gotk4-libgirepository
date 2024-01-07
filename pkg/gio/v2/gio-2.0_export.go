@@ -12,8 +12,10 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gio2_ActionGroup_ConnectActionAdded
@@ -98,11 +100,14 @@ func _gotk4_gio2_ActionGroup_ConnectActionStateChanged(arg0 C.gpointer, arg1 *C.
 
 	_actionName = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
 	_value = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg2)))
-	C.g_variant_ref(arg2)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_value)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 
@@ -110,7 +115,7 @@ func _gotk4_gio2_ActionGroup_ConnectActionStateChanged(arg0 C.gpointer, arg1 *C.
 }
 
 //export _gotk4_gio2_DBusObject_ConnectInterfaceAdded
-func _gotk4_gio2_DBusObject_ConnectInterfaceAdded(arg0 C.gpointer, arg1 *C.GDBusInterface, arg2 C.guintptr) {
+func _gotk4_gio2_DBusObject_ConnectInterfaceAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(iface DBusInterfacer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -146,7 +151,7 @@ func _gotk4_gio2_DBusObject_ConnectInterfaceAdded(arg0 C.gpointer, arg1 *C.GDBus
 }
 
 //export _gotk4_gio2_DBusObject_ConnectInterfaceRemoved
-func _gotk4_gio2_DBusObject_ConnectInterfaceRemoved(arg0 C.gpointer, arg1 *C.GDBusInterface, arg2 C.guintptr) {
+func _gotk4_gio2_DBusObject_ConnectInterfaceRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(iface DBusInterfacer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -182,7 +187,7 @@ func _gotk4_gio2_DBusObject_ConnectInterfaceRemoved(arg0 C.gpointer, arg1 *C.GDB
 }
 
 //export _gotk4_gio2_DBusObjectManager_ConnectInterfaceAdded
-func _gotk4_gio2_DBusObjectManager_ConnectInterfaceAdded(arg0 C.gpointer, arg1 *C.GDBusObject, arg2 *C.GDBusInterface, arg3 C.guintptr) {
+func _gotk4_gio2_DBusObjectManager_ConnectInterfaceAdded(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(object DBusObjector, iface DBusInterfacer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -236,7 +241,7 @@ func _gotk4_gio2_DBusObjectManager_ConnectInterfaceAdded(arg0 C.gpointer, arg1 *
 }
 
 //export _gotk4_gio2_DBusObjectManager_ConnectInterfaceRemoved
-func _gotk4_gio2_DBusObjectManager_ConnectInterfaceRemoved(arg0 C.gpointer, arg1 *C.GDBusObject, arg2 *C.GDBusInterface, arg3 C.guintptr) {
+func _gotk4_gio2_DBusObjectManager_ConnectInterfaceRemoved(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(object DBusObjector, iface DBusInterfacer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -290,7 +295,7 @@ func _gotk4_gio2_DBusObjectManager_ConnectInterfaceRemoved(arg0 C.gpointer, arg1
 }
 
 //export _gotk4_gio2_DBusObjectManager_ConnectObjectAdded
-func _gotk4_gio2_DBusObjectManager_ConnectObjectAdded(arg0 C.gpointer, arg1 *C.GDBusObject, arg2 C.guintptr) {
+func _gotk4_gio2_DBusObjectManager_ConnectObjectAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(object DBusObjector)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -326,7 +331,7 @@ func _gotk4_gio2_DBusObjectManager_ConnectObjectAdded(arg0 C.gpointer, arg1 *C.G
 }
 
 //export _gotk4_gio2_DBusObjectManager_ConnectObjectRemoved
-func _gotk4_gio2_DBusObjectManager_ConnectObjectRemoved(arg0 C.gpointer, arg1 *C.GDBusObject, arg2 C.guintptr) {
+func _gotk4_gio2_DBusObjectManager_ConnectObjectRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(object DBusObjector)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -425,52 +430,6 @@ func _gotk4_gio2_Drive_ConnectStopButton(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gio2_DtlsConnection_ConnectAcceptCertificate
-func _gotk4_gio2_DtlsConnection_ConnectAcceptCertificate(arg0 C.gpointer, arg1 *C.GTlsCertificate, arg2 C.GTlsCertificateFlags, arg3 C.guintptr) (cret C.gboolean) {
-	var f func(peerCert TLSCertificater, errors TLSCertificateFlags) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(peerCert TLSCertificater, errors TLSCertificateFlags) (ok bool))
-	}
-
-	var _peerCert TLSCertificater   // out
-	var _errors TLSCertificateFlags // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type gio.TLSCertificater is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(TLSCertificater)
-			return ok
-		})
-		rv, ok := casted.(TLSCertificater)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.TLSCertificater")
-		}
-		_peerCert = rv
-	}
-	_errors = TLSCertificateFlags(arg2)
-
-	ok := f(_peerCert, _errors)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
 //export _gotk4_gio2_ListModel_ConnectItemsChanged
 func _gotk4_gio2_ListModel_ConnectItemsChanged(arg0 C.gpointer, arg1 C.guint, arg2 C.guint, arg3 C.guint, arg4 C.guintptr) {
 	var f func(position, removed, added uint)
@@ -493,26 +452,6 @@ func _gotk4_gio2_ListModel_ConnectItemsChanged(arg0 C.gpointer, arg1 C.guint, ar
 	_added = uint(arg3)
 
 	f(_position, _removed, _added)
-}
-
-//export _gotk4_gio2_MemoryMonitor_ConnectLowMemoryWarning
-func _gotk4_gio2_MemoryMonitor_ConnectLowMemoryWarning(arg0 C.gpointer, arg1 C.GMemoryMonitorWarningLevel, arg2 C.guintptr) {
-	var f func(level MemoryMonitorWarningLevel)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(level MemoryMonitorWarningLevel))
-	}
-
-	var _level MemoryMonitorWarningLevel // out
-
-	_level = MemoryMonitorWarningLevel(arg1)
-
-	f(_level)
 }
 
 //export _gotk4_gio2_Mount_ConnectChanged
@@ -654,7 +593,7 @@ func _gotk4_gio2_AppLaunchContext_ConnectLaunchFailed(arg0 C.gpointer, arg1 *C.g
 }
 
 //export _gotk4_gio2_AppLaunchContext_ConnectLaunched
-func _gotk4_gio2_AppLaunchContext_ConnectLaunched(arg0 C.gpointer, arg1 *C.GAppInfo, arg2 *C.GVariant, arg3 C.guintptr) {
+func _gotk4_gio2_AppLaunchContext_ConnectLaunched(arg0 C.gpointer, arg1 *C.void, arg2 *C.GVariant, arg3 C.guintptr) {
 	var f func(info AppInfor, platformData *glib.Variant)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -687,11 +626,14 @@ func _gotk4_gio2_AppLaunchContext_ConnectLaunched(arg0 C.gpointer, arg1 *C.GAppI
 		_info = rv
 	}
 	_platformData = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg2)))
-	C.g_variant_ref(arg2)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_platformData)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 
@@ -715,7 +657,7 @@ func _gotk4_gio2_Application_ConnectActivate(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gio2_Application_ConnectCommandLine
-func _gotk4_gio2_Application_ConnectCommandLine(arg0 C.gpointer, arg1 *C.GApplicationCommandLine, arg2 C.guintptr) (cret C.gint) {
+func _gotk4_gio2_Application_ConnectCommandLine(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gint) {
 	var f func(commandLine *ApplicationCommandLine) (gint int)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -756,11 +698,14 @@ func _gotk4_gio2_Application_ConnectHandleLocalOptions(arg0 C.gpointer, arg1 *C.
 	var _options *glib.VariantDict // out
 
 	_options = (*glib.VariantDict)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	C.g_variant_dict_ref(arg1)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_options)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_dict_unref((*C.GVariantDict)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariantDict.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 
@@ -798,7 +743,7 @@ func _gotk4_gio2_Application_ConnectNameLost(arg0 C.gpointer, arg1 C.guintptr) (
 }
 
 //export _gotk4_gio2_Application_ConnectOpen
-func _gotk4_gio2_Application_ConnectOpen(arg0 C.gpointer, arg1 **C.GFile, arg2 C.gint, arg3 *C.gchar, arg4 C.guintptr) {
+func _gotk4_gio2_Application_ConnectOpen(arg0 C.gpointer, arg1 **C.void, arg2 C.gint, arg3 *C.gchar, arg4 C.guintptr) {
 	var f func(files []Filer, hint string)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
@@ -814,7 +759,7 @@ func _gotk4_gio2_Application_ConnectOpen(arg0 C.gpointer, arg1 **C.GFile, arg2 C
 	var _hint string   // out
 
 	{
-		src := unsafe.Slice((**C.GFile)(arg1), arg2)
+		src := unsafe.Slice((**C.void)(arg1), arg2)
 		_files = make([]Filer, arg2)
 		for i := 0; i < int(arg2); i++ {
 			{
@@ -918,7 +863,7 @@ func _gotk4_gio2_DBusAuthObserver_ConnectAllowMechanism(arg0 C.gpointer, arg1 *C
 }
 
 //export _gotk4_gio2_DBusAuthObserver_ConnectAuthorizeAuthenticatedPeer
-func _gotk4_gio2_DBusAuthObserver_ConnectAuthorizeAuthenticatedPeer(arg0 C.gpointer, arg1 *C.GIOStream, arg2 *C.GCredentials, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gio2_DBusAuthObserver_ConnectAuthorizeAuthenticatedPeer(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(stream IOStreamer, credentials *Credentials) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -992,7 +937,7 @@ func _gotk4_gio2_DBusConnection_ConnectClosed(arg0 C.gpointer, arg1 C.gboolean, 
 }
 
 //export _gotk4_gio2_DBusInterfaceSkeleton_ConnectGAuthorizeMethod
-func _gotk4_gio2_DBusInterfaceSkeleton_ConnectGAuthorizeMethod(arg0 C.gpointer, arg1 *C.GDBusMethodInvocation, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gio2_DBusInterfaceSkeleton_ConnectGAuthorizeMethod(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(invocation *DBusMethodInvocation) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1020,7 +965,7 @@ func _gotk4_gio2_DBusInterfaceSkeleton_ConnectGAuthorizeMethod(arg0 C.gpointer, 
 }
 
 //export _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxyPropertiesChanged
-func _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxyPropertiesChanged(arg0 C.gpointer, arg1 *C.GDBusObjectProxy, arg2 *C.GDBusProxy, arg3 *C.GVariant, arg4 **C.gchar, arg5 C.guintptr) {
+func _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxyPropertiesChanged(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 *C.GVariant, arg4 **C.gchar, arg5 C.guintptr) {
 	var f func(objectProxy *DBusObjectProxy, interfaceProxy *DBusProxy, changedProperties *glib.Variant, invalidatedProperties []string)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -1040,11 +985,14 @@ func _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxyPropertiesChanged(
 	_objectProxy = wrapDBusObjectProxy(coreglib.Take(unsafe.Pointer(arg1)))
 	_interfaceProxy = wrapDBusProxy(coreglib.Take(unsafe.Pointer(arg2)))
 	_changedProperties = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg3)))
-	C.g_variant_ref(arg3)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_changedProperties)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 	{
@@ -1065,7 +1013,7 @@ func _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxyPropertiesChanged(
 }
 
 //export _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxySignal
-func _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxySignal(arg0 C.gpointer, arg1 *C.GDBusObjectProxy, arg2 *C.GDBusProxy, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.GVariant, arg6 C.guintptr) {
+func _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxySignal(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 *C.gchar, arg4 *C.gchar, arg5 *C.GVariant, arg6 C.guintptr) {
 	var f func(objectProxy *DBusObjectProxy, interfaceProxy *DBusProxy, senderName, signalName string, parameters *glib.Variant)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg6))
@@ -1088,11 +1036,14 @@ func _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxySignal(arg0 C.gpoi
 	_senderName = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
 	_signalName = C.GoString((*C.gchar)(unsafe.Pointer(arg4)))
 	_parameters = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg5)))
-	C.g_variant_ref(arg5)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_parameters)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 
@@ -1100,7 +1051,7 @@ func _gotk4_gio2_DBusObjectManagerClient_ConnectInterfaceProxySignal(arg0 C.gpoi
 }
 
 //export _gotk4_gio2_DBusObjectSkeleton_ConnectAuthorizeMethod
-func _gotk4_gio2_DBusObjectSkeleton_ConnectAuthorizeMethod(arg0 C.gpointer, arg1 *C.GDBusInterfaceSkeleton, arg2 *C.GDBusMethodInvocation, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gio2_DBusObjectSkeleton_ConnectAuthorizeMethod(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(iface DBusInterfaceSkeletonner, invocation *DBusMethodInvocation) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -1162,11 +1113,14 @@ func _gotk4_gio2_DBusProxy_ConnectGPropertiesChanged(arg0 C.gpointer, arg1 *C.GV
 	var _invalidatedProperties []string  // out
 
 	_changedProperties = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	C.g_variant_ref(arg1)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_changedProperties)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 	{
@@ -1208,11 +1162,14 @@ func _gotk4_gio2_DBusProxy_ConnectGSignal(arg0 C.gpointer, arg1 *C.gchar, arg2 *
 	}
 	_signalName = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
 	_parameters = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg3)))
-	C.g_variant_ref(arg3)
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(_parameters)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_variant_unref((*C.GVariant)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+			}
 		},
 	)
 
@@ -1220,7 +1177,7 @@ func _gotk4_gio2_DBusProxy_ConnectGSignal(arg0 C.gpointer, arg1 *C.gchar, arg2 *
 }
 
 //export _gotk4_gio2_DBusServer_ConnectNewConnection
-func _gotk4_gio2_DBusServer_ConnectNewConnection(arg0 C.gpointer, arg1 *C.GDBusConnection, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gio2_DBusServer_ConnectNewConnection(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(connection *DBusConnection) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1245,61 +1202,6 @@ func _gotk4_gio2_DBusServer_ConnectNewConnection(arg0 C.gpointer, arg1 *C.GDBusC
 	}
 
 	return cret
-}
-
-//export _gotk4_gio2_FileMonitor_ConnectChanged
-func _gotk4_gio2_FileMonitor_ConnectChanged(arg0 C.gpointer, arg1 *C.GFile, arg2 *C.GFile, arg3 C.GFileMonitorEvent, arg4 C.guintptr) {
-	var f func(file, otherFile Filer, eventType FileMonitorEvent)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(file, otherFile Filer, eventType FileMonitorEvent))
-	}
-
-	var _file Filer                 // out
-	var _otherFile Filer            // out
-	var _eventType FileMonitorEvent // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type gio.Filer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Filer)
-			return ok
-		})
-		rv, ok := casted.(Filer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.Filer")
-		}
-		_file = rv
-	}
-	if arg2 != nil {
-		{
-			objptr := unsafe.Pointer(arg2)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Filer)
-				return ok
-			})
-			rv, ok := casted.(Filer)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.Filer")
-			}
-			_otherFile = rv
-		}
-	}
-	_eventType = FileMonitorEvent(arg3)
-
-	f(_file, _otherFile, _eventType)
 }
 
 //export _gotk4_gio2_FilenameCompleter_ConnectGotCompletionData
@@ -1358,32 +1260,6 @@ func _gotk4_gio2_MountOperation_ConnectAborted(arg0 C.gpointer, arg1 C.guintptr)
 	f()
 }
 
-//export _gotk4_gio2_MountOperation_ConnectAskPassword
-func _gotk4_gio2_MountOperation_ConnectAskPassword(arg0 C.gpointer, arg1 *C.gchar, arg2 *C.gchar, arg3 *C.gchar, arg4 C.GAskPasswordFlags, arg5 C.guintptr) {
-	var f func(message, defaultUser, defaultDomain string, flags AskPasswordFlags)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(message, defaultUser, defaultDomain string, flags AskPasswordFlags))
-	}
-
-	var _message string         // out
-	var _defaultUser string     // out
-	var _defaultDomain string   // out
-	var _flags AskPasswordFlags // out
-
-	_message = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
-	_defaultUser = C.GoString((*C.gchar)(unsafe.Pointer(arg2)))
-	_defaultDomain = C.GoString((*C.gchar)(unsafe.Pointer(arg3)))
-	_flags = AskPasswordFlags(arg4)
-
-	f(_message, _defaultUser, _defaultDomain, _flags)
-}
-
 //export _gotk4_gio2_MountOperation_ConnectAskQuestion
 func _gotk4_gio2_MountOperation_ConnectAskQuestion(arg0 C.gpointer, arg1 *C.gchar, arg2 **C.gchar, arg3 C.guintptr) {
 	var f func(message string, choices []string)
@@ -1416,26 +1292,6 @@ func _gotk4_gio2_MountOperation_ConnectAskQuestion(arg0 C.gpointer, arg1 *C.gcha
 	}
 
 	f(_message, _choices)
-}
-
-//export _gotk4_gio2_MountOperation_ConnectReply
-func _gotk4_gio2_MountOperation_ConnectReply(arg0 C.gpointer, arg1 C.GMountOperationResult, arg2 C.guintptr) {
-	var f func(result MountOperationResult)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(result MountOperationResult))
-	}
-
-	var _result MountOperationResult // out
-
-	_result = MountOperationResult(arg1)
-
-	f(_result)
 }
 
 //export _gotk4_gio2_MountOperation_ConnectShowUnmountProgress
@@ -1479,7 +1335,7 @@ func _gotk4_gio2_Resolver_ConnectReload(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gio2_Settings_ConnectChangeEvent
-func _gotk4_gio2_Settings_ConnectChangeEvent(arg0 C.gpointer, arg1 C.gpointer, arg2 C.gint, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gio2_Settings_ConnectChangeEvent(arg0 C.gpointer, arg1 *C.GQuark, arg2 C.gint, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(keys []glib.Quark) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -1599,11 +1455,14 @@ func _gotk4_gio2_SimpleAction_ConnectActivate(arg0 C.gpointer, arg1 *C.GVariant,
 
 	if arg1 != nil {
 		_parameter = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-		C.g_variant_ref(arg1)
 		runtime.SetFinalizer(
 			gextras.StructIntern(unsafe.Pointer(_parameter)),
 			func(intern *struct{ C unsafe.Pointer }) {
-				C.g_variant_unref((*C.GVariant)(intern.C))
+				{
+					var args [1]girepository.Argument
+					*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+					GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+				}
 			},
 		)
 	}
@@ -1628,11 +1487,14 @@ func _gotk4_gio2_SimpleAction_ConnectChangeState(arg0 C.gpointer, arg1 *C.GVaria
 
 	if arg1 != nil {
 		_value = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-		C.g_variant_ref(arg1)
 		runtime.SetFinalizer(
 			gextras.StructIntern(unsafe.Pointer(_value)),
 			func(intern *struct{ C unsafe.Pointer }) {
-				C.g_variant_unref((*C.GVariant)(intern.C))
+				{
+					var args [1]girepository.Argument
+					*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+					GIRInfoVariant.InvokeRecordMethod("unref", args[:], nil)
+				}
 			},
 		)
 	}
@@ -1640,85 +1502,8 @@ func _gotk4_gio2_SimpleAction_ConnectChangeState(arg0 C.gpointer, arg1 *C.GVaria
 	f(_value)
 }
 
-//export _gotk4_gio2_SocketClient_ConnectEvent
-func _gotk4_gio2_SocketClient_ConnectEvent(arg0 C.gpointer, arg1 C.GSocketClientEvent, arg2 *C.GSocketConnectable, arg3 *C.GIOStream, arg4 C.guintptr) {
-	var f func(event SocketClientEvent, connectable SocketConnectabler, connection IOStreamer)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(event SocketClientEvent, connectable SocketConnectabler, connection IOStreamer))
-	}
-
-	var _event SocketClientEvent        // out
-	var _connectable SocketConnectabler // out
-	var _connection IOStreamer          // out
-
-	_event = SocketClientEvent(arg1)
-	{
-		objptr := unsafe.Pointer(arg2)
-		if objptr == nil {
-			panic("object of type gio.SocketConnectabler is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(SocketConnectabler)
-			return ok
-		})
-		rv, ok := casted.(SocketConnectabler)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.SocketConnectabler")
-		}
-		_connectable = rv
-	}
-	if arg3 != nil {
-		{
-			objptr := unsafe.Pointer(arg3)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(IOStreamer)
-				return ok
-			})
-			rv, ok := casted.(IOStreamer)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.IOStreamer")
-			}
-			_connection = rv
-		}
-	}
-
-	f(_event, _connectable, _connection)
-}
-
-//export _gotk4_gio2_SocketListener_ConnectEvent
-func _gotk4_gio2_SocketListener_ConnectEvent(arg0 C.gpointer, arg1 C.GSocketListenerEvent, arg2 *C.GSocket, arg3 C.guintptr) {
-	var f func(event SocketListenerEvent, socket *Socket)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(event SocketListenerEvent, socket *Socket))
-	}
-
-	var _event SocketListenerEvent // out
-	var _socket *Socket            // out
-
-	_event = SocketListenerEvent(arg1)
-	_socket = wrapSocket(coreglib.Take(unsafe.Pointer(arg2)))
-
-	f(_event, _socket)
-}
-
 //export _gotk4_gio2_SocketService_ConnectIncoming
-func _gotk4_gio2_SocketService_ConnectIncoming(arg0 C.gpointer, arg1 *C.GSocketConnection, arg2 C.GObject, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gio2_SocketService_ConnectIncoming(arg0 C.gpointer, arg1 *C.void, arg2 C.GObject, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(connection *SocketConnection, sourceObject *coreglib.Object) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -1748,7 +1533,7 @@ func _gotk4_gio2_SocketService_ConnectIncoming(arg0 C.gpointer, arg1 *C.GSocketC
 }
 
 //export _gotk4_gio2_ThreadedSocketService_ConnectRun
-func _gotk4_gio2_ThreadedSocketService_ConnectRun(arg0 C.gpointer, arg1 *C.GSocketConnection, arg2 C.GObject, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gio2_ThreadedSocketService_ConnectRun(arg0 C.gpointer, arg1 *C.void, arg2 C.GObject, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(connection *SocketConnection, sourceObject *coreglib.Object) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -1777,54 +1562,8 @@ func _gotk4_gio2_ThreadedSocketService_ConnectRun(arg0 C.gpointer, arg1 *C.GSock
 	return cret
 }
 
-//export _gotk4_gio2_TlsConnection_ConnectAcceptCertificate
-func _gotk4_gio2_TlsConnection_ConnectAcceptCertificate(arg0 C.gpointer, arg1 *C.GTlsCertificate, arg2 C.GTlsCertificateFlags, arg3 C.guintptr) (cret C.gboolean) {
-	var f func(peerCert TLSCertificater, errors TLSCertificateFlags) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(peerCert TLSCertificater, errors TLSCertificateFlags) (ok bool))
-	}
-
-	var _peerCert TLSCertificater   // out
-	var _errors TLSCertificateFlags // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type gio.TLSCertificater is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(TLSCertificater)
-			return ok
-		})
-		rv, ok := casted.(TLSCertificater)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.TLSCertificater")
-		}
-		_peerCert = rv
-	}
-	_errors = TLSCertificateFlags(arg2)
-
-	ok := f(_peerCert, _errors)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
 //export _gotk4_gio2_VolumeMonitor_ConnectDriveChanged
-func _gotk4_gio2_VolumeMonitor_ConnectDriveChanged(arg0 C.gpointer, arg1 *C.GDrive, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectDriveChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(drive Driver)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1860,7 +1599,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectDriveChanged(arg0 C.gpointer, arg1 *C.GDri
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectDriveConnected
-func _gotk4_gio2_VolumeMonitor_ConnectDriveConnected(arg0 C.gpointer, arg1 *C.GDrive, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectDriveConnected(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(drive Driver)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1896,7 +1635,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectDriveConnected(arg0 C.gpointer, arg1 *C.GD
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectDriveDisconnected
-func _gotk4_gio2_VolumeMonitor_ConnectDriveDisconnected(arg0 C.gpointer, arg1 *C.GDrive, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectDriveDisconnected(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(drive Driver)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1932,7 +1671,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectDriveDisconnected(arg0 C.gpointer, arg1 *C
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectDriveEjectButton
-func _gotk4_gio2_VolumeMonitor_ConnectDriveEjectButton(arg0 C.gpointer, arg1 *C.GDrive, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectDriveEjectButton(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(drive Driver)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1968,7 +1707,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectDriveEjectButton(arg0 C.gpointer, arg1 *C.
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectDriveStopButton
-func _gotk4_gio2_VolumeMonitor_ConnectDriveStopButton(arg0 C.gpointer, arg1 *C.GDrive, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectDriveStopButton(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(drive Driver)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -2004,7 +1743,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectDriveStopButton(arg0 C.gpointer, arg1 *C.G
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectMountAdded
-func _gotk4_gio2_VolumeMonitor_ConnectMountAdded(arg0 C.gpointer, arg1 *C.GMount, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectMountAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(mount Mounter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -2040,7 +1779,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectMountAdded(arg0 C.gpointer, arg1 *C.GMount
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectMountChanged
-func _gotk4_gio2_VolumeMonitor_ConnectMountChanged(arg0 C.gpointer, arg1 *C.GMount, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectMountChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(mount Mounter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -2076,7 +1815,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectMountChanged(arg0 C.gpointer, arg1 *C.GMou
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectMountPreUnmount
-func _gotk4_gio2_VolumeMonitor_ConnectMountPreUnmount(arg0 C.gpointer, arg1 *C.GMount, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectMountPreUnmount(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(mount Mounter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -2112,7 +1851,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectMountPreUnmount(arg0 C.gpointer, arg1 *C.G
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectMountRemoved
-func _gotk4_gio2_VolumeMonitor_ConnectMountRemoved(arg0 C.gpointer, arg1 *C.GMount, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectMountRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(mount Mounter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -2148,7 +1887,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectMountRemoved(arg0 C.gpointer, arg1 *C.GMou
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectVolumeAdded
-func _gotk4_gio2_VolumeMonitor_ConnectVolumeAdded(arg0 C.gpointer, arg1 *C.GVolume, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectVolumeAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(volume Volumer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -2184,7 +1923,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectVolumeAdded(arg0 C.gpointer, arg1 *C.GVolu
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectVolumeChanged
-func _gotk4_gio2_VolumeMonitor_ConnectVolumeChanged(arg0 C.gpointer, arg1 *C.GVolume, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectVolumeChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(volume Volumer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -2220,7 +1959,7 @@ func _gotk4_gio2_VolumeMonitor_ConnectVolumeChanged(arg0 C.gpointer, arg1 *C.GVo
 }
 
 //export _gotk4_gio2_VolumeMonitor_ConnectVolumeRemoved
-func _gotk4_gio2_VolumeMonitor_ConnectVolumeRemoved(arg0 C.gpointer, arg1 *C.GVolume, arg2 C.guintptr) {
+func _gotk4_gio2_VolumeMonitor_ConnectVolumeRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(volume Volumer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

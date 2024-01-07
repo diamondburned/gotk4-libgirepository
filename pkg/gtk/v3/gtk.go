@@ -9,27 +9,24 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: gtk+-3.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeMovementStep        = coreglib.Type(C.gtk_movement_step_get_type())
-	GTypeNotebookTab         = coreglib.Type(C.gtk_notebook_tab_get_type())
-	GTypeResizeMode          = coreglib.Type(C.gtk_resize_mode_get_type())
-	GTypeScrollStep          = coreglib.Type(C.gtk_scroll_step_get_type())
-	GTypeDebugFlag           = coreglib.Type(C.gtk_debug_flag_get_type())
-	GTypeEntryIconAccessible = coreglib.Type(C.gtk_entry_icon_accessible_get_type())
+	GTypeMovementStep        = coreglib.Type(girepository.MustFind("Gtk", "MovementStep").RegisteredGType())
+	GTypeNotebookTab         = coreglib.Type(girepository.MustFind("Gtk", "NotebookTab").RegisteredGType())
+	GTypeResizeMode          = coreglib.Type(girepository.MustFind("Gtk", "ResizeMode").RegisteredGType())
+	GTypeScrollStep          = coreglib.Type(girepository.MustFind("Gtk", "ScrollStep").RegisteredGType())
+	GTypeDebugFlag           = coreglib.Type(girepository.MustFind("Gtk", "DebugFlag").RegisteredGType())
+	GTypeEntryIconAccessible = coreglib.Type(girepository.MustFind("Gtk", "EntryIconAccessible").RegisteredGType())
 )
 
 func init() {
@@ -43,52 +40,8 @@ func init() {
 	})
 }
 
-// The function returns the following values:
-//
-func BuilderErrorQuark() glib.Quark {
-	var _cret C.GQuark // in
-
-	_cret = C.gtk_builder_error_quark()
-
-	var _quark glib.Quark // out
-
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
-
-	return _quark
-}
-
-// The function returns the following values:
-//
-func CSSProviderErrorQuark() glib.Quark {
-	var _cret C.GQuark // in
-
-	_cret = C.gtk_css_provider_error_quark()
-
-	var _quark glib.Quark // out
-
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
-
-	return _quark
-}
-
-// The function returns the following values:
-//
-func IconThemeErrorQuark() glib.Quark {
-	var _cret C.GQuark // in
-
-	_cret = C.gtk_icon_theme_error_quark()
-
-	var _quark glib.Quark // out
-
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
-
-	return _quark
+func init() {
+	girepository.Require("Gtk", "3.0", girepository.LoadFlagLazy)
 }
 
 type MovementStep C.gint
@@ -169,38 +122,6 @@ func (n NotebookTab) String() string {
 	default:
 		return fmt.Sprintf("NotebookTab(%d)", n)
 	}
-}
-
-// The function returns the following values:
-//
-func RecentChooserErrorQuark() glib.Quark {
-	var _cret C.GQuark // in
-
-	_cret = C.gtk_recent_chooser_error_quark()
-
-	var _quark glib.Quark // out
-
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
-
-	return _quark
-}
-
-// The function returns the following values:
-//
-func RecentManagerErrorQuark() glib.Quark {
-	var _cret C.GQuark // in
-
-	_cret = C.gtk_recent_manager_error_quark()
-
-	var _quark glib.Quark // out
-
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
-
-	return _quark
 }
 
 type ResizeMode C.gint

@@ -7,20 +7,20 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeButtonRole  = coreglib.Type(C.gtk_button_role_get_type())
-	GTypeModelButton = coreglib.Type(C.gtk_model_button_get_type())
+	GTypeButtonRole  = coreglib.Type(girepository.MustFind("Gtk", "ButtonRole").RegisteredGType())
+	GTypeModelButton = coreglib.Type(girepository.MustFind("Gtk", "ModelButton").RegisteredGType())
 )
 
 func init() {
@@ -182,22 +182,4 @@ func wrapModelButton(obj *coreglib.Object) *ModelButton {
 
 func marshalModelButton(p uintptr) (interface{}, error) {
 	return wrapModelButton(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewModelButton creates a new GtkModelButton.
-//
-// The function returns the following values:
-//
-//    - modelButton: newly created ModelButton widget.
-//
-func NewModelButton() *ModelButton {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_model_button_new()
-
-	var _modelButton *ModelButton // out
-
-	_modelButton = wrapModelButton(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _modelButton
 }

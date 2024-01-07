@@ -3,21 +3,22 @@
 package pango
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <pango/pango.h>
 import "C"
 
 // GType values.
 var (
-	GTypeGlyphItem = coreglib.Type(C.pango_glyph_item_get_type())
+	GTypeGlyphItem = coreglib.Type(girepository.MustFind("Pango", "GlyphItem").RegisteredGType())
 )
 
 func init() {
@@ -40,17 +41,20 @@ type GlyphItem struct {
 
 // glyphItem is the struct that's finalized.
 type glyphItem struct {
-	native *C.PangoGlyphItem
+	native unsafe.Pointer
 }
+
+var GIRInfoGlyphItem = girepository.MustFind("Pango", "GlyphItem")
 
 func marshalGlyphItem(p uintptr) (interface{}, error) {
 	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
-	return &GlyphItem{&glyphItem{(*C.PangoGlyphItem)(b)}}, nil
+	return &GlyphItem{&glyphItem{(unsafe.Pointer)(b)}}, nil
 }
 
 // Item: corresponding PangoItem.
 func (g *GlyphItem) Item() *Item {
-	valptr := &g.native.item
+	offset := GIRInfoGlyphItem.StructFieldOffset("item")
+	valptr := (**Item)(unsafe.Add(g.native, offset))
 	var _v *Item // out
 	_v = (*Item)(gextras.NewStructNative(unsafe.Pointer(*valptr)))
 	return _v
@@ -58,155 +62,9 @@ func (g *GlyphItem) Item() *Item {
 
 // Glyphs: corresponding PangoGlyphString.
 func (g *GlyphItem) Glyphs() *GlyphString {
-	valptr := &g.native.glyphs
+	offset := GIRInfoGlyphItem.StructFieldOffset("glyphs")
+	valptr := (**GlyphString)(unsafe.Add(g.native, offset))
 	var _v *GlyphString // out
 	_v = (*GlyphString)(gextras.NewStructNative(unsafe.Pointer(*valptr)))
 	return _v
-}
-
-// ApplyAttrs splits a shaped item (PangoGlyphItem) into multiple items based on
-// an attribute list.
-//
-// The idea is that if you have attributes that don't affect shaping, such as
-// color or underline, to avoid affecting shaping, you filter them out
-// (pango.AttrList.Filter()), apply the shaping process and then reapply them to
-// the result using this function.
-//
-// All attributes that start or end inside a cluster are applied to that
-// cluster; for instance, if half of a cluster is underlined and the other-half
-// strikethrough, then the cluster will end up with both underline and
-// strikethrough attributes. In these cases, it may happen that
-// item->extra_attrs for some of the result items can have multiple attributes
-// of the same type.
-//
-// This function takes ownership of glyph_item; it will be reused as one of the
-// elements in the list.
-//
-// The function takes the following parameters:
-//
-//    - text that list applies to.
-//    - list: PangoAttrList.
-//
-// The function returns the following values:
-//
-//    - sList: a list of glyph items resulting from splitting glyph_item. Free
-//      the elements using pango.GlyphItem.Free(), the list using g_slist_free().
-//
-func (glyphItem *GlyphItem) ApplyAttrs(text string, list *AttrList) []*GlyphItem {
-	var _arg0 *C.PangoGlyphItem // out
-	var _arg1 *C.char           // out
-	var _arg2 *C.PangoAttrList  // out
-	var _cret *C.GSList         // in
-
-	_arg0 = (*C.PangoGlyphItem)(gextras.StructNative(unsafe.Pointer(glyphItem)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(text)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.PangoAttrList)(gextras.StructNative(unsafe.Pointer(list)))
-
-	_cret = C.pango_glyph_item_apply_attrs(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(glyphItem)
-	runtime.KeepAlive(text)
-	runtime.KeepAlive(list)
-
-	var _sList []*GlyphItem // out
-
-	_sList = make([]*GlyphItem, 0, gextras.SListSize(unsafe.Pointer(_cret)))
-	gextras.MoveSList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
-		src := (*C.PangoGlyphItem)(v)
-		var dst *GlyphItem // out
-		dst = (*GlyphItem)(gextras.NewStructNative(unsafe.Pointer(src)))
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(dst)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.pango_glyph_item_free((*C.PangoGlyphItem)(intern.C))
-			},
-		)
-		_sList = append(_sList, dst)
-	})
-
-	return _sList
-}
-
-// Copy: make a deep copy of an existing PangoGlyphItem structure.
-//
-// The function returns the following values:
-//
-//    - glyphItem (optional): newly allocated PangoGlyphItem, which should be
-//      freed with pango_glyph_item_free(), or NULL if orig was NULL.
-//
-func (orig *GlyphItem) Copy() *GlyphItem {
-	var _arg0 *C.PangoGlyphItem // out
-	var _cret *C.PangoGlyphItem // in
-
-	if orig != nil {
-		_arg0 = (*C.PangoGlyphItem)(gextras.StructNative(unsafe.Pointer(orig)))
-	}
-
-	_cret = C.pango_glyph_item_copy(_arg0)
-	runtime.KeepAlive(orig)
-
-	var _glyphItem *GlyphItem // out
-
-	if _cret != nil {
-		_glyphItem = (*GlyphItem)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_glyphItem)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.pango_glyph_item_free((*C.PangoGlyphItem)(intern.C))
-			},
-		)
-	}
-
-	return _glyphItem
-}
-
-// Split modifies orig to cover only the text after split_index, and returns a
-// new item that covers the text before split_index that used to be in orig.
-//
-// You can think of split_index as the length of the returned item. split_index
-// may not be 0, and it may not be greater than or equal to the length of orig
-// (that is, there must be at least one byte assigned to each item, you can't
-// create a zero-length item).
-//
-// This function is similar in function to pango_item_split() (and uses it
-// internally.).
-//
-// The function takes the following parameters:
-//
-//    - text to which positions in orig apply.
-//    - splitIndex: byte index of position to split item, relative to the start
-//      of the item.
-//
-// The function returns the following values:
-//
-//    - glyphItem: newly allocated item representing text before split_index,
-//      which should be freed with pango_glyph_item_free().
-//
-func (orig *GlyphItem) Split(text string, splitIndex int) *GlyphItem {
-	var _arg0 *C.PangoGlyphItem // out
-	var _arg1 *C.char           // out
-	var _arg2 C.int             // out
-	var _cret *C.PangoGlyphItem // in
-
-	_arg0 = (*C.PangoGlyphItem)(gextras.StructNative(unsafe.Pointer(orig)))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(text)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.int(splitIndex)
-
-	_cret = C.pango_glyph_item_split(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(orig)
-	runtime.KeepAlive(text)
-	runtime.KeepAlive(splitIndex)
-
-	var _glyphItem *GlyphItem // out
-
-	_glyphItem = (*GlyphItem)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_glyphItem)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.pango_glyph_item_free((*C.PangoGlyphItem)(intern.C))
-		},
-	)
-
-	return _glyphItem
 }

@@ -8,12 +8,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gdk4_DisplayManager_ConnectDisplayOpened
-func _gotk4_gdk4_DisplayManager_ConnectDisplayOpened(arg0 C.gpointer, arg1 *C.GdkDisplay, arg2 C.guintptr) {
+func _gotk4_gdk4_DisplayManager_ConnectDisplayOpened(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(display *Display)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

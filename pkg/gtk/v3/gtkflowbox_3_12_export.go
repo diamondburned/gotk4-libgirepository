@@ -9,14 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_FlowBoxFilterFunc
-func _gotk4_gtk3_FlowBoxFilterFunc(arg1 *C.GtkFlowBoxChild, arg2 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk3_FlowBoxFilterFunc(arg1 *C.void, arg2 C.gpointer) (cret C.gboolean) {
 	var fn FlowBoxFilterFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -42,7 +42,7 @@ func _gotk4_gtk3_FlowBoxFilterFunc(arg1 *C.GtkFlowBoxChild, arg2 C.gpointer) (cr
 }
 
 //export _gotk4_gtk3_FlowBoxForEachFunc
-func _gotk4_gtk3_FlowBoxForEachFunc(arg1 *C.GtkFlowBox, arg2 *C.GtkFlowBoxChild, arg3 C.gpointer) {
+func _gotk4_gtk3_FlowBoxForEachFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) {
 	var fn FlowBoxForEachFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -62,7 +62,7 @@ func _gotk4_gtk3_FlowBoxForEachFunc(arg1 *C.GtkFlowBox, arg2 *C.GtkFlowBoxChild,
 }
 
 //export _gotk4_gtk3_FlowBoxSortFunc
-func _gotk4_gtk3_FlowBoxSortFunc(arg1 *C.GtkFlowBoxChild, arg2 *C.GtkFlowBoxChild, arg3 C.gpointer) (cret C.gint) {
+func _gotk4_gtk3_FlowBoxSortFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) (cret C.gint) {
 	var fn FlowBoxSortFunc
 	{
 		v := gbox.Get(uintptr(arg3))

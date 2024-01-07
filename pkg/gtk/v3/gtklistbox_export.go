@@ -8,14 +8,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_ListBox_ConnectRowActivated
-func _gotk4_gtk3_ListBox_ConnectRowActivated(arg0 C.gpointer, arg1 *C.GtkListBoxRow, arg2 C.guintptr) {
+func _gotk4_gtk3_ListBox_ConnectRowActivated(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(row *ListBoxRow)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -35,7 +35,7 @@ func _gotk4_gtk3_ListBox_ConnectRowActivated(arg0 C.gpointer, arg1 *C.GtkListBox
 }
 
 //export _gotk4_gtk3_ListBox_ConnectRowSelected
-func _gotk4_gtk3_ListBox_ConnectRowSelected(arg0 C.gpointer, arg1 *C.GtkListBoxRow, arg2 C.guintptr) {
+func _gotk4_gtk3_ListBox_ConnectRowSelected(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(row *ListBoxRow)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

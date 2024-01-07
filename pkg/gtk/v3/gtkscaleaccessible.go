@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeScaleAccessible = coreglib.Type(C.gtk_scale_accessible_get_type())
+	GTypeScaleAccessible = coreglib.Type(girepository.MustFind("Gtk", "ScaleAccessible").RegisteredGType())
 )
 
 func init() {
@@ -92,12 +92,7 @@ type ScaleAccessibleClass struct {
 
 // scaleAccessibleClass is the struct that's finalized.
 type scaleAccessibleClass struct {
-	native *C.GtkScaleAccessibleClass
+	native unsafe.Pointer
 }
 
-func (s *ScaleAccessibleClass) ParentClass() *RangeAccessibleClass {
-	valptr := &s.native.parent_class
-	var _v *RangeAccessibleClass // out
-	_v = (*RangeAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoScaleAccessibleClass = girepository.MustFind("Gtk", "ScaleAccessibleClass")

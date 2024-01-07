@@ -3,22 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeMultiSorter = coreglib.Type(C.gtk_multi_sorter_get_type())
+	GTypeMultiSorter = coreglib.Type(girepository.MustFind("Gtk", "MultiSorter").RegisteredGType())
 )
 
 func init() {
@@ -87,71 +88,6 @@ func marshalMultiSorter(p uintptr) (interface{}, error) {
 	return wrapMultiSorter(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewMultiSorter creates a new multi sorter.
-//
-// This sorter compares items by trying each of the sorters in turn, until one
-// returns non-zero. In particular, if no sorter has been added to it, it will
-// always compare items as equal.
-//
-// The function returns the following values:
-//
-//    - multiSorter: new GtkMultiSorter.
-//
-func NewMultiSorter() *MultiSorter {
-	var _cret *C.GtkMultiSorter // in
-
-	_cret = C.gtk_multi_sorter_new()
-
-	var _multiSorter *MultiSorter // out
-
-	_multiSorter = wrapMultiSorter(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _multiSorter
-}
-
-// Append: add sorter to self to use for sorting at the end.
-//
-// self will consult all existing sorters before it will sort with the given
-// sorter.
-//
-// The function takes the following parameters:
-//
-//    - sorter to add.
-//
-func (self *MultiSorter) Append(sorter *Sorter) {
-	var _arg0 *C.GtkMultiSorter // out
-	var _arg1 *C.GtkSorter      // out
-
-	_arg0 = (*C.GtkMultiSorter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = (*C.GtkSorter)(unsafe.Pointer(coreglib.InternObject(sorter).Native()))
-	C.g_object_ref(C.gpointer(coreglib.InternObject(sorter).Native()))
-
-	C.gtk_multi_sorter_append(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(sorter)
-}
-
-// Remove removes the sorter at the given position from the list of sorter used
-// by self.
-//
-// If position is larger than the number of sorters, nothing happens.
-//
-// The function takes the following parameters:
-//
-//    - position of sorter to remove.
-//
-func (self *MultiSorter) Remove(position uint) {
-	var _arg0 *C.GtkMultiSorter // out
-	var _arg1 C.guint           // out
-
-	_arg0 = (*C.GtkMultiSorter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = C.guint(position)
-
-	C.gtk_multi_sorter_remove(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(position)
-}
-
 // MultiSorterClass: instance of this type is always passed by reference.
 type MultiSorterClass struct {
 	*multiSorterClass
@@ -159,12 +95,7 @@ type MultiSorterClass struct {
 
 // multiSorterClass is the struct that's finalized.
 type multiSorterClass struct {
-	native *C.GtkMultiSorterClass
+	native unsafe.Pointer
 }
 
-func (m *MultiSorterClass) ParentClass() *SorterClass {
-	valptr := &m.native.parent_class
-	var _v *SorterClass // out
-	_v = (*SorterClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoMultiSorterClass = girepository.MustFind("Gtk", "MultiSorterClass")

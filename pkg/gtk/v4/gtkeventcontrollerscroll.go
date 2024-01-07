@@ -4,16 +4,17 @@ package gtk
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_EventControllerScroll_ConnectScrollEnd(gpointer, guintptr);
 // extern void _gotk4_gtk4_EventControllerScroll_ConnectScrollBegin(gpointer, guintptr);
 // extern void _gotk4_gtk4_EventControllerScroll_ConnectDecelerate(gpointer, gdouble, gdouble, guintptr);
@@ -22,8 +23,8 @@ import "C"
 
 // GType values.
 var (
-	GTypeEventControllerScrollFlags = coreglib.Type(C.gtk_event_controller_scroll_flags_get_type())
-	GTypeEventControllerScroll      = coreglib.Type(C.gtk_event_controller_scroll_get_type())
+	GTypeEventControllerScrollFlags = coreglib.Type(girepository.MustFind("Gtk", "EventControllerScrollFlags").RegisteredGType())
+	GTypeEventControllerScroll      = coreglib.Type(girepository.MustFind("Gtk", "EventControllerScroll").RegisteredGType())
 )
 
 func init() {
@@ -159,93 +160,26 @@ func marshalEventControllerScroll(p uintptr) (interface{}, error) {
 //
 // vel_x and vel_y express the initial velocity that was imprinted by the scroll
 // events. vel_x and vel_y are expressed in pixels/ms.
-func (scroll *EventControllerScroll) ConnectDecelerate(f func(velX, velY float64)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(scroll, "decelerate", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerScroll_ConnectDecelerate), f)
+func (v *EventControllerScroll) ConnectDecelerate(f func(velX, velY float64)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "decelerate", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerScroll_ConnectDecelerate), f)
 }
 
 // ConnectScroll signals that the widget should scroll by the amount specified
 // by dx and dy.
-func (scroll *EventControllerScroll) ConnectScroll(f func(dx, dy float64) (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(scroll, "scroll", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerScroll_ConnectScroll), f)
+func (v *EventControllerScroll) ConnectScroll(f func(dx, dy float64) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "scroll", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerScroll_ConnectScroll), f)
 }
 
 // ConnectScrollBegin signals that a new scrolling operation has begun.
 //
 // It will only be emitted on devices capable of it.
-func (scroll *EventControllerScroll) ConnectScrollBegin(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(scroll, "scroll-begin", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerScroll_ConnectScrollBegin), f)
+func (v *EventControllerScroll) ConnectScrollBegin(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "scroll-begin", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerScroll_ConnectScrollBegin), f)
 }
 
 // ConnectScrollEnd signals that a scrolling operation has finished.
 //
 // It will only be emitted on devices capable of it.
-func (scroll *EventControllerScroll) ConnectScrollEnd(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(scroll, "scroll-end", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerScroll_ConnectScrollEnd), f)
-}
-
-// NewEventControllerScroll creates a new event controller that will handle
-// scroll events.
-//
-// The function takes the following parameters:
-//
-//    - flags affecting the controller behavior.
-//
-// The function returns the following values:
-//
-//    - eventControllerScroll: new GtkEventControllerScroll.
-//
-func NewEventControllerScroll(flags EventControllerScrollFlags) *EventControllerScroll {
-	var _arg1 C.GtkEventControllerScrollFlags // out
-	var _cret *C.GtkEventController           // in
-
-	_arg1 = C.GtkEventControllerScrollFlags(flags)
-
-	_cret = C.gtk_event_controller_scroll_new(_arg1)
-	runtime.KeepAlive(flags)
-
-	var _eventControllerScroll *EventControllerScroll // out
-
-	_eventControllerScroll = wrapEventControllerScroll(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _eventControllerScroll
-}
-
-// Flags gets the flags conditioning the scroll controller behavior.
-//
-// The function returns the following values:
-//
-//    - eventControllerScrollFlags: controller flags.
-//
-func (scroll *EventControllerScroll) Flags() EventControllerScrollFlags {
-	var _arg0 *C.GtkEventControllerScroll     // out
-	var _cret C.GtkEventControllerScrollFlags // in
-
-	_arg0 = (*C.GtkEventControllerScroll)(unsafe.Pointer(coreglib.InternObject(scroll).Native()))
-
-	_cret = C.gtk_event_controller_scroll_get_flags(_arg0)
-	runtime.KeepAlive(scroll)
-
-	var _eventControllerScrollFlags EventControllerScrollFlags // out
-
-	_eventControllerScrollFlags = EventControllerScrollFlags(_cret)
-
-	return _eventControllerScrollFlags
-}
-
-// SetFlags sets the flags conditioning scroll controller behavior.
-//
-// The function takes the following parameters:
-//
-//    - flags affecting the controller behavior.
-//
-func (scroll *EventControllerScroll) SetFlags(flags EventControllerScrollFlags) {
-	var _arg0 *C.GtkEventControllerScroll     // out
-	var _arg1 C.GtkEventControllerScrollFlags // out
-
-	_arg0 = (*C.GtkEventControllerScroll)(unsafe.Pointer(coreglib.InternObject(scroll).Native()))
-	_arg1 = C.GtkEventControllerScrollFlags(flags)
-
-	C.gtk_event_controller_scroll_set_flags(_arg0, _arg1)
-	runtime.KeepAlive(scroll)
-	runtime.KeepAlive(flags)
+func (v *EventControllerScroll) ConnectScrollEnd(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "scroll-end", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerScroll_ConnectScrollEnd), f)
 }

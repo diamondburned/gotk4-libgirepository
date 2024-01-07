@@ -3,19 +3,18 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 // extern void _gotk4_gtk3_FileChooserWidget_ConnectUpFolder(gpointer, guintptr);
 // extern void _gotk4_gtk3_FileChooserWidget_ConnectShowHidden(gpointer, guintptr);
 // extern void _gotk4_gtk3_FileChooserWidget_ConnectSearchShortcut(gpointer, guintptr);
@@ -32,7 +31,7 @@ import "C"
 
 // GType values.
 var (
-	GTypeFileChooserWidget = coreglib.Type(C.gtk_file_chooser_widget_get_type())
+	GTypeFileChooserWidget = coreglib.Type(girepository.MustFind("Gtk", "FileChooserWidget").RegisteredGType())
 )
 
 func init() {
@@ -258,34 +257,6 @@ func (v *FileChooserWidget) ConnectUpFolder(f func()) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "up-folder", false, unsafe.Pointer(C._gotk4_gtk3_FileChooserWidget_ConnectUpFolder), f)
 }
 
-// NewFileChooserWidget creates a new FileChooserWidget. This is a file chooser
-// widget that can be embedded in custom windows, and it is the same widget that
-// is used by FileChooserDialog.
-//
-// The function takes the following parameters:
-//
-//    - action: open or save mode for the widget.
-//
-// The function returns the following values:
-//
-//    - fileChooserWidget: new FileChooserWidget.
-//
-func NewFileChooserWidget(action FileChooserAction) *FileChooserWidget {
-	var _arg1 C.GtkFileChooserAction // out
-	var _cret *C.GtkWidget           // in
-
-	_arg1 = C.GtkFileChooserAction(action)
-
-	_cret = C.gtk_file_chooser_widget_new(_arg1)
-	runtime.KeepAlive(action)
-
-	var _fileChooserWidget *FileChooserWidget // out
-
-	_fileChooserWidget = wrapFileChooserWidget(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _fileChooserWidget
-}
-
 // FileChooserWidgetClass: instance of this type is always passed by reference.
 type FileChooserWidgetClass struct {
 	*fileChooserWidgetClass
@@ -293,13 +264,7 @@ type FileChooserWidgetClass struct {
 
 // fileChooserWidgetClass is the struct that's finalized.
 type fileChooserWidgetClass struct {
-	native *C.GtkFileChooserWidgetClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (f *FileChooserWidgetClass) ParentClass() *BoxClass {
-	valptr := &f.native.parent_class
-	var _v *BoxClass // out
-	_v = (*BoxClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoFileChooserWidgetClass = girepository.MustFind("Gtk", "FileChooserWidgetClass")

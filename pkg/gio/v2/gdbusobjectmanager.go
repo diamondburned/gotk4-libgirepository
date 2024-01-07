@@ -3,55 +3,35 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern void _gotk4_gio2_DBusObjectManager_ConnectObjectRemoved(gpointer, GDBusObject*, guintptr);
-// extern void _gotk4_gio2_DBusObjectManager_ConnectObjectAdded(gpointer, GDBusObject*, guintptr);
-// extern void _gotk4_gio2_DBusObjectManager_ConnectInterfaceRemoved(gpointer, GDBusObject*, GDBusInterface*, guintptr);
-// extern void _gotk4_gio2_DBusObjectManager_ConnectInterfaceAdded(gpointer, GDBusObject*, GDBusInterface*, guintptr);
-// GDBusInterface* _gotk4_gio2_DBusObjectManager_virtual_get_interface(void* fnptr, GDBusObjectManager* arg0, gchar* arg1, gchar* arg2) {
-//   return ((GDBusInterface* (*)(GDBusObjectManager*, gchar*, gchar*))(fnptr))(arg0, arg1, arg2);
-// };
-// GDBusObject* _gotk4_gio2_DBusObjectManager_virtual_get_object(void* fnptr, GDBusObjectManager* arg0, gchar* arg1) {
-//   return ((GDBusObject* (*)(GDBusObjectManager*, gchar*))(fnptr))(arg0, arg1);
-// };
-// GList* _gotk4_gio2_DBusObjectManager_virtual_get_objects(void* fnptr, GDBusObjectManager* arg0) {
-//   return ((GList* (*)(GDBusObjectManager*))(fnptr))(arg0);
-// };
-// gchar* _gotk4_gio2_DBusObjectManager_virtual_get_object_path(void* fnptr, GDBusObjectManager* arg0) {
-//   return ((gchar* (*)(GDBusObjectManager*))(fnptr))(arg0);
-// };
-// void _gotk4_gio2_DBusObjectManager_virtual_interface_added(void* fnptr, GDBusObjectManager* arg0, GDBusObject* arg1, GDBusInterface* arg2) {
-//   ((void (*)(GDBusObjectManager*, GDBusObject*, GDBusInterface*))(fnptr))(arg0, arg1, arg2);
-// };
-// void _gotk4_gio2_DBusObjectManager_virtual_interface_removed(void* fnptr, GDBusObjectManager* arg0, GDBusObject* arg1, GDBusInterface* arg2) {
-//   ((void (*)(GDBusObjectManager*, GDBusObject*, GDBusInterface*))(fnptr))(arg0, arg1, arg2);
-// };
-// void _gotk4_gio2_DBusObjectManager_virtual_object_added(void* fnptr, GDBusObjectManager* arg0, GDBusObject* arg1) {
-//   ((void (*)(GDBusObjectManager*, GDBusObject*))(fnptr))(arg0, arg1);
-// };
-// void _gotk4_gio2_DBusObjectManager_virtual_object_removed(void* fnptr, GDBusObjectManager* arg0, GDBusObject* arg1) {
-//   ((void (*)(GDBusObjectManager*, GDBusObject*))(fnptr))(arg0, arg1);
-// };
+// extern void _gotk4_gio2_DBusObjectManager_ConnectObjectRemoved(gpointer, void*, guintptr);
+// extern void _gotk4_gio2_DBusObjectManager_ConnectObjectAdded(gpointer, void*, guintptr);
+// extern void _gotk4_gio2_DBusObjectManager_ConnectInterfaceRemoved(gpointer, void*, void*, guintptr);
+// extern void _gotk4_gio2_DBusObjectManager_ConnectInterfaceAdded(gpointer, void*, void*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeDBusObjectManager = coreglib.Type(C.g_dbus_object_manager_get_type())
+	GTypeDBusObjectManager = coreglib.Type(girepository.MustFind("Gio", "DBusObjectManager").RegisteredGType())
 )
 
 func init() {
 	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
 		coreglib.TypeMarshaler{T: GTypeDBusObjectManager, F: marshalDBusObjectManager},
 	})
+}
+
+// DBusObjectManagerOverrider contains methods that are overridable.
+type DBusObjectManagerOverrider interface {
 }
 
 // DBusObjectManager type is the base type for service- and client-side
@@ -77,27 +57,13 @@ var (
 type DBusObjectManagerer interface {
 	coreglib.Objector
 
-	// Interface gets the interface proxy for interface_name at object_path, if
-	// any.
-	Interface(objectPath, interfaceName string) *DBusInterface
-	// GetObject gets the BusObjectProxy at object_path, if any.
-	GetObject(objectPath string) *DBusObject
-	// ObjectPath gets the object path that manager is for.
-	ObjectPath() string
-	// Objects gets all BusObject objects known to manager.
-	Objects() []*DBusObject
-
-	// Interface-added is emitted when interface is added to object.
-	ConnectInterfaceAdded(func(object DBusObjector, iface DBusInterfacer)) coreglib.SignalHandle
-	// Interface-removed is emitted when interface has been removed from object.
-	ConnectInterfaceRemoved(func(object DBusObjector, iface DBusInterfacer)) coreglib.SignalHandle
-	// Object-added is emitted when object is added to manager.
-	ConnectObjectAdded(func(object DBusObjector)) coreglib.SignalHandle
-	// Object-removed is emitted when object is removed from manager.
-	ConnectObjectRemoved(func(object DBusObjector)) coreglib.SignalHandle
+	baseDBusObjectManager() *DBusObjectManager
 }
 
 var _ DBusObjectManagerer = (*DBusObjectManager)(nil)
+
+func ifaceInitDBusObjectManagerer(gifacePtr, data C.gpointer) {
+}
 
 func wrapDBusObjectManager(obj *coreglib.Object) *DBusObjectManager {
 	return &DBusObjectManager{
@@ -109,12 +75,21 @@ func marshalDBusObjectManager(p uintptr) (interface{}, error) {
 	return wrapDBusObjectManager(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
+func (v *DBusObjectManager) baseDBusObjectManager() *DBusObjectManager {
+	return v
+}
+
+// BaseDBusObjectManager returns the underlying base object.
+func BaseDBusObjectManager(obj DBusObjectManagerer) *DBusObjectManager {
+	return obj.baseDBusObjectManager()
+}
+
 // ConnectInterfaceAdded is emitted when interface is added to object.
 //
 // This signal exists purely as a convenience to avoid having to connect signals
 // to all objects managed by manager.
-func (manager *DBusObjectManager) ConnectInterfaceAdded(f func(object DBusObjector, iface DBusInterfacer)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(manager, "interface-added", false, unsafe.Pointer(C._gotk4_gio2_DBusObjectManager_ConnectInterfaceAdded), f)
+func (v *DBusObjectManager) ConnectInterfaceAdded(f func(object DBusObjector, iface DBusInterfacer)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "interface-added", false, unsafe.Pointer(C._gotk4_gio2_DBusObjectManager_ConnectInterfaceAdded), f)
 }
 
 // ConnectInterfaceRemoved is emitted when interface has been removed from
@@ -122,340 +97,16 @@ func (manager *DBusObjectManager) ConnectInterfaceAdded(f func(object DBusObject
 //
 // This signal exists purely as a convenience to avoid having to connect signals
 // to all objects managed by manager.
-func (manager *DBusObjectManager) ConnectInterfaceRemoved(f func(object DBusObjector, iface DBusInterfacer)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(manager, "interface-removed", false, unsafe.Pointer(C._gotk4_gio2_DBusObjectManager_ConnectInterfaceRemoved), f)
+func (v *DBusObjectManager) ConnectInterfaceRemoved(f func(object DBusObjector, iface DBusInterfacer)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "interface-removed", false, unsafe.Pointer(C._gotk4_gio2_DBusObjectManager_ConnectInterfaceRemoved), f)
 }
 
 // ConnectObjectAdded is emitted when object is added to manager.
-func (manager *DBusObjectManager) ConnectObjectAdded(f func(object DBusObjector)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(manager, "object-added", false, unsafe.Pointer(C._gotk4_gio2_DBusObjectManager_ConnectObjectAdded), f)
+func (v *DBusObjectManager) ConnectObjectAdded(f func(object DBusObjector)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "object-added", false, unsafe.Pointer(C._gotk4_gio2_DBusObjectManager_ConnectObjectAdded), f)
 }
 
 // ConnectObjectRemoved is emitted when object is removed from manager.
-func (manager *DBusObjectManager) ConnectObjectRemoved(f func(object DBusObjector)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(manager, "object-removed", false, unsafe.Pointer(C._gotk4_gio2_DBusObjectManager_ConnectObjectRemoved), f)
-}
-
-// Interface gets the interface proxy for interface_name at object_path, if any.
-//
-// The function takes the following parameters:
-//
-//    - objectPath: object path to look up.
-//    - interfaceName d-Bus interface name to look up.
-//
-// The function returns the following values:
-//
-//    - dBusInterface instance or NULL. Free with g_object_unref().
-//
-func (manager *DBusObjectManager) Interface(objectPath, interfaceName string) *DBusInterface {
-	var _arg0 *C.GDBusObjectManager // out
-	var _arg1 *C.gchar              // out
-	var _arg2 *C.gchar              // out
-	var _cret *C.GDBusInterface     // in
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(objectPath)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(interfaceName)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	_cret = C.g_dbus_object_manager_get_interface(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(manager)
-	runtime.KeepAlive(objectPath)
-	runtime.KeepAlive(interfaceName)
-
-	var _dBusInterface *DBusInterface // out
-
-	_dBusInterface = wrapDBusInterface(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _dBusInterface
-}
-
-// GetObject gets the BusObjectProxy at object_path, if any.
-//
-// The function takes the following parameters:
-//
-//    - objectPath: object path to look up.
-//
-// The function returns the following values:
-//
-//    - dBusObject or NULL. Free with g_object_unref().
-//
-func (manager *DBusObjectManager) GetObject(objectPath string) *DBusObject {
-	var _arg0 *C.GDBusObjectManager // out
-	var _arg1 *C.gchar              // out
-	var _cret *C.GDBusObject        // in
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(objectPath)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.g_dbus_object_manager_get_object(_arg0, _arg1)
-	runtime.KeepAlive(manager)
-	runtime.KeepAlive(objectPath)
-
-	var _dBusObject *DBusObject // out
-
-	_dBusObject = wrapDBusObject(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _dBusObject
-}
-
-// ObjectPath gets the object path that manager is for.
-//
-// The function returns the following values:
-//
-//    - utf8: string owned by manager. Do not free.
-//
-func (manager *DBusObjectManager) ObjectPath() string {
-	var _arg0 *C.GDBusObjectManager // out
-	var _cret *C.gchar              // in
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-
-	_cret = C.g_dbus_object_manager_get_object_path(_arg0)
-	runtime.KeepAlive(manager)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
-}
-
-// Objects gets all BusObject objects known to manager.
-//
-// The function returns the following values:
-//
-//    - list of BusObject objects. The returned list should be freed with
-//      g_list_free() after each element has been freed with g_object_unref().
-//
-func (manager *DBusObjectManager) Objects() []*DBusObject {
-	var _arg0 *C.GDBusObjectManager // out
-	var _cret *C.GList              // in
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-
-	_cret = C.g_dbus_object_manager_get_objects(_arg0)
-	runtime.KeepAlive(manager)
-
-	var _list []*DBusObject // out
-
-	_list = make([]*DBusObject, 0, gextras.ListSize(unsafe.Pointer(_cret)))
-	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
-		src := (*C.GDBusObject)(v)
-		var dst *DBusObject // out
-		dst = wrapDBusObject(coreglib.AssumeOwnership(unsafe.Pointer(src)))
-		_list = append(_list, dst)
-	})
-
-	return _list
-}
-
-// Iface gets the interface proxy for interface_name at object_path, if any.
-//
-// The function takes the following parameters:
-//
-//    - objectPath: object path to look up.
-//    - interfaceName d-Bus interface name to look up.
-//
-// The function returns the following values:
-//
-//    - dBusInterface instance or NULL. Free with g_object_unref().
-//
-func (manager *DBusObjectManager) iface(objectPath, interfaceName string) *DBusInterface {
-	gclass := (*C.GDBusObjectManagerIface)(coreglib.PeekParentClass(manager))
-	fnarg := gclass.get_interface
-
-	var _arg0 *C.GDBusObjectManager // out
-	var _arg1 *C.gchar              // out
-	var _arg2 *C.gchar              // out
-	var _cret *C.GDBusInterface     // in
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(objectPath)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(interfaceName)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	_cret = C._gotk4_gio2_DBusObjectManager_virtual_get_interface(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(manager)
-	runtime.KeepAlive(objectPath)
-	runtime.KeepAlive(interfaceName)
-
-	var _dBusInterface *DBusInterface // out
-
-	_dBusInterface = wrapDBusInterface(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _dBusInterface
-}
-
-// getObject gets the BusObjectProxy at object_path, if any.
-//
-// The function takes the following parameters:
-//
-//    - objectPath: object path to look up.
-//
-// The function returns the following values:
-//
-//    - dBusObject or NULL. Free with g_object_unref().
-//
-func (manager *DBusObjectManager) getObject(objectPath string) *DBusObject {
-	gclass := (*C.GDBusObjectManagerIface)(coreglib.PeekParentClass(manager))
-	fnarg := gclass.get_object
-
-	var _arg0 *C.GDBusObjectManager // out
-	var _arg1 *C.gchar              // out
-	var _cret *C.GDBusObject        // in
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(objectPath)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C._gotk4_gio2_DBusObjectManager_virtual_get_object(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(manager)
-	runtime.KeepAlive(objectPath)
-
-	var _dBusObject *DBusObject // out
-
-	_dBusObject = wrapDBusObject(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _dBusObject
-}
-
-// objectPath gets the object path that manager is for.
-//
-// The function returns the following values:
-//
-//    - utf8: string owned by manager. Do not free.
-//
-func (manager *DBusObjectManager) objectPath() string {
-	gclass := (*C.GDBusObjectManagerIface)(coreglib.PeekParentClass(manager))
-	fnarg := gclass.get_object_path
-
-	var _arg0 *C.GDBusObjectManager // out
-	var _cret *C.gchar              // in
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-
-	_cret = C._gotk4_gio2_DBusObjectManager_virtual_get_object_path(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(manager)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
-}
-
-// Objects gets all BusObject objects known to manager.
-//
-// The function returns the following values:
-//
-//    - list of BusObject objects. The returned list should be freed with
-//      g_list_free() after each element has been freed with g_object_unref().
-//
-func (manager *DBusObjectManager) objects() []*DBusObject {
-	gclass := (*C.GDBusObjectManagerIface)(coreglib.PeekParentClass(manager))
-	fnarg := gclass.get_objects
-
-	var _arg0 *C.GDBusObjectManager // out
-	var _cret *C.GList              // in
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-
-	_cret = C._gotk4_gio2_DBusObjectManager_virtual_get_objects(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(manager)
-
-	var _list []*DBusObject // out
-
-	_list = make([]*DBusObject, 0, gextras.ListSize(unsafe.Pointer(_cret)))
-	gextras.MoveList(unsafe.Pointer(_cret), true, func(v unsafe.Pointer) {
-		src := (*C.GDBusObject)(v)
-		var dst *DBusObject // out
-		dst = wrapDBusObject(coreglib.AssumeOwnership(unsafe.Pointer(src)))
-		_list = append(_list, dst)
-	})
-
-	return _list
-}
-
-// The function takes the following parameters:
-//
-//    - object
-//    - interface_
-//
-func (manager *DBusObjectManager) interfaceAdded(object DBusObjector, interface_ DBusInterfacer) {
-	gclass := (*C.GDBusObjectManagerIface)(coreglib.PeekParentClass(manager))
-	fnarg := gclass.interface_added
-
-	var _arg0 *C.GDBusObjectManager // out
-	var _arg1 *C.GDBusObject        // out
-	var _arg2 *C.GDBusInterface     // out
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-	_arg1 = (*C.GDBusObject)(unsafe.Pointer(coreglib.InternObject(object).Native()))
-	_arg2 = (*C.GDBusInterface)(unsafe.Pointer(coreglib.InternObject(interface_).Native()))
-
-	C._gotk4_gio2_DBusObjectManager_virtual_interface_added(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(manager)
-	runtime.KeepAlive(object)
-	runtime.KeepAlive(interface_)
-}
-
-// The function takes the following parameters:
-//
-//    - object
-//    - interface_
-//
-func (manager *DBusObjectManager) interfaceRemoved(object DBusObjector, interface_ DBusInterfacer) {
-	gclass := (*C.GDBusObjectManagerIface)(coreglib.PeekParentClass(manager))
-	fnarg := gclass.interface_removed
-
-	var _arg0 *C.GDBusObjectManager // out
-	var _arg1 *C.GDBusObject        // out
-	var _arg2 *C.GDBusInterface     // out
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-	_arg1 = (*C.GDBusObject)(unsafe.Pointer(coreglib.InternObject(object).Native()))
-	_arg2 = (*C.GDBusInterface)(unsafe.Pointer(coreglib.InternObject(interface_).Native()))
-
-	C._gotk4_gio2_DBusObjectManager_virtual_interface_removed(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(manager)
-	runtime.KeepAlive(object)
-	runtime.KeepAlive(interface_)
-}
-
-// The function takes the following parameters:
-//
-func (manager *DBusObjectManager) objectAdded(object DBusObjector) {
-	gclass := (*C.GDBusObjectManagerIface)(coreglib.PeekParentClass(manager))
-	fnarg := gclass.object_added
-
-	var _arg0 *C.GDBusObjectManager // out
-	var _arg1 *C.GDBusObject        // out
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-	_arg1 = (*C.GDBusObject)(unsafe.Pointer(coreglib.InternObject(object).Native()))
-
-	C._gotk4_gio2_DBusObjectManager_virtual_object_added(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(manager)
-	runtime.KeepAlive(object)
-}
-
-// The function takes the following parameters:
-//
-func (manager *DBusObjectManager) objectRemoved(object DBusObjector) {
-	gclass := (*C.GDBusObjectManagerIface)(coreglib.PeekParentClass(manager))
-	fnarg := gclass.object_removed
-
-	var _arg0 *C.GDBusObjectManager // out
-	var _arg1 *C.GDBusObject        // out
-
-	_arg0 = (*C.GDBusObjectManager)(unsafe.Pointer(coreglib.InternObject(manager).Native()))
-	_arg1 = (*C.GDBusObject)(unsafe.Pointer(coreglib.InternObject(object).Native()))
-
-	C._gotk4_gio2_DBusObjectManager_virtual_object_removed(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(manager)
-	runtime.KeepAlive(object)
+func (v *DBusObjectManager) ConnectObjectRemoved(f func(object DBusObjector)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "object-removed", false, unsafe.Pointer(C._gotk4_gio2_DBusObjectManager_ConnectObjectRemoved), f)
 }

@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFontChooserDialog = coreglib.Type(C.gtk_font_chooser_dialog_get_type())
+	GTypeFontChooserDialog = coreglib.Type(girepository.MustFind("Gtk", "FontChooserDialog").RegisteredGType())
 )
 
 func init() {
@@ -105,39 +104,4 @@ func wrapFontChooserDialog(obj *coreglib.Object) *FontChooserDialog {
 
 func marshalFontChooserDialog(p uintptr) (interface{}, error) {
 	return wrapFontChooserDialog(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewFontChooserDialog creates a new FontChooserDialog.
-//
-// The function takes the following parameters:
-//
-//    - title (optional): title of the dialog, or NULL.
-//    - parent (optional): transient parent of the dialog, or NULL.
-//
-// The function returns the following values:
-//
-//    - fontChooserDialog: new FontChooserDialog.
-//
-func NewFontChooserDialog(title string, parent *Window) *FontChooserDialog {
-	var _arg1 *C.gchar     // out
-	var _arg2 *C.GtkWindow // out
-	var _cret *C.GtkWidget // in
-
-	if title != "" {
-		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(title)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-	if parent != nil {
-		_arg2 = (*C.GtkWindow)(unsafe.Pointer(coreglib.InternObject(parent).Native()))
-	}
-
-	_cret = C.gtk_font_chooser_dialog_new(_arg1, _arg2)
-	runtime.KeepAlive(title)
-	runtime.KeepAlive(parent)
-
-	var _fontChooserDialog *FontChooserDialog // out
-
-	_fontChooserDialog = wrapFontChooserDialog(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _fontChooserDialog
 }

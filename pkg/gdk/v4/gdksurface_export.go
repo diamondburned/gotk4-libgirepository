@@ -10,12 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gdk4_Surface_ConnectEnterMonitor
-func _gotk4_gdk4_Surface_ConnectEnterMonitor(arg0 C.gpointer, arg1 *C.GdkMonitor, arg2 C.guintptr) {
+func _gotk4_gdk4_Surface_ConnectEnterMonitor(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(monitor *Monitor)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -35,7 +37,7 @@ func _gotk4_gdk4_Surface_ConnectEnterMonitor(arg0 C.gpointer, arg1 *C.GdkMonitor
 }
 
 //export _gotk4_gdk4_Surface_ConnectEvent
-func _gotk4_gdk4_Surface_ConnectEvent(arg0 C.gpointer, arg1 *C.gpointer, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gdk4_Surface_ConnectEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event Eventer) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -101,7 +103,7 @@ func _gotk4_gdk4_Surface_ConnectLayout(arg0 C.gpointer, arg1 C.gint, arg2 C.gint
 }
 
 //export _gotk4_gdk4_Surface_ConnectLeaveMonitor
-func _gotk4_gdk4_Surface_ConnectLeaveMonitor(arg0 C.gpointer, arg1 *C.GdkMonitor, arg2 C.guintptr) {
+func _gotk4_gdk4_Surface_ConnectLeaveMonitor(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(monitor *Monitor)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -121,7 +123,7 @@ func _gotk4_gdk4_Surface_ConnectLeaveMonitor(arg0 C.gpointer, arg1 *C.GdkMonitor
 }
 
 //export _gotk4_gdk4_Surface_ConnectRender
-func _gotk4_gdk4_Surface_ConnectRender(arg0 C.gpointer, arg1 *C.cairo_region_t, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gdk4_Surface_ConnectRender(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(region *cairo.Region) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -141,7 +143,7 @@ func _gotk4_gdk4_Surface_ConnectRender(arg0 C.gpointer, arg1 *C.cairo_region_t, 
 	}
 	C.cairo_region_reference(arg1)
 	runtime.SetFinalizer(_region, func(v *cairo.Region) {
-		C.cairo_region_destroy((*C.cairo_region_t)(unsafe.Pointer(v.Native())))
+		C.cairo_region_destroy((*C.void)(unsafe.Pointer(v.Native())))
 	})
 
 	ok := f(_region)

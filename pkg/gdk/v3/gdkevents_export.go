@@ -9,12 +9,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gdk3_EventFunc
-func _gotk4_gdk3_EventFunc(arg1 *C.GdkEvent, arg2 C.gpointer) {
+func _gotk4_gdk3_EventFunc(arg1 *C.void, arg2 C.gpointer) {
 	var fn EventFunc
 	{
 		v := gbox.Get(uintptr(arg2))

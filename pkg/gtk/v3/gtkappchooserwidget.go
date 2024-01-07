@@ -3,40 +3,27 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
-// extern void _gotk4_gtk3_AppChooserWidget_ConnectPopulatePopup(gpointer, GtkMenu*, GAppInfo*, guintptr);
-// extern void _gotk4_gtk3_AppChooserWidget_ConnectApplicationSelected(gpointer, GAppInfo*, guintptr);
-// extern void _gotk4_gtk3_AppChooserWidget_ConnectApplicationActivated(gpointer, GAppInfo*, guintptr);
-// extern void _gotk4_gtk3_AppChooserWidgetClass_populate_popup(GtkAppChooserWidget*, GtkMenu*, GAppInfo*);
-// extern void _gotk4_gtk3_AppChooserWidgetClass_application_selected(GtkAppChooserWidget*, GAppInfo*);
-// extern void _gotk4_gtk3_AppChooserWidgetClass_application_activated(GtkAppChooserWidget*, GAppInfo*);
-// void _gotk4_gtk3_AppChooserWidget_virtual_application_activated(void* fnptr, GtkAppChooserWidget* arg0, GAppInfo* arg1) {
-//   ((void (*)(GtkAppChooserWidget*, GAppInfo*))(fnptr))(arg0, arg1);
-// };
-// void _gotk4_gtk3_AppChooserWidget_virtual_application_selected(void* fnptr, GtkAppChooserWidget* arg0, GAppInfo* arg1) {
-//   ((void (*)(GtkAppChooserWidget*, GAppInfo*))(fnptr))(arg0, arg1);
-// };
-// void _gotk4_gtk3_AppChooserWidget_virtual_populate_popup(void* fnptr, GtkAppChooserWidget* arg0, GtkMenu* arg1, GAppInfo* arg2) {
-//   ((void (*)(GtkAppChooserWidget*, GtkMenu*, GAppInfo*))(fnptr))(arg0, arg1, arg2);
-// };
+// extern void _gotk4_gtk3_AppChooserWidget_ConnectPopulatePopup(gpointer, void*, void*, guintptr);
+// extern void _gotk4_gtk3_AppChooserWidget_ConnectApplicationSelected(gpointer, void*, guintptr);
+// extern void _gotk4_gtk3_AppChooserWidget_ConnectApplicationActivated(gpointer, void*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeAppChooserWidget = coreglib.Type(C.gtk_app_chooser_widget_get_type())
+	GTypeAppChooserWidget = coreglib.Type(girepository.MustFind("Gtk", "AppChooserWidget").RegisteredGType())
 )
 
 func init() {
@@ -47,26 +34,10 @@ func init() {
 
 // AppChooserWidgetOverrides contains methods that are overridable.
 type AppChooserWidgetOverrides struct {
-	// The function takes the following parameters:
-	//
-	ApplicationActivated func(appInfo gio.AppInfor)
-	// The function takes the following parameters:
-	//
-	ApplicationSelected func(appInfo gio.AppInfor)
-	// The function takes the following parameters:
-	//
-	//    - menu
-	//    - appInfo
-	//
-	PopulatePopup func(menu *Menu, appInfo gio.AppInfor)
 }
 
 func defaultAppChooserWidgetOverrides(v *AppChooserWidget) AppChooserWidgetOverrides {
-	return AppChooserWidgetOverrides{
-		ApplicationActivated: v.applicationActivated,
-		ApplicationSelected:  v.applicationSelected,
-		PopulatePopup:        v.populatePopup,
-	}
+	return AppChooserWidgetOverrides{}
 }
 
 // AppChooserWidget is a widget for selecting applications. It is the main
@@ -111,20 +82,6 @@ func init() {
 }
 
 func initAppChooserWidgetClass(gclass unsafe.Pointer, overrides AppChooserWidgetOverrides, classInitFunc func(*AppChooserWidgetClass)) {
-	pclass := (*C.GtkAppChooserWidgetClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeAppChooserWidget))))
-
-	if overrides.ApplicationActivated != nil {
-		pclass.application_activated = (*[0]byte)(C._gotk4_gtk3_AppChooserWidgetClass_application_activated)
-	}
-
-	if overrides.ApplicationSelected != nil {
-		pclass.application_selected = (*[0]byte)(C._gotk4_gtk3_AppChooserWidgetClass_application_selected)
-	}
-
-	if overrides.PopulatePopup != nil {
-		pclass.populate_popup = (*[0]byte)(C._gotk4_gtk3_AppChooserWidgetClass_populate_popup)
-	}
-
 	if classInitFunc != nil {
 		class := (*AppChooserWidgetClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -181,379 +138,22 @@ func marshalAppChooserWidget(p uintptr) (interface{}, error) {
 // This usually happens when the user double clicks an item, or an item is
 // selected and the user presses one of the keys Space, Shift+Space, Return or
 // Enter.
-func (self *AppChooserWidget) ConnectApplicationActivated(f func(application gio.AppInfor)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "application-activated", false, unsafe.Pointer(C._gotk4_gtk3_AppChooserWidget_ConnectApplicationActivated), f)
+func (v *AppChooserWidget) ConnectApplicationActivated(f func(application gio.AppInfor)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "application-activated", false, unsafe.Pointer(C._gotk4_gtk3_AppChooserWidget_ConnectApplicationActivated), f)
 }
 
 // ConnectApplicationSelected is emitted when an application item is selected
 // from the widget's list.
-func (self *AppChooserWidget) ConnectApplicationSelected(f func(application gio.AppInfor)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "application-selected", false, unsafe.Pointer(C._gotk4_gtk3_AppChooserWidget_ConnectApplicationSelected), f)
+func (v *AppChooserWidget) ConnectApplicationSelected(f func(application gio.AppInfor)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "application-selected", false, unsafe.Pointer(C._gotk4_gtk3_AppChooserWidget_ConnectApplicationSelected), f)
 }
 
 // ConnectPopulatePopup is emitted when a context menu is about to popup over an
 // application item. Clients can insert menu items into the provided Menu object
 // in the callback of this signal; the context menu will be shown over the item
 // if at least one item has been added to the menu.
-func (self *AppChooserWidget) ConnectPopulatePopup(f func(menu *Menu, application gio.AppInfor)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "populate-popup", false, unsafe.Pointer(C._gotk4_gtk3_AppChooserWidget_ConnectPopulatePopup), f)
-}
-
-// NewAppChooserWidget creates a new AppChooserWidget for applications that can
-// handle content of the given type.
-//
-// The function takes the following parameters:
-//
-//    - contentType: content type to show applications for.
-//
-// The function returns the following values:
-//
-//    - appChooserWidget: newly created AppChooserWidget.
-//
-func NewAppChooserWidget(contentType string) *AppChooserWidget {
-	var _arg1 *C.gchar     // out
-	var _cret *C.GtkWidget // in
-
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(contentType)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.gtk_app_chooser_widget_new(_arg1)
-	runtime.KeepAlive(contentType)
-
-	var _appChooserWidget *AppChooserWidget // out
-
-	_appChooserWidget = wrapAppChooserWidget(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _appChooserWidget
-}
-
-// DefaultText returns the text that is shown if there are not applications that
-// can handle the content type.
-//
-// The function returns the following values:
-//
-//    - utf8: value of AppChooserWidget:default-text.
-//
-func (self *AppChooserWidget) DefaultText() string {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _cret *C.gchar               // in
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_app_chooser_widget_get_default_text(_arg0)
-	runtime.KeepAlive(self)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-
-	return _utf8
-}
-
-// ShowAll returns the current value of the AppChooserWidget:show-all property.
-//
-// The function returns the following values:
-//
-//    - ok: value of AppChooserWidget:show-all.
-//
-func (self *AppChooserWidget) ShowAll() bool {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _cret C.gboolean             // in
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_app_chooser_widget_get_show_all(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// ShowDefault returns the current value of the AppChooserWidget:show-default
-// property.
-//
-// The function returns the following values:
-//
-//    - ok: value of AppChooserWidget:show-default.
-//
-func (self *AppChooserWidget) ShowDefault() bool {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _cret C.gboolean             // in
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_app_chooser_widget_get_show_default(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// ShowFallback returns the current value of the AppChooserWidget:show-fallback
-// property.
-//
-// The function returns the following values:
-//
-//    - ok: value of AppChooserWidget:show-fallback.
-//
-func (self *AppChooserWidget) ShowFallback() bool {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _cret C.gboolean             // in
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_app_chooser_widget_get_show_fallback(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// ShowOther returns the current value of the AppChooserWidget:show-other
-// property.
-//
-// The function returns the following values:
-//
-//    - ok: value of AppChooserWidget:show-other.
-//
-func (self *AppChooserWidget) ShowOther() bool {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _cret C.gboolean             // in
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_app_chooser_widget_get_show_other(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// ShowRecommended returns the current value of the
-// AppChooserWidget:show-recommended property.
-//
-// The function returns the following values:
-//
-//    - ok: value of AppChooserWidget:show-recommended.
-//
-func (self *AppChooserWidget) ShowRecommended() bool {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _cret C.gboolean             // in
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_app_chooser_widget_get_show_recommended(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetDefaultText sets the text that is shown if there are not applications that
-// can handle the content type.
-//
-// The function takes the following parameters:
-//
-//    - text: new value for AppChooserWidget:default-text.
-//
-func (self *AppChooserWidget) SetDefaultText(text string) {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 *C.gchar               // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(text)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_app_chooser_widget_set_default_text(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(text)
-}
-
-// SetShowAll sets whether the app chooser should show all applications in a
-// flat list.
-//
-// The function takes the following parameters:
-//
-//    - setting: new value for AppChooserWidget:show-all.
-//
-func (self *AppChooserWidget) SetShowAll(setting bool) {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 C.gboolean             // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if setting {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_app_chooser_widget_set_show_all(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(setting)
-}
-
-// SetShowDefault sets whether the app chooser should show the default handler
-// for the content type in a separate section.
-//
-// The function takes the following parameters:
-//
-//    - setting: new value for AppChooserWidget:show-default.
-//
-func (self *AppChooserWidget) SetShowDefault(setting bool) {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 C.gboolean             // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if setting {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_app_chooser_widget_set_show_default(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(setting)
-}
-
-// SetShowFallback sets whether the app chooser should show related applications
-// for the content type in a separate section.
-//
-// The function takes the following parameters:
-//
-//    - setting: new value for AppChooserWidget:show-fallback.
-//
-func (self *AppChooserWidget) SetShowFallback(setting bool) {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 C.gboolean             // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if setting {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_app_chooser_widget_set_show_fallback(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(setting)
-}
-
-// SetShowOther sets whether the app chooser should show applications which are
-// unrelated to the content type.
-//
-// The function takes the following parameters:
-//
-//    - setting: new value for AppChooserWidget:show-other.
-//
-func (self *AppChooserWidget) SetShowOther(setting bool) {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 C.gboolean             // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if setting {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_app_chooser_widget_set_show_other(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(setting)
-}
-
-// SetShowRecommended sets whether the app chooser should show recommended
-// applications for the content type in a separate section.
-//
-// The function takes the following parameters:
-//
-//    - setting: new value for AppChooserWidget:show-recommended.
-//
-func (self *AppChooserWidget) SetShowRecommended(setting bool) {
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 C.gboolean             // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if setting {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_app_chooser_widget_set_show_recommended(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(setting)
-}
-
-// The function takes the following parameters:
-//
-func (self *AppChooserWidget) applicationActivated(appInfo gio.AppInfor) {
-	gclass := (*C.GtkAppChooserWidgetClass)(coreglib.PeekParentClass(self))
-	fnarg := gclass.application_activated
-
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 *C.GAppInfo            // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = (*C.GAppInfo)(unsafe.Pointer(coreglib.InternObject(appInfo).Native()))
-
-	C._gotk4_gtk3_AppChooserWidget_virtual_application_activated(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(appInfo)
-}
-
-// The function takes the following parameters:
-//
-func (self *AppChooserWidget) applicationSelected(appInfo gio.AppInfor) {
-	gclass := (*C.GtkAppChooserWidgetClass)(coreglib.PeekParentClass(self))
-	fnarg := gclass.application_selected
-
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 *C.GAppInfo            // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = (*C.GAppInfo)(unsafe.Pointer(coreglib.InternObject(appInfo).Native()))
-
-	C._gotk4_gtk3_AppChooserWidget_virtual_application_selected(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(appInfo)
-}
-
-// The function takes the following parameters:
-//
-//    - menu
-//    - appInfo
-//
-func (self *AppChooserWidget) populatePopup(menu *Menu, appInfo gio.AppInfor) {
-	gclass := (*C.GtkAppChooserWidgetClass)(coreglib.PeekParentClass(self))
-	fnarg := gclass.populate_popup
-
-	var _arg0 *C.GtkAppChooserWidget // out
-	var _arg1 *C.GtkMenu             // out
-	var _arg2 *C.GAppInfo            // out
-
-	_arg0 = (*C.GtkAppChooserWidget)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	_arg1 = (*C.GtkMenu)(unsafe.Pointer(coreglib.InternObject(menu).Native()))
-	_arg2 = (*C.GAppInfo)(unsafe.Pointer(coreglib.InternObject(appInfo).Native()))
-
-	C._gotk4_gtk3_AppChooserWidget_virtual_populate_popup(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(menu)
-	runtime.KeepAlive(appInfo)
+func (v *AppChooserWidget) ConnectPopulatePopup(f func(menu *Menu, application gio.AppInfor)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "populate-popup", false, unsafe.Pointer(C._gotk4_gtk3_AppChooserWidget_ConnectPopulatePopup), f)
 }
 
 // AppChooserWidgetClass: instance of this type is always passed by reference.
@@ -563,13 +163,7 @@ type AppChooserWidgetClass struct {
 
 // appChooserWidgetClass is the struct that's finalized.
 type appChooserWidgetClass struct {
-	native *C.GtkAppChooserWidgetClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (a *AppChooserWidgetClass) ParentClass() *BoxClass {
-	valptr := &a.native.parent_class
-	var _v *BoxClass // out
-	_v = (*BoxClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoAppChooserWidgetClass = girepository.MustFind("Gtk", "AppChooserWidgetClass")

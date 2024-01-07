@@ -2,12 +2,12 @@
 
 package gio
 
-import (
-	"runtime"
-)
+import ()
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // BusNameAppearedCallback: invoked when the name being watched is known to have
@@ -20,25 +20,3 @@ type BusNameAppearedCallback func(connection *DBusConnection, name, nameOwner st
 // This is also invoked when the BusConnection on which the watch was
 // established has been closed. In that case, connection will be NULL.
 type BusNameVanishedCallback func(connection *DBusConnection, name string)
-
-// BusUnwatchName stops watching a name.
-//
-// Note that there may still be D-Bus traffic to process (relating to watching
-// and unwatching the name) in the current thread-default Context after this
-// function has returned. You should continue to iterate the Context until the
-// Notify function passed to g_bus_watch_name() is called, in order to avoid
-// memory leaks through callbacks queued on the Context after it’s stopped being
-// iterated.
-//
-// The function takes the following parameters:
-//
-//    - watcherId: identifier obtained from g_bus_watch_name().
-//
-func BusUnwatchName(watcherId uint) {
-	var _arg1 C.guint // out
-
-	_arg1 = C.guint(watcherId)
-
-	C.g_bus_unwatch_name(_arg1)
-	runtime.KeepAlive(watcherId)
-}

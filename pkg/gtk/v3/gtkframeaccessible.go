@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFrameAccessible = coreglib.Type(C.gtk_frame_accessible_get_type())
+	GTypeFrameAccessible = coreglib.Type(girepository.MustFind("Gtk", "FrameAccessible").RegisteredGType())
 )
 
 func init() {
@@ -89,12 +89,7 @@ type FrameAccessibleClass struct {
 
 // frameAccessibleClass is the struct that's finalized.
 type frameAccessibleClass struct {
-	native *C.GtkFrameAccessibleClass
+	native unsafe.Pointer
 }
 
-func (f *FrameAccessibleClass) ParentClass() *ContainerAccessibleClass {
-	valptr := &f.native.parent_class
-	var _v *ContainerAccessibleClass // out
-	_v = (*ContainerAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoFrameAccessibleClass = girepository.MustFind("Gtk", "FrameAccessibleClass")

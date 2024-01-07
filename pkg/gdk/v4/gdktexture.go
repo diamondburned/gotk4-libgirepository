@@ -3,23 +3,21 @@
 package gdk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdkpixbuf/v2"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTexture = coreglib.Type(C.gdk_texture_get_type())
+	GTypeTexture = coreglib.Type(girepository.MustFind("Gdk", "Texture").RegisteredGType())
 )
 
 func init() {
@@ -76,188 +74,11 @@ func marshalTexture(p uintptr) (interface{}, error) {
 	return wrapTexture(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-func (texture *Texture) baseTexture() *Texture {
-	return texture
+func (v *Texture) baseTexture() *Texture {
+	return v
 }
 
 // BaseTexture returns the underlying base object.
 func BaseTexture(obj Texturer) *Texture {
 	return obj.baseTexture()
-}
-
-// NewTextureForPixbuf creates a new texture object representing the GdkPixbuf.
-//
-// The function takes the following parameters:
-//
-//    - pixbuf: GdkPixbuf.
-//
-// The function returns the following values:
-//
-//    - texture: new GdkTexture.
-//
-func NewTextureForPixbuf(pixbuf *gdkpixbuf.Pixbuf) *Texture {
-	var _arg1 *C.GdkPixbuf  // out
-	var _cret *C.GdkTexture // in
-
-	_arg1 = (*C.GdkPixbuf)(unsafe.Pointer(coreglib.InternObject(pixbuf).Native()))
-
-	_cret = C.gdk_texture_new_for_pixbuf(_arg1)
-	runtime.KeepAlive(pixbuf)
-
-	var _texture *Texture // out
-
-	_texture = wrapTexture(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _texture
-}
-
-// NewTextureFromFile creates a new texture by loading an image from a file.
-//
-// The file format is detected automatically. The supported formats are PNG and
-// JPEG, though more formats might be available.
-//
-// If NULL is returned, then error will be set.
-//
-// The function takes the following parameters:
-//
-//    - file: GFile to load.
-//
-// The function returns the following values:
-//
-//    - texture: newly-created GdkTexture or NULL if an error occurred.
-//
-func NewTextureFromFile(file gio.Filer) (*Texture, error) {
-	var _arg1 *C.GFile      // out
-	var _cret *C.GdkTexture // in
-	var _cerr *C.GError     // in
-
-	_arg1 = (*C.GFile)(unsafe.Pointer(coreglib.InternObject(file).Native()))
-
-	_cret = C.gdk_texture_new_from_file(_arg1, &_cerr)
-	runtime.KeepAlive(file)
-
-	var _texture *Texture // out
-	var _goerr error      // out
-
-	_texture = wrapTexture(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _texture, _goerr
-}
-
-// NewTextureFromResource creates a new texture by loading an image from a
-// resource.
-//
-// The file format is detected automatically. The supported formats are PNG and
-// JPEG, though more formats might be available.
-//
-// It is a fatal error if resource_path does not specify a valid image resource
-// and the program will abort if that happens. If you are unsure about the
-// validity of a resource, use gdk.Texture.NewFromFile to load it.
-//
-// The function takes the following parameters:
-//
-//    - resourcePath: path of the resource file.
-//
-// The function returns the following values:
-//
-//    - texture: newly-created GdkTexture.
-//
-func NewTextureFromResource(resourcePath string) *Texture {
-	var _arg1 *C.char       // out
-	var _cret *C.GdkTexture // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(resourcePath)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.gdk_texture_new_from_resource(_arg1)
-	runtime.KeepAlive(resourcePath)
-
-	var _texture *Texture // out
-
-	_texture = wrapTexture(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _texture
-}
-
-// Height returns the height of the texture, in pixels.
-//
-// The function returns the following values:
-//
-//    - gint: height of the GdkTexture.
-//
-func (texture *Texture) Height() int {
-	var _arg0 *C.GdkTexture // out
-	var _cret C.int         // in
-
-	_arg0 = (*C.GdkTexture)(unsafe.Pointer(coreglib.InternObject(texture).Native()))
-
-	_cret = C.gdk_texture_get_height(_arg0)
-	runtime.KeepAlive(texture)
-
-	var _gint int // out
-
-	_gint = int(_cret)
-
-	return _gint
-}
-
-// Width returns the width of texture, in pixels.
-//
-// The function returns the following values:
-//
-//    - gint: width of the GdkTexture.
-//
-func (texture *Texture) Width() int {
-	var _arg0 *C.GdkTexture // out
-	var _cret C.int         // in
-
-	_arg0 = (*C.GdkTexture)(unsafe.Pointer(coreglib.InternObject(texture).Native()))
-
-	_cret = C.gdk_texture_get_width(_arg0)
-	runtime.KeepAlive(texture)
-
-	var _gint int // out
-
-	_gint = int(_cret)
-
-	return _gint
-}
-
-// SaveToPNG: store the given texture to the filename as a PNG file.
-//
-// This is a utility function intended for debugging and testing. If you want
-// more control over formats, proper error handling or want to store to a GFile
-// or other location, you might want to look into using the gdk-pixbuf library.
-//
-// The function takes the following parameters:
-//
-//    - filename to store to.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if saving succeeded, FALSE on failure.
-//
-func (texture *Texture) SaveToPNG(filename string) bool {
-	var _arg0 *C.GdkTexture // out
-	var _arg1 *C.char       // out
-	var _cret C.gboolean    // in
-
-	_arg0 = (*C.GdkTexture)(unsafe.Pointer(coreglib.InternObject(texture).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(filename)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.gdk_texture_save_to_png(_arg0, _arg1)
-	runtime.KeepAlive(texture)
-	runtime.KeepAlive(filename)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
 }

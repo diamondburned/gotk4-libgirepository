@@ -8,8 +8,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_Application_ConnectQueryEnd
@@ -29,7 +31,7 @@ func _gotk4_gtk4_Application_ConnectQueryEnd(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk4_Application_ConnectWindowAdded
-func _gotk4_gtk4_Application_ConnectWindowAdded(arg0 C.gpointer, arg1 *C.GtkWindow, arg2 C.guintptr) {
+func _gotk4_gtk4_Application_ConnectWindowAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(window *Window)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -49,7 +51,7 @@ func _gotk4_gtk4_Application_ConnectWindowAdded(arg0 C.gpointer, arg1 *C.GtkWind
 }
 
 //export _gotk4_gtk4_Application_ConnectWindowRemoved
-func _gotk4_gtk4_Application_ConnectWindowRemoved(arg0 C.gpointer, arg1 *C.GtkWindow, arg2 C.guintptr) {
+func _gotk4_gtk4_Application_ConnectWindowRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(window *Window)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

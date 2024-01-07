@@ -5,21 +5,23 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// extern void _gotk4_gtk4_SignalListItemFactory_ConnectUnbind(gpointer, GtkListItem*, guintptr);
-// extern void _gotk4_gtk4_SignalListItemFactory_ConnectTeardown(gpointer, GtkListItem*, guintptr);
-// extern void _gotk4_gtk4_SignalListItemFactory_ConnectSetup(gpointer, GtkListItem*, guintptr);
-// extern void _gotk4_gtk4_SignalListItemFactory_ConnectBind(gpointer, GtkListItem*, guintptr);
+// extern void _gotk4_gtk4_SignalListItemFactory_ConnectUnbind(gpointer, void*, guintptr);
+// extern void _gotk4_gtk4_SignalListItemFactory_ConnectTeardown(gpointer, void*, guintptr);
+// extern void _gotk4_gtk4_SignalListItemFactory_ConnectSetup(gpointer, void*, guintptr);
+// extern void _gotk4_gtk4_SignalListItemFactory_ConnectBind(gpointer, void*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeSignalListItemFactory = coreglib.Type(C.gtk_signal_list_item_factory_get_type())
+	GTypeSignalListItemFactory = coreglib.Type(girepository.MustFind("Gtk", "SignalListItemFactory").RegisteredGType())
 )
 
 func init() {
@@ -129,24 +131,4 @@ func (v *SignalListItemFactory) ConnectTeardown(f func(listitem *ListItem)) core
 // should be used to undo everything done in that signal.
 func (v *SignalListItemFactory) ConnectUnbind(f func(listitem *ListItem)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "unbind", false, unsafe.Pointer(C._gotk4_gtk4_SignalListItemFactory_ConnectUnbind), f)
-}
-
-// NewSignalListItemFactory creates a new GtkSignalListItemFactory.
-//
-// You need to connect signal handlers before you use it.
-//
-// The function returns the following values:
-//
-//    - signalListItemFactory: new GtkSignalListItemFactory.
-//
-func NewSignalListItemFactory() *SignalListItemFactory {
-	var _cret *C.GtkListItemFactory // in
-
-	_cret = C.gtk_signal_list_item_factory_new()
-
-	var _signalListItemFactory *SignalListItemFactory // out
-
-	_signalListItemFactory = wrapSignalListItemFactory(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _signalListItemFactory
 }

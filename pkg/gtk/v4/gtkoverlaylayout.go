@@ -3,22 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeOverlayLayout      = coreglib.Type(C.gtk_overlay_layout_get_type())
-	GTypeOverlayLayoutChild = coreglib.Type(C.gtk_overlay_layout_child_get_type())
+	GTypeOverlayLayout      = coreglib.Type(girepository.MustFind("Gtk", "OverlayLayout").RegisteredGType())
+	GTypeOverlayLayoutChild = coreglib.Type(girepository.MustFind("Gtk", "OverlayLayoutChild").RegisteredGType())
 )
 
 func init() {
@@ -79,24 +80,6 @@ func marshalOverlayLayout(p uintptr) (interface{}, error) {
 	return wrapOverlayLayout(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewOverlayLayout creates a new GtkOverlayLayout instance.
-//
-// The function returns the following values:
-//
-//    - overlayLayout: newly created instance.
-//
-func NewOverlayLayout() *OverlayLayout {
-	var _cret *C.GtkLayoutManager // in
-
-	_cret = C.gtk_overlay_layout_new()
-
-	var _overlayLayout *OverlayLayout // out
-
-	_overlayLayout = wrapOverlayLayout(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _overlayLayout
-}
-
 // OverlayLayoutChildOverrides contains methods that are overridable.
 type OverlayLayoutChildOverrides struct {
 }
@@ -144,94 +127,6 @@ func marshalOverlayLayoutChild(p uintptr) (interface{}, error) {
 	return wrapOverlayLayoutChild(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ClipOverlay retrieves whether the child is clipped.
-//
-// The function returns the following values:
-//
-//    - ok: whether the child is clipped.
-//
-func (child *OverlayLayoutChild) ClipOverlay() bool {
-	var _arg0 *C.GtkOverlayLayoutChild // out
-	var _cret C.gboolean               // in
-
-	_arg0 = (*C.GtkOverlayLayoutChild)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	_cret = C.gtk_overlay_layout_child_get_clip_overlay(_arg0)
-	runtime.KeepAlive(child)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Measure retrieves whether the child is measured.
-//
-// The function returns the following values:
-//
-//    - ok: whether the child is measured.
-//
-func (child *OverlayLayoutChild) Measure() bool {
-	var _arg0 *C.GtkOverlayLayoutChild // out
-	var _cret C.gboolean               // in
-
-	_arg0 = (*C.GtkOverlayLayoutChild)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	_cret = C.gtk_overlay_layout_child_get_measure(_arg0)
-	runtime.KeepAlive(child)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetClipOverlay sets whether to clip this child.
-//
-// The function takes the following parameters:
-//
-//    - clipOverlay: whether to clip this child.
-//
-func (child *OverlayLayoutChild) SetClipOverlay(clipOverlay bool) {
-	var _arg0 *C.GtkOverlayLayoutChild // out
-	var _arg1 C.gboolean               // out
-
-	_arg0 = (*C.GtkOverlayLayoutChild)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-	if clipOverlay {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_overlay_layout_child_set_clip_overlay(_arg0, _arg1)
-	runtime.KeepAlive(child)
-	runtime.KeepAlive(clipOverlay)
-}
-
-// SetMeasure sets whether to measure this child.
-//
-// The function takes the following parameters:
-//
-//    - measure: whether to measure this child.
-//
-func (child *OverlayLayoutChild) SetMeasure(measure bool) {
-	var _arg0 *C.GtkOverlayLayoutChild // out
-	var _arg1 C.gboolean               // out
-
-	_arg0 = (*C.GtkOverlayLayoutChild)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-	if measure {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_overlay_layout_child_set_measure(_arg0, _arg1)
-	runtime.KeepAlive(child)
-	runtime.KeepAlive(measure)
-}
-
 // OverlayLayoutChildClass: instance of this type is always passed by reference.
 type OverlayLayoutChildClass struct {
 	*overlayLayoutChildClass
@@ -239,15 +134,10 @@ type OverlayLayoutChildClass struct {
 
 // overlayLayoutChildClass is the struct that's finalized.
 type overlayLayoutChildClass struct {
-	native *C.GtkOverlayLayoutChildClass
+	native unsafe.Pointer
 }
 
-func (o *OverlayLayoutChildClass) ParentClass() *LayoutChildClass {
-	valptr := &o.native.parent_class
-	var _v *LayoutChildClass // out
-	_v = (*LayoutChildClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoOverlayLayoutChildClass = girepository.MustFind("Gtk", "OverlayLayoutChildClass")
 
 // OverlayLayoutClass: instance of this type is always passed by reference.
 type OverlayLayoutClass struct {
@@ -256,12 +146,7 @@ type OverlayLayoutClass struct {
 
 // overlayLayoutClass is the struct that's finalized.
 type overlayLayoutClass struct {
-	native *C.GtkOverlayLayoutClass
+	native unsafe.Pointer
 }
 
-func (o *OverlayLayoutClass) ParentClass() *LayoutManagerClass {
-	valptr := &o.native.parent_class
-	var _v *LayoutManagerClass // out
-	_v = (*LayoutManagerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoOverlayLayoutClass = girepository.MustFind("Gtk", "OverlayLayoutClass")

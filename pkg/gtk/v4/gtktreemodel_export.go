@@ -10,12 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_TreeModelForEachFunc
-func _gotk4_gtk4_TreeModelForEachFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreePath, arg3 *C.GtkTreeIter, arg4 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_TreeModelForEachFunc(arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.gpointer) (cret C.gboolean) {
 	var fn TreeModelForEachFunc
 	{
 		v := gbox.Get(uintptr(arg4))
@@ -61,7 +63,7 @@ func _gotk4_gtk4_TreeModelForEachFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreePath,
 }
 
 //export _gotk4_gtk4_TreeModel_ConnectRowChanged
-func _gotk4_gtk4_TreeModel_ConnectRowChanged(arg0 C.gpointer, arg1 *C.GtkTreePath, arg2 *C.GtkTreeIter, arg3 C.guintptr) {
+func _gotk4_gtk4_TreeModel_ConnectRowChanged(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(path *TreePath, iter *TreeIter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -83,7 +85,7 @@ func _gotk4_gtk4_TreeModel_ConnectRowChanged(arg0 C.gpointer, arg1 *C.GtkTreePat
 }
 
 //export _gotk4_gtk4_TreeModel_ConnectRowDeleted
-func _gotk4_gtk4_TreeModel_ConnectRowDeleted(arg0 C.gpointer, arg1 *C.GtkTreePath, arg2 C.guintptr) {
+func _gotk4_gtk4_TreeModel_ConnectRowDeleted(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(path *TreePath)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -103,7 +105,7 @@ func _gotk4_gtk4_TreeModel_ConnectRowDeleted(arg0 C.gpointer, arg1 *C.GtkTreePat
 }
 
 //export _gotk4_gtk4_TreeModel_ConnectRowHasChildToggled
-func _gotk4_gtk4_TreeModel_ConnectRowHasChildToggled(arg0 C.gpointer, arg1 *C.GtkTreePath, arg2 *C.GtkTreeIter, arg3 C.guintptr) {
+func _gotk4_gtk4_TreeModel_ConnectRowHasChildToggled(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(path *TreePath, iter *TreeIter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -125,7 +127,7 @@ func _gotk4_gtk4_TreeModel_ConnectRowHasChildToggled(arg0 C.gpointer, arg1 *C.Gt
 }
 
 //export _gotk4_gtk4_TreeModel_ConnectRowInserted
-func _gotk4_gtk4_TreeModel_ConnectRowInserted(arg0 C.gpointer, arg1 *C.GtkTreePath, arg2 *C.GtkTreeIter, arg3 C.guintptr) {
+func _gotk4_gtk4_TreeModel_ConnectRowInserted(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(path *TreePath, iter *TreeIter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -147,7 +149,7 @@ func _gotk4_gtk4_TreeModel_ConnectRowInserted(arg0 C.gpointer, arg1 *C.GtkTreePa
 }
 
 //export _gotk4_gtk4_TreeModel_ConnectRowsReordered
-func _gotk4_gtk4_TreeModel_ConnectRowsReordered(arg0 C.gpointer, arg1 *C.GtkTreePath, arg2 *C.GtkTreeIter, arg3 C.gpointer, arg4 C.guintptr) {
+func _gotk4_gtk4_TreeModel_ConnectRowsReordered(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.gpointer, arg4 C.guintptr) {
 	var f func(path *TreePath, iter *TreeIter, newOrder unsafe.Pointer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))

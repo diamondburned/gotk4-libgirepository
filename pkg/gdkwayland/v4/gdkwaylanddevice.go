@@ -3,21 +3,22 @@
 package gdkwayland
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/wayland/gdkwayland.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeWaylandDevice = coreglib.Type(C.gdk_wayland_device_get_type())
+	GTypeWaylandDevice = coreglib.Type(girepository.MustFind("GdkWayland", "WaylandDevice").RegisteredGType())
 )
 
 func init() {
@@ -52,34 +53,4 @@ func wrapWaylandDevice(obj *coreglib.Object) *WaylandDevice {
 
 func marshalWaylandDevice(p uintptr) (interface{}, error) {
 	return wrapWaylandDevice(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NodePath returns the /dev/input/event* path of this device.
-//
-// For GdkDevices that possibly coalesce multiple hardware devices (eg. mouse,
-// keyboard, touch,...), this function will return NULL.
-//
-// This is most notably implemented for devices of type GDK_SOURCE_PEN,
-// GDK_SOURCE_TABLET_PAD.
-//
-// The function returns the following values:
-//
-//    - utf8 (optional): /dev/input/event* path of this device.
-//
-func (device *WaylandDevice) NodePath() string {
-	var _arg0 *C.GdkDevice // out
-	var _cret *C.char      // in
-
-	_arg0 = (*C.GdkDevice)(unsafe.Pointer(coreglib.InternObject(device).Native()))
-
-	_cret = C.gdk_wayland_device_get_node_path(_arg0)
-	runtime.KeepAlive(device)
-
-	var _utf8 string // out
-
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	}
-
-	return _utf8
 }

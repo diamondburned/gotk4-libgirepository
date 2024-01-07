@@ -7,17 +7,19 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeAxisFlags = coreglib.Type(C.gdk_axis_flags_get_type())
+	GTypeAxisFlags = coreglib.Type(girepository.MustFind("Gdk", "AxisFlags").RegisteredGType())
 )
 
 func init() {

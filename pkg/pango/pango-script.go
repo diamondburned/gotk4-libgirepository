@@ -4,22 +4,22 @@ package pango
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <pango/pango.h>
 import "C"
 
 // GType values.
 var (
-	GTypeScript     = coreglib.Type(C.pango_script_get_type())
-	GTypeScriptIter = coreglib.Type(C.pango_script_iter_get_type())
+	GTypeScript     = coreglib.Type(girepository.MustFind("Pango", "Script").RegisteredGType())
+	GTypeScriptIter = coreglib.Type(girepository.MustFind("Pango", "ScriptIter").RegisteredGType())
 )
 
 func init() {
@@ -539,104 +539,12 @@ type ScriptIter struct {
 
 // scriptIter is the struct that's finalized.
 type scriptIter struct {
-	native *C.PangoScriptIter
+	native unsafe.Pointer
 }
+
+var GIRInfoScriptIter = girepository.MustFind("Pango", "ScriptIter")
 
 func marshalScriptIter(p uintptr) (interface{}, error) {
 	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
-	return &ScriptIter{&scriptIter{(*C.PangoScriptIter)(b)}}, nil
-}
-
-// NewScriptIter constructs a struct ScriptIter.
-func NewScriptIter(text string, length int) *ScriptIter {
-	var _arg1 *C.char            // out
-	var _arg2 C.int              // out
-	var _cret *C.PangoScriptIter // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(text)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = C.int(length)
-
-	_cret = C.pango_script_iter_new(_arg1, _arg2)
-	runtime.KeepAlive(text)
-	runtime.KeepAlive(length)
-
-	var _scriptIter *ScriptIter // out
-
-	_scriptIter = (*ScriptIter)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_scriptIter)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.pango_script_iter_free((*C.PangoScriptIter)(intern.C))
-		},
-	)
-
-	return _scriptIter
-}
-
-// Range gets information about the range to which iter currently points. The
-// range is the set of locations p where *start <= p < *end. (That is, it
-// doesn't include the character stored at *end)
-//
-// Note that while the type of the script argument is declared as PangoScript,
-// as of Pango 1.18, this function simply returns GUnicodeScript values. Callers
-// must be prepared to handle unknown values.
-//
-// The function returns the following values:
-//
-//    - start (optional): location to store start position of the range, or NULL.
-//    - end (optional): location to store end position of the range, or NULL.
-//    - script (optional): location to store script for range, or NULL.
-//
-func (iter *ScriptIter) Range() (start string, end string, script Script) {
-	var _arg0 *C.PangoScriptIter // out
-	var _arg1 *C.char            // in
-	var _arg2 *C.char            // in
-	var _arg3 C.PangoScript      // in
-
-	_arg0 = (*C.PangoScriptIter)(gextras.StructNative(unsafe.Pointer(iter)))
-
-	C.pango_script_iter_get_range(_arg0, &_arg1, &_arg2, &_arg3)
-	runtime.KeepAlive(iter)
-
-	var _start string  // out
-	var _end string    // out
-	var _script Script // out
-
-	if _arg1 != nil {
-		_start = C.GoString((*C.gchar)(unsafe.Pointer(_arg1)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-	if _arg2 != nil {
-		_end = C.GoString((*C.gchar)(unsafe.Pointer(_arg2)))
-		defer C.free(unsafe.Pointer(_arg2))
-	}
-	_script = Script(_arg3)
-
-	return _start, _end, _script
-}
-
-// Next advances a ScriptIter to the next range. If iter is already at the end,
-// it is left unchanged and FALSE is returned.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if iter was successfully advanced.
-//
-func (iter *ScriptIter) Next() bool {
-	var _arg0 *C.PangoScriptIter // out
-	var _cret C.gboolean         // in
-
-	_arg0 = (*C.PangoScriptIter)(gextras.StructNative(unsafe.Pointer(iter)))
-
-	_cret = C.pango_script_iter_next(_arg0)
-	runtime.KeepAlive(iter)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
+	return &ScriptIter{&scriptIter{(unsafe.Pointer)(b)}}, nil
 }

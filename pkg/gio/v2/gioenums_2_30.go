@@ -7,23 +7,25 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeIOModuleScopeFlags           = coreglib.Type(C.g_io_module_scope_flags_get_type())
-	GTypeTLSDatabaseLookupFlags       = coreglib.Type(C.g_tls_database_lookup_flags_get_type())
-	GTypeTLSInteractionResult         = coreglib.Type(C.g_tls_interaction_result_get_type())
-	GTypeDBusInterfaceSkeletonFlags   = coreglib.Type(C.g_dbus_interface_skeleton_flags_get_type())
-	GTypeDBusObjectManagerClientFlags = coreglib.Type(C.g_dbus_object_manager_client_flags_get_type())
-	GTypeTLSDatabaseVerifyFlags       = coreglib.Type(C.g_tls_database_verify_flags_get_type())
-	GTypeTLSPasswordFlags             = coreglib.Type(C.g_tls_password_flags_get_type())
+	GTypeIOModuleScopeFlags           = coreglib.Type(girepository.MustFind("Gio", "IOModuleScopeFlags").RegisteredGType())
+	GTypeTLSDatabaseLookupFlags       = coreglib.Type(girepository.MustFind("Gio", "TlsDatabaseLookupFlags").RegisteredGType())
+	GTypeTLSInteractionResult         = coreglib.Type(girepository.MustFind("Gio", "TlsInteractionResult").RegisteredGType())
+	GTypeDBusInterfaceSkeletonFlags   = coreglib.Type(girepository.MustFind("Gio", "DBusInterfaceSkeletonFlags").RegisteredGType())
+	GTypeDBusObjectManagerClientFlags = coreglib.Type(girepository.MustFind("Gio", "DBusObjectManagerClientFlags").RegisteredGType())
+	GTypeTLSDatabaseVerifyFlags       = coreglib.Type(girepository.MustFind("Gio", "TlsDatabaseVerifyFlags").RegisteredGType())
+	GTypeTLSPasswordFlags             = coreglib.Type(girepository.MustFind("Gio", "TlsPasswordFlags").RegisteredGType())
 )
 
 func init() {

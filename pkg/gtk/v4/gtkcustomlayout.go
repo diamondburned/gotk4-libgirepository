@@ -6,17 +6,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeCustomLayout = coreglib.Type(C.gtk_custom_layout_get_type())
+	GTypeCustomLayout = coreglib.Type(girepository.MustFind("Gtk", "CustomLayout").RegisteredGType())
 )
 
 func init() {
@@ -82,12 +84,7 @@ type CustomLayoutClass struct {
 
 // customLayoutClass is the struct that's finalized.
 type customLayoutClass struct {
-	native *C.GtkCustomLayoutClass
+	native unsafe.Pointer
 }
 
-func (c *CustomLayoutClass) ParentClass() *LayoutManagerClass {
-	valptr := &c.native.parent_class
-	var _v *LayoutManagerClass // out
-	_v = (*LayoutManagerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoCustomLayoutClass = girepository.MustFind("Gtk", "CustomLayoutClass")

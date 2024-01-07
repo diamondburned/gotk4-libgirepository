@@ -6,17 +6,19 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeNotificationPriority = coreglib.Type(C.g_notification_priority_get_type())
+	GTypeNotificationPriority = coreglib.Type(girepository.MustFind("Gio", "NotificationPriority").RegisteredGType())
 )
 
 func init() {

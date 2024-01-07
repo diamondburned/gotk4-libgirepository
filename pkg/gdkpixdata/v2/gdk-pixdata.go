@@ -4,19 +4,16 @@ package gdkpixdata
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
-	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdkpixbuf/v2"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk-pixbuf/gdk-pixdata.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // PIXBUF_MAGIC_NUMBER: magic number for Pixdata structures.
@@ -186,59 +183,6 @@ func (p PixdataType) Has(other PixdataType) bool {
 	return (p & other) == other
 }
 
-// PixbufFromPixdata converts a GdkPixdata to a GdkPixbuf.
-//
-// If copy_pixels is TRUE or if the pixel data is run-length-encoded, the pixel
-// data is copied into newly-allocated memory; otherwise it is reused.
-//
-// Deprecated: Use GResource instead.
-//
-// The function takes the following parameters:
-//
-//    - pixdata to convert into a GdkPixbuf.
-//    - copyPixels: whether to copy raw pixel data; run-length encoded pixel data
-//      is always copied.
-//
-// The function returns the following values:
-//
-//    - pixbuf: new pixbuf.
-//
-func PixbufFromPixdata(pixdata *Pixdata, copyPixels bool) (*gdkpixbuf.Pixbuf, error) {
-	var _arg1 *C.GdkPixdata // out
-	var _arg2 C.gboolean    // out
-	var _cret *C.GdkPixbuf  // in
-	var _cerr *C.GError     // in
-
-	_arg1 = (*C.GdkPixdata)(gextras.StructNative(unsafe.Pointer(pixdata)))
-	if copyPixels {
-		_arg2 = C.TRUE
-	}
-
-	_cret = C.gdk_pixbuf_from_pixdata(_arg1, _arg2, &_cerr)
-	runtime.KeepAlive(pixdata)
-	runtime.KeepAlive(copyPixels)
-
-	var _pixbuf *gdkpixbuf.Pixbuf // out
-	var _goerr error              // out
-
-	{
-		obj := coreglib.AssumeOwnership(unsafe.Pointer(_cret))
-		_pixbuf = &gdkpixbuf.Pixbuf{
-			Object: obj,
-			LoadableIcon: gio.LoadableIcon{
-				Icon: gio.Icon{
-					Object: obj,
-				},
-			},
-		}
-	}
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _pixbuf, _goerr
-}
-
 // Pixdata: pixel buffer suitable for serialization and streaming.
 //
 // Using GdkPixdata, images can be compiled into an application, making it
@@ -259,79 +203,7 @@ type Pixdata struct {
 
 // pixdata is the struct that's finalized.
 type pixdata struct {
-	native *C.GdkPixdata
+	native unsafe.Pointer
 }
 
-// Deserialize deserializes (reconstruct) a Pixdata structure from a byte
-// stream.
-//
-// The byte stream consists of a straightforward writeout of the GdkPixdata
-// fields in network byte order, plus the pixel_data bytes the structure points
-// to.
-//
-// The pixdata contents are reconstructed byte by byte and are checked for
-// validity.
-//
-// This function may fail with GDK_PIXBUF_ERROR_CORRUPT_IMAGE or
-// GDK_PIXBUF_ERROR_UNKNOWN_TYPE.
-//
-// Deprecated: Use GResource instead.
-//
-// The function takes the following parameters:
-//
-//    - stream of bytes containing a serialized Pixdata structure.
-//
-func (pixdata *Pixdata) Deserialize(stream []byte) error {
-	var _arg0 *C.GdkPixdata // out
-	var _arg2 *C.guint8     // out
-	var _arg1 C.guint
-	var _cerr *C.GError // in
-
-	_arg0 = (*C.GdkPixdata)(gextras.StructNative(unsafe.Pointer(pixdata)))
-	_arg1 = (C.guint)(len(stream))
-	if len(stream) > 0 {
-		_arg2 = (*C.guint8)(unsafe.Pointer(&stream[0]))
-	}
-
-	C.gdk_pixdata_deserialize(_arg0, _arg1, _arg2, &_cerr)
-	runtime.KeepAlive(pixdata)
-	runtime.KeepAlive(stream)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// Serialize serializes a Pixdata structure into a byte stream. The byte stream
-// consists of a straightforward writeout of the Pixdata fields in network byte
-// order, plus the pixel_data bytes the structure points to.
-//
-// Deprecated: Use #GResource instead.
-//
-// The function returns the following values:
-//
-//    - guint8s: a newly-allocated string containing the serialized Pixdata
-//      structure.
-//
-func (pixdata *Pixdata) Serialize() []byte {
-	var _arg0 *C.GdkPixdata // out
-	var _cret *C.guint8     // in
-	var _arg1 C.guint       // in
-
-	_arg0 = (*C.GdkPixdata)(gextras.StructNative(unsafe.Pointer(pixdata)))
-
-	_cret = C.gdk_pixdata_serialize(_arg0, &_arg1)
-	runtime.KeepAlive(pixdata)
-
-	var _guint8s []byte // out
-
-	defer C.free(unsafe.Pointer(_cret))
-	_guint8s = make([]byte, _arg1)
-	copy(_guint8s, unsafe.Slice((*byte)(unsafe.Pointer(_cret)), _arg1))
-
-	return _guint8s
-}
+var GIRInfoPixdata = girepository.MustFind("GdkPixdata", "Pixdata")

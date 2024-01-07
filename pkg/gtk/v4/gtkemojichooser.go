@@ -5,18 +5,20 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_EmojiChooser_ConnectEmojiPicked(gpointer, gchar*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeEmojiChooser = coreglib.Type(C.gtk_emoji_chooser_get_type())
+	GTypeEmojiChooser = coreglib.Type(girepository.MustFind("Gtk", "EmojiChooser").RegisteredGType())
 )
 
 func init() {
@@ -110,22 +112,4 @@ func marshalEmojiChooser(p uintptr) (interface{}, error) {
 // ConnectEmojiPicked is emitted when the user selects an Emoji.
 func (v *EmojiChooser) ConnectEmojiPicked(f func(text string)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "emoji-picked", false, unsafe.Pointer(C._gotk4_gtk4_EmojiChooser_ConnectEmojiPicked), f)
-}
-
-// NewEmojiChooser creates a new GtkEmojiChooser.
-//
-// The function returns the following values:
-//
-//    - emojiChooser: new GtkEmojiChooser.
-//
-func NewEmojiChooser() *EmojiChooser {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_emoji_chooser_new()
-
-	var _emojiChooser *EmojiChooser // out
-
-	_emojiChooser = wrapEmojiChooser(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _emojiChooser
 }

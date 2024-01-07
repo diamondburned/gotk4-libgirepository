@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFontChooserWidget = coreglib.Type(C.gtk_font_chooser_widget_get_type())
+	GTypeFontChooserWidget = coreglib.Type(girepository.MustFind("Gtk", "FontChooserWidget").RegisteredGType())
 )
 
 func init() {
@@ -113,22 +113,4 @@ func wrapFontChooserWidget(obj *coreglib.Object) *FontChooserWidget {
 
 func marshalFontChooserWidget(p uintptr) (interface{}, error) {
 	return wrapFontChooserWidget(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewFontChooserWidget creates a new FontChooserWidget.
-//
-// The function returns the following values:
-//
-//    - fontChooserWidget: new FontChooserWidget.
-//
-func NewFontChooserWidget() *FontChooserWidget {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_font_chooser_widget_new()
-
-	var _fontChooserWidget *FontChooserWidget // out
-
-	_fontChooserWidget = wrapFontChooserWidget(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _fontChooserWidget
 }

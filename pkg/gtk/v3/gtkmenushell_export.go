@@ -8,10 +8,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_MenuShell_ConnectActivateCurrent
@@ -52,26 +52,6 @@ func _gotk4_gtk3_MenuShell_ConnectCancel(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gtk3_MenuShell_ConnectCycleFocus
-func _gotk4_gtk3_MenuShell_ConnectCycleFocus(arg0 C.gpointer, arg1 C.GtkDirectionType, arg2 C.guintptr) {
-	var f func(direction DirectionType)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(direction DirectionType))
-	}
-
-	var _direction DirectionType // out
-
-	_direction = DirectionType(arg1)
-
-	f(_direction)
-}
-
 //export _gotk4_gtk3_MenuShell_ConnectDeactivate
 func _gotk4_gtk3_MenuShell_ConnectDeactivate(arg0 C.gpointer, arg1 C.guintptr) {
 	var f func()
@@ -89,7 +69,7 @@ func _gotk4_gtk3_MenuShell_ConnectDeactivate(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_MenuShell_ConnectInsert
-func _gotk4_gtk3_MenuShell_ConnectInsert(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.gint, arg3 C.guintptr) {
+func _gotk4_gtk3_MenuShell_ConnectInsert(arg0 C.gpointer, arg1 *C.void, arg2 C.gint, arg3 C.guintptr) {
 	var f func(child Widgetter, position int)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -124,26 +104,6 @@ func _gotk4_gtk3_MenuShell_ConnectInsert(arg0 C.gpointer, arg1 *C.GtkWidget, arg
 	_position = int(arg2)
 
 	f(_child, _position)
-}
-
-//export _gotk4_gtk3_MenuShell_ConnectMoveCurrent
-func _gotk4_gtk3_MenuShell_ConnectMoveCurrent(arg0 C.gpointer, arg1 C.GtkMenuDirectionType, arg2 C.guintptr) {
-	var f func(direction MenuDirectionType)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(direction MenuDirectionType))
-	}
-
-	var _direction MenuDirectionType // out
-
-	_direction = MenuDirectionType(arg1)
-
-	f(_direction)
 }
 
 //export _gotk4_gtk3_MenuShell_ConnectMoveSelected

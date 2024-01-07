@@ -3,22 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_Statusbar_ConnectTextPushed(gpointer, guint, gchar*, guintptr);
 // extern void _gotk4_gtk4_Statusbar_ConnectTextPopped(gpointer, guint, gchar*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeStatusbar = coreglib.Type(C.gtk_statusbar_get_type())
+	GTypeStatusbar = coreglib.Type(girepository.MustFind("Gtk", "Statusbar").RegisteredGType())
 )
 
 func init() {
@@ -98,163 +99,12 @@ func marshalStatusbar(p uintptr) (interface{}, error) {
 
 // ConnectTextPopped is emitted whenever a new message is popped off a
 // statusbar's stack.
-func (statusbar *Statusbar) ConnectTextPopped(f func(contextId uint, text string)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(statusbar, "text-popped", false, unsafe.Pointer(C._gotk4_gtk4_Statusbar_ConnectTextPopped), f)
+func (v *Statusbar) ConnectTextPopped(f func(contextId uint, text string)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "text-popped", false, unsafe.Pointer(C._gotk4_gtk4_Statusbar_ConnectTextPopped), f)
 }
 
 // ConnectTextPushed is emitted whenever a new message gets pushed onto a
 // statusbar's stack.
-func (statusbar *Statusbar) ConnectTextPushed(f func(contextId uint, text string)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(statusbar, "text-pushed", false, unsafe.Pointer(C._gotk4_gtk4_Statusbar_ConnectTextPushed), f)
-}
-
-// NewStatusbar creates a new GtkStatusbar ready for messages.
-//
-// The function returns the following values:
-//
-//    - statusbar: new GtkStatusbar.
-//
-func NewStatusbar() *Statusbar {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_statusbar_new()
-
-	var _statusbar *Statusbar // out
-
-	_statusbar = wrapStatusbar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _statusbar
-}
-
-// ContextID returns a new context identifier, given a description of the actual
-// context.
-//
-// Note that the description is not shown in the UI.
-//
-// The function takes the following parameters:
-//
-//    - contextDescription: textual description of what context the new message
-//      is being used in.
-//
-// The function returns the following values:
-//
-//    - guint: integer id.
-//
-func (statusbar *Statusbar) ContextID(contextDescription string) uint {
-	var _arg0 *C.GtkStatusbar // out
-	var _arg1 *C.char         // out
-	var _cret C.guint         // in
-
-	_arg0 = (*C.GtkStatusbar)(unsafe.Pointer(coreglib.InternObject(statusbar).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(contextDescription)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.gtk_statusbar_get_context_id(_arg0, _arg1)
-	runtime.KeepAlive(statusbar)
-	runtime.KeepAlive(contextDescription)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// Pop removes the first message in the GtkStatusbar’s stack with the given
-// context id.
-//
-// Note that this may not change the displayed message, if the message at the
-// top of the stack has a different context id.
-//
-// The function takes the following parameters:
-//
-//    - contextId: context identifier.
-//
-func (statusbar *Statusbar) Pop(contextId uint) {
-	var _arg0 *C.GtkStatusbar // out
-	var _arg1 C.guint         // out
-
-	_arg0 = (*C.GtkStatusbar)(unsafe.Pointer(coreglib.InternObject(statusbar).Native()))
-	_arg1 = C.guint(contextId)
-
-	C.gtk_statusbar_pop(_arg0, _arg1)
-	runtime.KeepAlive(statusbar)
-	runtime.KeepAlive(contextId)
-}
-
-// Push pushes a new message onto a statusbar’s stack.
-//
-// The function takes the following parameters:
-//
-//    - contextId message’s context id, as returned by
-//      gtk_statusbar_get_context_id().
-//    - text: message to add to the statusbar.
-//
-// The function returns the following values:
-//
-//    - guint: message id that can be used with gtk.Statusbar.Remove().
-//
-func (statusbar *Statusbar) Push(contextId uint, text string) uint {
-	var _arg0 *C.GtkStatusbar // out
-	var _arg1 C.guint         // out
-	var _arg2 *C.char         // out
-	var _cret C.guint         // in
-
-	_arg0 = (*C.GtkStatusbar)(unsafe.Pointer(coreglib.InternObject(statusbar).Native()))
-	_arg1 = C.guint(contextId)
-	_arg2 = (*C.char)(unsafe.Pointer(C.CString(text)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	_cret = C.gtk_statusbar_push(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(statusbar)
-	runtime.KeepAlive(contextId)
-	runtime.KeepAlive(text)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// Remove forces the removal of a message from a statusbar’s stack. The exact
-// context_id and message_id must be specified.
-//
-// The function takes the following parameters:
-//
-//    - contextId: context identifier.
-//    - messageId: message identifier, as returned by gtk.Statusbar.Push().
-//
-func (statusbar *Statusbar) Remove(contextId, messageId uint) {
-	var _arg0 *C.GtkStatusbar // out
-	var _arg1 C.guint         // out
-	var _arg2 C.guint         // out
-
-	_arg0 = (*C.GtkStatusbar)(unsafe.Pointer(coreglib.InternObject(statusbar).Native()))
-	_arg1 = C.guint(contextId)
-	_arg2 = C.guint(messageId)
-
-	C.gtk_statusbar_remove(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(statusbar)
-	runtime.KeepAlive(contextId)
-	runtime.KeepAlive(messageId)
-}
-
-// RemoveAll forces the removal of all messages from a statusbar's stack with
-// the exact context_id.
-//
-// The function takes the following parameters:
-//
-//    - contextId: context identifier.
-//
-func (statusbar *Statusbar) RemoveAll(contextId uint) {
-	var _arg0 *C.GtkStatusbar // out
-	var _arg1 C.guint         // out
-
-	_arg0 = (*C.GtkStatusbar)(unsafe.Pointer(coreglib.InternObject(statusbar).Native()))
-	_arg1 = C.guint(contextId)
-
-	C.gtk_statusbar_remove_all(_arg0, _arg1)
-	runtime.KeepAlive(statusbar)
-	runtime.KeepAlive(contextId)
+func (v *Statusbar) ConnectTextPushed(f func(contextId uint, text string)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "text-pushed", false, unsafe.Pointer(C._gotk4_gtk4_Statusbar_ConnectTextPushed), f)
 }

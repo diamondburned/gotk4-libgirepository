@@ -9,8 +9,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 // GtkWidget* _gotk4_gtk4_dialog_new2(const gchar* title, GtkWindow* parent, GtkDialogFlags flags) {
 // 	return gtk_dialog_new_with_buttons(title, parent, flags, NULL, NULL);
 // }

@@ -6,17 +6,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeBinLayout = coreglib.Type(C.gtk_bin_layout_get_type())
+	GTypeBinLayout = coreglib.Type(girepository.MustFind("Gtk", "BinLayout").RegisteredGType())
 )
 
 func init() {
@@ -77,24 +79,6 @@ func marshalBinLayout(p uintptr) (interface{}, error) {
 	return wrapBinLayout(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewBinLayout creates a new GtkBinLayout instance.
-//
-// The function returns the following values:
-//
-//    - binLayout: newly created GtkBinLayout.
-//
-func NewBinLayout() *BinLayout {
-	var _cret *C.GtkLayoutManager // in
-
-	_cret = C.gtk_bin_layout_new()
-
-	var _binLayout *BinLayout // out
-
-	_binLayout = wrapBinLayout(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _binLayout
-}
-
 // BinLayoutClass: instance of this type is always passed by reference.
 type BinLayoutClass struct {
 	*binLayoutClass
@@ -102,12 +86,7 @@ type BinLayoutClass struct {
 
 // binLayoutClass is the struct that's finalized.
 type binLayoutClass struct {
-	native *C.GtkBinLayoutClass
+	native unsafe.Pointer
 }
 
-func (b *BinLayoutClass) ParentClass() *LayoutManagerClass {
-	valptr := &b.native.parent_class
-	var _v *LayoutManagerClass // out
-	_v = (*LayoutManagerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoBinLayoutClass = girepository.MustFind("Gtk", "BinLayoutClass")

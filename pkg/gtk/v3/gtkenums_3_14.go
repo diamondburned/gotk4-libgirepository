@@ -6,21 +6,21 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeEventSequenceState = coreglib.Type(C.gtk_event_sequence_state_get_type())
-	GTypePanDirection       = coreglib.Type(C.gtk_pan_direction_get_type())
-	GTypePropagationPhase   = coreglib.Type(C.gtk_propagation_phase_get_type())
+	GTypeEventSequenceState = coreglib.Type(girepository.MustFind("Gtk", "EventSequenceState").RegisteredGType())
+	GTypePanDirection       = coreglib.Type(girepository.MustFind("Gtk", "PanDirection").RegisteredGType())
+	GTypePropagationPhase   = coreglib.Type(girepository.MustFind("Gtk", "PropagationPhase").RegisteredGType())
 )
 
 func init() {

@@ -4,22 +4,23 @@ package gdk
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDragProtocol = coreglib.Type(C.gdk_drag_protocol_get_type())
-	GTypeDragAction   = coreglib.Type(C.gdk_drag_action_get_type())
+	GTypeDragProtocol = coreglib.Type(girepository.MustFind("Gdk", "DragProtocol").RegisteredGType())
+	GTypeDragAction   = coreglib.Type(girepository.MustFind("Gdk", "DragAction").RegisteredGType())
 )
 
 func init() {
@@ -146,194 +147,4 @@ func (d DragAction) String() string {
 // Has returns true if d contains other.
 func (d DragAction) Has(other DragAction) bool {
 	return (d & other) == other
-}
-
-// DragAbort aborts a drag without dropping.
-//
-// This function is called by the drag source.
-//
-// This function does not need to be called in managed drag and drop operations.
-// See gdk_drag_context_manage_dnd() for more information.
-//
-// The function takes the following parameters:
-//
-//    - context: DragContext.
-//    - time_: timestamp for this operation.
-//
-func DragAbort(context *DragContext, time_ uint32) {
-	var _arg1 *C.GdkDragContext // out
-	var _arg2 C.guint32         // out
-
-	_arg1 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	_arg2 = C.guint32(time_)
-
-	C.gdk_drag_abort(_arg1, _arg2)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(time_)
-}
-
-// DragDrop drops on the current destination.
-//
-// This function is called by the drag source.
-//
-// This function does not need to be called in managed drag and drop operations.
-// See gdk_drag_context_manage_dnd() for more information.
-//
-// The function takes the following parameters:
-//
-//    - context: DragContext.
-//    - time_: timestamp for this operation.
-//
-func DragDrop(context *DragContext, time_ uint32) {
-	var _arg1 *C.GdkDragContext // out
-	var _arg2 C.guint32         // out
-
-	_arg1 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	_arg2 = C.guint32(time_)
-
-	C.gdk_drag_drop(_arg1, _arg2)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(time_)
-}
-
-// DragMotion updates the drag context when the pointer moves or the set of
-// actions changes.
-//
-// This function is called by the drag source.
-//
-// This function does not need to be called in managed drag and drop operations.
-// See gdk_drag_context_manage_dnd() for more information.
-//
-// The function takes the following parameters:
-//
-//    - context: DragContext.
-//    - destWindow: new destination window, obtained by gdk_drag_find_window().
-//    - protocol: DND protocol in use, obtained by gdk_drag_find_window().
-//    - xRoot: x position of the pointer in root coordinates.
-//    - yRoot: y position of the pointer in root coordinates.
-//    - suggestedAction: suggested action.
-//    - possibleActions: possible actions.
-//    - time_: timestamp for this operation.
-//
-// The function returns the following values:
-//
-func DragMotion(context *DragContext, destWindow Windower, protocol DragProtocol, xRoot, yRoot int, suggestedAction, possibleActions DragAction, time_ uint32) bool {
-	var _arg1 *C.GdkDragContext // out
-	var _arg2 *C.GdkWindow      // out
-	var _arg3 C.GdkDragProtocol // out
-	var _arg4 C.gint            // out
-	var _arg5 C.gint            // out
-	var _arg6 C.GdkDragAction   // out
-	var _arg7 C.GdkDragAction   // out
-	var _arg8 C.guint32         // out
-	var _cret C.gboolean        // in
-
-	_arg1 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	_arg2 = (*C.GdkWindow)(unsafe.Pointer(coreglib.InternObject(destWindow).Native()))
-	_arg3 = C.GdkDragProtocol(protocol)
-	_arg4 = C.gint(xRoot)
-	_arg5 = C.gint(yRoot)
-	_arg6 = C.GdkDragAction(suggestedAction)
-	_arg7 = C.GdkDragAction(possibleActions)
-	_arg8 = C.guint32(time_)
-
-	_cret = C.gdk_drag_motion(_arg1, _arg2, _arg3, _arg4, _arg5, _arg6, _arg7, _arg8)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(destWindow)
-	runtime.KeepAlive(protocol)
-	runtime.KeepAlive(xRoot)
-	runtime.KeepAlive(yRoot)
-	runtime.KeepAlive(suggestedAction)
-	runtime.KeepAlive(possibleActions)
-	runtime.KeepAlive(time_)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// DragStatus selects one of the actions offered by the drag source.
-//
-// This function is called by the drag destination in response to
-// gdk_drag_motion() called by the drag source.
-//
-// The function takes the following parameters:
-//
-//    - context: DragContext.
-//    - action: selected action which will be taken when a drop happens, or 0 to
-//      indicate that a drop will not be accepted.
-//    - time_: timestamp for this operation.
-//
-func DragStatus(context *DragContext, action DragAction, time_ uint32) {
-	var _arg1 *C.GdkDragContext // out
-	var _arg2 C.GdkDragAction   // out
-	var _arg3 C.guint32         // out
-
-	_arg1 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	_arg2 = C.GdkDragAction(action)
-	_arg3 = C.guint32(time_)
-
-	C.gdk_drag_status(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(action)
-	runtime.KeepAlive(time_)
-}
-
-// DropFinish ends the drag operation after a drop.
-//
-// This function is called by the drag destination.
-//
-// The function takes the following parameters:
-//
-//    - context: DragContext.
-//    - success: TRUE if the data was successfully received.
-//    - time_: timestamp for this operation.
-//
-func DropFinish(context *DragContext, success bool, time_ uint32) {
-	var _arg1 *C.GdkDragContext // out
-	var _arg2 C.gboolean        // out
-	var _arg3 C.guint32         // out
-
-	_arg1 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	if success {
-		_arg2 = C.TRUE
-	}
-	_arg3 = C.guint32(time_)
-
-	C.gdk_drop_finish(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(success)
-	runtime.KeepAlive(time_)
-}
-
-// DropReply accepts or rejects a drop.
-//
-// This function is called by the drag destination in response to a drop
-// initiated by the drag source.
-//
-// The function takes the following parameters:
-//
-//    - context: DragContext.
-//    - accepted: TRUE if the drop is accepted.
-//    - time_: timestamp for this operation.
-//
-func DropReply(context *DragContext, accepted bool, time_ uint32) {
-	var _arg1 *C.GdkDragContext // out
-	var _arg2 C.gboolean        // out
-	var _arg3 C.guint32         // out
-
-	_arg1 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	if accepted {
-		_arg2 = C.TRUE
-	}
-	_arg3 = C.guint32(time_)
-
-	C.gdk_drop_reply(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(accepted)
-	runtime.KeepAlive(time_)
 }

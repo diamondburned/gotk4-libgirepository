@@ -7,23 +7,25 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDriveStartStopType = coreglib.Type(C.g_drive_start_stop_type_get_type())
-	GTypeResolverError      = coreglib.Type(C.g_resolver_error_get_type())
-	GTypeSocketFamily       = coreglib.Type(C.g_socket_family_get_type())
-	GTypeSocketProtocol     = coreglib.Type(C.g_socket_protocol_get_type())
-	GTypeSocketType         = coreglib.Type(C.g_socket_type_get_type())
-	GTypeDriveStartFlags    = coreglib.Type(C.g_drive_start_flags_get_type())
-	GTypeSocketMsgFlags     = coreglib.Type(C.g_socket_msg_flags_get_type())
+	GTypeDriveStartStopType = coreglib.Type(girepository.MustFind("Gio", "DriveStartStopType").RegisteredGType())
+	GTypeResolverError      = coreglib.Type(girepository.MustFind("Gio", "ResolverError").RegisteredGType())
+	GTypeSocketFamily       = coreglib.Type(girepository.MustFind("Gio", "SocketFamily").RegisteredGType())
+	GTypeSocketProtocol     = coreglib.Type(girepository.MustFind("Gio", "SocketProtocol").RegisteredGType())
+	GTypeSocketType         = coreglib.Type(girepository.MustFind("Gio", "SocketType").RegisteredGType())
+	GTypeDriveStartFlags    = coreglib.Type(girepository.MustFind("Gio", "DriveStartFlags").RegisteredGType())
+	GTypeSocketMsgFlags     = coreglib.Type(girepository.MustFind("Gio", "SocketMsgFlags").RegisteredGType())
 )
 
 func init() {

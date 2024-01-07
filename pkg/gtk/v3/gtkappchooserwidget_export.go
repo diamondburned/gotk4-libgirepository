@@ -9,14 +9,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_AppChooserWidget_ConnectApplicationActivated
-func _gotk4_gtk3_AppChooserWidget_ConnectApplicationActivated(arg0 C.gpointer, arg1 *C.GAppInfo, arg2 C.guintptr) {
+func _gotk4_gtk3_AppChooserWidget_ConnectApplicationActivated(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(application gio.AppInfor)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -52,7 +52,7 @@ func _gotk4_gtk3_AppChooserWidget_ConnectApplicationActivated(arg0 C.gpointer, a
 }
 
 //export _gotk4_gtk3_AppChooserWidget_ConnectApplicationSelected
-func _gotk4_gtk3_AppChooserWidget_ConnectApplicationSelected(arg0 C.gpointer, arg1 *C.GAppInfo, arg2 C.guintptr) {
+func _gotk4_gtk3_AppChooserWidget_ConnectApplicationSelected(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(application gio.AppInfor)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -88,7 +88,7 @@ func _gotk4_gtk3_AppChooserWidget_ConnectApplicationSelected(arg0 C.gpointer, ar
 }
 
 //export _gotk4_gtk3_AppChooserWidget_ConnectPopulatePopup
-func _gotk4_gtk3_AppChooserWidget_ConnectPopulatePopup(arg0 C.gpointer, arg1 *C.GtkMenu, arg2 *C.GAppInfo, arg3 C.guintptr) {
+func _gotk4_gtk3_AppChooserWidget_ConnectPopulatePopup(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(menu *Menu, application gio.AppInfor)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))

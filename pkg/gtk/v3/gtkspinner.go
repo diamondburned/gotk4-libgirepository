@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSpinner = coreglib.Type(C.gtk_spinner_get_type())
+	GTypeSpinner = coreglib.Type(girepository.MustFind("Gtk", "Spinner").RegisteredGType())
 )
 
 func init() {
@@ -95,44 +94,6 @@ func marshalSpinner(p uintptr) (interface{}, error) {
 	return wrapSpinner(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewSpinner returns a new spinner widget. Not yet started.
-//
-// The function returns the following values:
-//
-//    - spinner: new Spinner.
-//
-func NewSpinner() *Spinner {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_spinner_new()
-
-	var _spinner *Spinner // out
-
-	_spinner = wrapSpinner(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _spinner
-}
-
-// Start starts the animation of the spinner.
-func (spinner *Spinner) Start() {
-	var _arg0 *C.GtkSpinner // out
-
-	_arg0 = (*C.GtkSpinner)(unsafe.Pointer(coreglib.InternObject(spinner).Native()))
-
-	C.gtk_spinner_start(_arg0)
-	runtime.KeepAlive(spinner)
-}
-
-// Stop stops the animation of the spinner.
-func (spinner *Spinner) Stop() {
-	var _arg0 *C.GtkSpinner // out
-
-	_arg0 = (*C.GtkSpinner)(unsafe.Pointer(coreglib.InternObject(spinner).Native()))
-
-	C.gtk_spinner_stop(_arg0)
-	runtime.KeepAlive(spinner)
-}
-
 // SpinnerClass: instance of this type is always passed by reference.
 type SpinnerClass struct {
 	*spinnerClass
@@ -140,12 +101,7 @@ type SpinnerClass struct {
 
 // spinnerClass is the struct that's finalized.
 type spinnerClass struct {
-	native *C.GtkSpinnerClass
+	native unsafe.Pointer
 }
 
-func (s *SpinnerClass) ParentClass() *WidgetClass {
-	valptr := &s.native.parent_class
-	var _v *WidgetClass // out
-	_v = (*WidgetClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoSpinnerClass = girepository.MustFind("Gtk", "SpinnerClass")

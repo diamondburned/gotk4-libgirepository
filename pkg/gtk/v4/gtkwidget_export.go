@@ -10,12 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_TickCallback
-func _gotk4_gtk4_TickCallback(arg1 *C.GtkWidget, arg2 *C.GdkFrameClock, arg3 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_TickCallback(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) (cret C.gboolean) {
 	var fn TickCallback
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -90,26 +92,6 @@ func _gotk4_gtk4_Widget_ConnectDestroy(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gtk4_Widget_ConnectDirectionChanged
-func _gotk4_gtk4_Widget_ConnectDirectionChanged(arg0 C.gpointer, arg1 C.GtkTextDirection, arg2 C.guintptr) {
-	var f func(previousDirection TextDirection)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(previousDirection TextDirection))
-	}
-
-	var _previousDirection TextDirection // out
-
-	_previousDirection = TextDirection(arg1)
-
-	f(_previousDirection)
-}
-
 //export _gotk4_gtk4_Widget_ConnectHide
 func _gotk4_gtk4_Widget_ConnectHide(arg0 C.gpointer, arg1 C.guintptr) {
 	var f func()
@@ -124,34 +106,6 @@ func _gotk4_gtk4_Widget_ConnectHide(arg0 C.gpointer, arg1 C.guintptr) {
 	}
 
 	f()
-}
-
-//export _gotk4_gtk4_Widget_ConnectKeynavFailed
-func _gotk4_gtk4_Widget_ConnectKeynavFailed(arg0 C.gpointer, arg1 C.GtkDirectionType, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(direction DirectionType) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(direction DirectionType) (ok bool))
-	}
-
-	var _direction DirectionType // out
-
-	_direction = DirectionType(arg1)
-
-	ok := f(_direction)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
 }
 
 //export _gotk4_gtk4_Widget_ConnectMap
@@ -200,28 +154,8 @@ func _gotk4_gtk4_Widget_ConnectMnemonicActivate(arg0 C.gpointer, arg1 C.gboolean
 	return cret
 }
 
-//export _gotk4_gtk4_Widget_ConnectMoveFocus
-func _gotk4_gtk4_Widget_ConnectMoveFocus(arg0 C.gpointer, arg1 C.GtkDirectionType, arg2 C.guintptr) {
-	var f func(direction DirectionType)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(direction DirectionType))
-	}
-
-	var _direction DirectionType // out
-
-	_direction = DirectionType(arg1)
-
-	f(_direction)
-}
-
 //export _gotk4_gtk4_Widget_ConnectQueryTooltip
-func _gotk4_gtk4_Widget_ConnectQueryTooltip(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.gboolean, arg4 *C.GtkTooltip, arg5 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_Widget_ConnectQueryTooltip(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.gboolean, arg4 *C.void, arg5 C.guintptr) (cret C.gboolean) {
 	var f func(x, y int, keyboardMode bool, tooltip *Tooltip) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -286,26 +220,6 @@ func _gotk4_gtk4_Widget_ConnectShow(arg0 C.gpointer, arg1 C.guintptr) {
 	}
 
 	f()
-}
-
-//export _gotk4_gtk4_Widget_ConnectStateFlagsChanged
-func _gotk4_gtk4_Widget_ConnectStateFlagsChanged(arg0 C.gpointer, arg1 C.GtkStateFlags, arg2 C.guintptr) {
-	var f func(flags StateFlags)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(flags StateFlags))
-	}
-
-	var _flags StateFlags // out
-
-	_flags = StateFlags(arg1)
-
-	f(_flags)
 }
 
 //export _gotk4_gtk4_Widget_ConnectUnmap

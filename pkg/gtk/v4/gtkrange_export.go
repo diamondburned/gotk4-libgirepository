@@ -6,8 +6,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_Range_ConnectAdjustBounds
@@ -28,56 +30,6 @@ func _gotk4_gtk4_Range_ConnectAdjustBounds(arg0 C.gpointer, arg1 C.gdouble, arg2
 	_value = float64(arg1)
 
 	f(_value)
-}
-
-//export _gotk4_gtk4_Range_ConnectChangeValue
-func _gotk4_gtk4_Range_ConnectChangeValue(arg0 C.gpointer, arg1 C.GtkScrollType, arg2 C.gdouble, arg3 C.guintptr) (cret C.gboolean) {
-	var f func(scroll ScrollType, value float64) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(scroll ScrollType, value float64) (ok bool))
-	}
-
-	var _scroll ScrollType // out
-	var _value float64     // out
-
-	_scroll = ScrollType(arg1)
-	_value = float64(arg2)
-
-	ok := f(_scroll, _value)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_gtk4_Range_ConnectMoveSlider
-func _gotk4_gtk4_Range_ConnectMoveSlider(arg0 C.gpointer, arg1 C.GtkScrollType, arg2 C.guintptr) {
-	var f func(step ScrollType)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(step ScrollType))
-	}
-
-	var _step ScrollType // out
-
-	_step = ScrollType(arg1)
-
-	f(_step)
 }
 
 //export _gotk4_gtk4_Range_ConnectValueChanged

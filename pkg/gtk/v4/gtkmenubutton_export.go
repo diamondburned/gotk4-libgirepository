@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_MenuButtonCreatePopupFunc
-func _gotk4_gtk4_MenuButtonCreatePopupFunc(arg1 *C.GtkMenuButton, arg2 C.gpointer) {
+func _gotk4_gtk4_MenuButtonCreatePopupFunc(arg1 *C.void, arg2 C.gpointer) {
 	var fn MenuButtonCreatePopupFunc
 	{
 		v := gbox.Get(uintptr(arg2))

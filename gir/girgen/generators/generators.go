@@ -71,8 +71,8 @@ func (s stubFileWriter) Header() *file.Header { return file.NoopHeader }
 func (s stubFileWriter) Pen() *pen.Pen        { return pen.NoopPen }
 
 type GeneratedGType struct {
-	Header  file.Header
-	GetType string
+	header  file.Header
+	getType string
 }
 
 func GenerateGType(gen FileGeneratorWriter, name, glibGetType string) (GeneratedGType, bool) {
@@ -84,11 +84,11 @@ func GenerateGType(gen FileGeneratorWriter, name, glibGetType string) (Generated
 
 	switch gen.LinkMode() {
 	case types.DynamicLinkMode:
-		gtype.GetType = glibGetType
+		gtype.getType = glibGetType
 
 	case types.RuntimeLinkMode:
-		gtype.Header.ImportCore("girepository")
-		gtype.GetType = fmt.Sprintf(
+		gtype.header.ImportCore("girepository")
+		gtype.getType = fmt.Sprintf(
 			`girepository.MustFind(%q, %q).RegisteredGType()`,
 			gen.Namespace().Namespace.Name, name,
 		)
@@ -98,4 +98,10 @@ func GenerateGType(gen FileGeneratorWriter, name, glibGetType string) (Generated
 	}
 
 	return gtype, true
+}
+
+// AddToHeader adds the generated GType to the given header.
+func (gtype GeneratedGType) AddToHeader(h *file.Header, goName string) {
+	h.AddMarshaler(gtype.getType, goName)
+	h.ApplyFrom(&gtype.header)
 }

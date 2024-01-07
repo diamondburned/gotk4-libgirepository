@@ -4,10 +4,16 @@ package gdkwayland
 
 import (
 	_ "runtime/cgo"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
-// #cgo pkg-config: gtk4-wayland gtk4
-// #cgo CFLAGS: -Wno-deprecated-declarations
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/wayland/gdkwayland.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
+
+func init() {
+	girepository.Require("GdkWayland", "4.0", girepository.LoadFlagLazy)
+}

@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeComboBoxAccessible = coreglib.Type(C.gtk_combo_box_accessible_get_type())
+	GTypeComboBoxAccessible = coreglib.Type(girepository.MustFind("Gtk", "ComboBoxAccessible").RegisteredGType())
 )
 
 func init() {
@@ -100,12 +100,7 @@ type ComboBoxAccessibleClass struct {
 
 // comboBoxAccessibleClass is the struct that's finalized.
 type comboBoxAccessibleClass struct {
-	native *C.GtkComboBoxAccessibleClass
+	native unsafe.Pointer
 }
 
-func (c *ComboBoxAccessibleClass) ParentClass() *ContainerAccessibleClass {
-	valptr := &c.native.parent_class
-	var _v *ContainerAccessibleClass // out
-	_v = (*ContainerAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoComboBoxAccessibleClass = girepository.MustFind("Gtk", "ComboBoxAccessibleClass")

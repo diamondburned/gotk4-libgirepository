@@ -4,16 +4,16 @@ package gdk
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 // extern void _gotk4_gdk4_FrameClock_ConnectUpdate(gpointer, guintptr);
 // extern void _gotk4_gdk4_FrameClock_ConnectResumeEvents(gpointer, guintptr);
@@ -26,8 +26,8 @@ import "C"
 
 // GType values.
 var (
-	GTypeFrameClockPhase = coreglib.Type(C.gdk_frame_clock_phase_get_type())
-	GTypeFrameClock      = coreglib.Type(C.gdk_frame_clock_get_type())
+	GTypeFrameClockPhase = coreglib.Type(girepository.MustFind("Gdk", "FrameClockPhase").RegisteredGType())
+	GTypeFrameClock      = coreglib.Type(girepository.MustFind("Gdk", "FrameClock").RegisteredGType())
 )
 
 func init() {
@@ -178,8 +178,8 @@ func marshalFrameClock(p uintptr) (interface{}, error) {
 	return wrapFrameClock(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-func (frameClock *FrameClock) baseFrameClock() *FrameClock {
-	return frameClock
+func (v *FrameClock) baseFrameClock() *FrameClock {
+	return v
 }
 
 // BaseFrameClock returns the underlying base object.
@@ -190,23 +190,23 @@ func BaseFrameClock(obj FrameClocker) *FrameClock {
 // ConnectAfterPaint: this signal ends processing of the frame.
 //
 // Applications should generally not handle this signal.
-func (frameClock *FrameClock) ConnectAfterPaint(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(frameClock, "after-paint", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectAfterPaint), f)
+func (v *FrameClock) ConnectAfterPaint(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "after-paint", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectAfterPaint), f)
 }
 
 // ConnectBeforePaint begins processing of the frame.
 //
 // Applications should generally not handle this signal.
-func (frameClock *FrameClock) ConnectBeforePaint(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(frameClock, "before-paint", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectBeforePaint), f)
+func (v *FrameClock) ConnectBeforePaint(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "before-paint", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectBeforePaint), f)
 }
 
 // ConnectFlushEvents: used to flush pending motion events that are being
 // batched up and compressed together.
 //
 // Applications should not handle this signal.
-func (frameClock *FrameClock) ConnectFlushEvents(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(frameClock, "flush-events", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectFlushEvents), f)
+func (v *FrameClock) ConnectFlushEvents(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "flush-events", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectFlushEvents), f)
 }
 
 // ConnectLayout is emitted as the second step of toolkit and application
@@ -214,8 +214,8 @@ func (frameClock *FrameClock) ConnectFlushEvents(f func()) coreglib.SignalHandle
 //
 // Any work to update sizes and positions of application elements should be
 // performed. GTK normally handles this internally.
-func (frameClock *FrameClock) ConnectLayout(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(frameClock, "layout", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectLayout), f)
+func (v *FrameClock) ConnectLayout(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "layout", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectLayout), f)
 }
 
 // ConnectPaint is emitted as the third step of toolkit and application
@@ -224,16 +224,16 @@ func (frameClock *FrameClock) ConnectLayout(f func()) coreglib.SignalHandle {
 // The frame is repainted. GDK normally handles this internally and emits
 // gdk.Surface::render signals which are turned into gtk.Widget::snapshot
 // signals by GTK.
-func (frameClock *FrameClock) ConnectPaint(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(frameClock, "paint", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectPaint), f)
+func (v *FrameClock) ConnectPaint(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "paint", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectPaint), f)
 }
 
 // ConnectResumeEvents is emitted after processing of the frame is finished.
 //
 // This signal is handled internally by GTK to resume normal event processing.
 // Applications should not handle this signal.
-func (frameClock *FrameClock) ConnectResumeEvents(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(frameClock, "resume-events", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectResumeEvents), f)
+func (v *FrameClock) ConnectResumeEvents(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "resume-events", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectResumeEvents), f)
 }
 
 // ConnectUpdate is emitted as the first step of toolkit and application
@@ -242,285 +242,6 @@ func (frameClock *FrameClock) ConnectResumeEvents(f func()) coreglib.SignalHandl
 // Animations should be updated using gdk.FrameClock.GetFrameTime().
 // Applications can connect directly to this signal, or use
 // gtk.Widget.AddTickCallback() as a more convenient interface.
-func (frameClock *FrameClock) ConnectUpdate(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(frameClock, "update", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectUpdate), f)
-}
-
-// BeginUpdating starts updates for an animation.
-//
-// Until a matching call to gdk.FrameClock.EndUpdating() is made, the frame
-// clock will continually request a new frame with the
-// GDK_FRAME_CLOCK_PHASE_UPDATE phase. This function may be called multiple
-// times and frames will be requested until gdk_frame_clock_end_updating() is
-// called the same number of times.
-func (frameClock *FrameClock) BeginUpdating() {
-	var _arg0 *C.GdkFrameClock // out
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-
-	C.gdk_frame_clock_begin_updating(_arg0)
-	runtime.KeepAlive(frameClock)
-}
-
-// EndUpdating stops updates for an animation.
-//
-// See the documentation for gdk.FrameClock.BeginUpdating().
-func (frameClock *FrameClock) EndUpdating() {
-	var _arg0 *C.GdkFrameClock // out
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-
-	C.gdk_frame_clock_end_updating(_arg0)
-	runtime.KeepAlive(frameClock)
-}
-
-// CurrentTimings gets the frame timings for the current frame.
-//
-// The function returns the following values:
-//
-//    - frameTimings (optional): GdkFrameTimings for the frame currently being
-//      processed, or even no frame is being processed, for the previous frame.
-//      Before any frames have been processed, returns NULL.
-//
-func (frameClock *FrameClock) CurrentTimings() *FrameTimings {
-	var _arg0 *C.GdkFrameClock   // out
-	var _cret *C.GdkFrameTimings // in
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-
-	_cret = C.gdk_frame_clock_get_current_timings(_arg0)
-	runtime.KeepAlive(frameClock)
-
-	var _frameTimings *FrameTimings // out
-
-	if _cret != nil {
-		_frameTimings = (*FrameTimings)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		C.gdk_frame_timings_ref(_cret)
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_frameTimings)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.gdk_frame_timings_unref((*C.GdkFrameTimings)(intern.C))
-			},
-		)
-	}
-
-	return _frameTimings
-}
-
-// FPS calculates the current frames-per-second, based on the frame timings of
-// frame_clock.
-//
-// The function returns the following values:
-//
-//    - gdouble: current fps, as a double.
-//
-func (frameClock *FrameClock) FPS() float64 {
-	var _arg0 *C.GdkFrameClock // out
-	var _cret C.double         // in
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-
-	_cret = C.gdk_frame_clock_get_fps(_arg0)
-	runtime.KeepAlive(frameClock)
-
-	var _gdouble float64 // out
-
-	_gdouble = float64(_cret)
-
-	return _gdouble
-}
-
-// FrameCounter: GdkFrameClock maintains a 64-bit counter that increments for
-// each frame drawn.
-//
-// The function returns the following values:
-//
-//    - gint64: inside frame processing, the value of the frame counter for the
-//      current frame. Outside of frame processing, the frame counter for the
-//      last frame.
-//
-func (frameClock *FrameClock) FrameCounter() int64 {
-	var _arg0 *C.GdkFrameClock // out
-	var _cret C.gint64         // in
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-
-	_cret = C.gdk_frame_clock_get_frame_counter(_arg0)
-	runtime.KeepAlive(frameClock)
-
-	var _gint64 int64 // out
-
-	_gint64 = int64(_cret)
-
-	return _gint64
-}
-
-// FrameTime gets the time that should currently be used for animations.
-//
-// Inside the processing of a frame, it’s the time used to compute the animation
-// position of everything in a frame. Outside of a frame, it's the time of the
-// conceptual “previous frame,” which may be either the actual previous frame
-// time, or if that’s too old, an updated time.
-//
-// The function returns the following values:
-//
-//    - gint64: timestamp in microseconds, in the timescale of of
-//      g_get_monotonic_time().
-//
-func (frameClock *FrameClock) FrameTime() int64 {
-	var _arg0 *C.GdkFrameClock // out
-	var _cret C.gint64         // in
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-
-	_cret = C.gdk_frame_clock_get_frame_time(_arg0)
-	runtime.KeepAlive(frameClock)
-
-	var _gint64 int64 // out
-
-	_gint64 = int64(_cret)
-
-	return _gint64
-}
-
-// HistoryStart returns the frame counter for the oldest frame available in
-// history.
-//
-// GdkFrameClock internally keeps a history of GdkFrameTimings objects for
-// recent frames that can be retrieved with gdk.FrameClock.GetTimings(). The set
-// of stored frames is the set from the counter values given by
-// gdk.FrameClock.GetHistoryStart() and gdk.FrameClock.GetFrameCounter(),
-// inclusive.
-//
-// The function returns the following values:
-//
-//    - gint64: frame counter value for the oldest frame that is available in the
-//      internal frame history of the GdkFrameClock.
-//
-func (frameClock *FrameClock) HistoryStart() int64 {
-	var _arg0 *C.GdkFrameClock // out
-	var _cret C.gint64         // in
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-
-	_cret = C.gdk_frame_clock_get_history_start(_arg0)
-	runtime.KeepAlive(frameClock)
-
-	var _gint64 int64 // out
-
-	_gint64 = int64(_cret)
-
-	return _gint64
-}
-
-// RefreshInfo predicts a presentation time, based on history.
-//
-// Using the frame history stored in the frame clock, finds the last known
-// presentation time and refresh interval, and assuming that presentation times
-// are separated by the refresh interval, predicts a presentation time that is a
-// multiple of the refresh interval after the last presentation time, and later
-// than base_time.
-//
-// The function takes the following parameters:
-//
-//    - baseTime: base time for determining a presentaton time.
-//
-// The function returns the following values:
-//
-//    - refreshIntervalReturn (optional): location to store the determined
-//      refresh interval, or NULL. A default refresh interval of 1/60th of a
-//      second will be stored if no history is present.
-//    - presentationTimeReturn: location to store the next candidate presentation
-//      time after the given base time. 0 will be will be stored if no history is
-//      present.
-//
-func (frameClock *FrameClock) RefreshInfo(baseTime int64) (refreshIntervalReturn, presentationTimeReturn int64) {
-	var _arg0 *C.GdkFrameClock // out
-	var _arg1 C.gint64         // out
-	var _arg2 C.gint64         // in
-	var _arg3 C.gint64         // in
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-	_arg1 = C.gint64(baseTime)
-
-	C.gdk_frame_clock_get_refresh_info(_arg0, _arg1, &_arg2, &_arg3)
-	runtime.KeepAlive(frameClock)
-	runtime.KeepAlive(baseTime)
-
-	var _refreshIntervalReturn int64  // out
-	var _presentationTimeReturn int64 // out
-
-	_refreshIntervalReturn = int64(_arg2)
-	_presentationTimeReturn = int64(_arg3)
-
-	return _refreshIntervalReturn, _presentationTimeReturn
-}
-
-// Timings retrieves a GdkFrameTimings object holding timing information for the
-// current frame or a recent frame.
-//
-// The GdkFrameTimings object may not yet be complete: see
-// gdk.FrameTimings.GetComplete().
-//
-// The function takes the following parameters:
-//
-//    - frameCounter: frame counter value identifying the frame to be received.
-//
-// The function returns the following values:
-//
-//    - frameTimings (optional): GdkFrameTimings object for the specified frame,
-//      or NULL if it is not available. See gdk.FrameClock.GetHistoryStart().
-//
-func (frameClock *FrameClock) Timings(frameCounter int64) *FrameTimings {
-	var _arg0 *C.GdkFrameClock   // out
-	var _arg1 C.gint64           // out
-	var _cret *C.GdkFrameTimings // in
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-	_arg1 = C.gint64(frameCounter)
-
-	_cret = C.gdk_frame_clock_get_timings(_arg0, _arg1)
-	runtime.KeepAlive(frameClock)
-	runtime.KeepAlive(frameCounter)
-
-	var _frameTimings *FrameTimings // out
-
-	if _cret != nil {
-		_frameTimings = (*FrameTimings)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		C.gdk_frame_timings_ref(_cret)
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_frameTimings)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.gdk_frame_timings_unref((*C.GdkFrameTimings)(intern.C))
-			},
-		)
-	}
-
-	return _frameTimings
-}
-
-// RequestPhase asks the frame clock to run a particular phase.
-//
-// The signal corresponding the requested phase will be emitted the next time
-// the frame clock processes. Multiple calls to gdk_frame_clock_request_phase()
-// will be combined together and only one frame processed. If you are displaying
-// animated content and want to continually request the
-// GDK_FRAME_CLOCK_PHASE_UPDATE phase for a period of time, you should use
-// gdk.FrameClock.BeginUpdating() instead, since this allows GTK to adjust
-// system parameters to get maximally smooth animations.
-//
-// The function takes the following parameters:
-//
-//    - phase that is requested.
-//
-func (frameClock *FrameClock) RequestPhase(phase FrameClockPhase) {
-	var _arg0 *C.GdkFrameClock     // out
-	var _arg1 C.GdkFrameClockPhase // out
-
-	_arg0 = (*C.GdkFrameClock)(unsafe.Pointer(coreglib.InternObject(frameClock).Native()))
-	_arg1 = C.GdkFrameClockPhase(phase)
-
-	C.gdk_frame_clock_request_phase(_arg0, _arg1)
-	runtime.KeepAlive(frameClock)
-	runtime.KeepAlive(phase)
+func (v *FrameClock) ConnectUpdate(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "update", false, unsafe.Pointer(C._gotk4_gdk4_FrameClock_ConnectUpdate), f)
 }

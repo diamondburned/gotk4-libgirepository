@@ -5,19 +5,21 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// extern gboolean _gotk4_gtk4_EventControllerLegacy_ConnectEvent(gpointer, GdkEvent*, guintptr);
+// extern gboolean _gotk4_gtk4_EventControllerLegacy_ConnectEvent(gpointer, void*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeEventControllerLegacy = coreglib.Type(C.gtk_event_controller_legacy_get_type())
+	GTypeEventControllerLegacy = coreglib.Type(girepository.MustFind("Gtk", "EventControllerLegacy").RegisteredGType())
 )
 
 func init() {
@@ -55,22 +57,4 @@ func marshalEventControllerLegacy(p uintptr) (interface{}, error) {
 // ConnectEvent is emitted for each GDK event delivered to controller.
 func (v *EventControllerLegacy) ConnectEvent(f func(event gdk.Eventer) (ok bool)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "event", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerLegacy_ConnectEvent), f)
-}
-
-// NewEventControllerLegacy creates a new legacy event controller.
-//
-// The function returns the following values:
-//
-//    - eventControllerLegacy: newly created event controller.
-//
-func NewEventControllerLegacy() *EventControllerLegacy {
-	var _cret *C.GtkEventController // in
-
-	_cret = C.gtk_event_controller_legacy_new()
-
-	var _eventControllerLegacy *EventControllerLegacy // out
-
-	_eventControllerLegacy = wrapEventControllerLegacy(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _eventControllerLegacy
 }

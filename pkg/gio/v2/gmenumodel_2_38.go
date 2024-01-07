@@ -2,8 +2,10 @@
 
 package gio
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // MENU_ATTRIBUTE_ICON: menu item attribute which holds the icon of the item.

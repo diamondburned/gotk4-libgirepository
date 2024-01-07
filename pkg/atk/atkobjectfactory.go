@@ -3,25 +3,22 @@
 package atk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern void _gotk4_atk1_ObjectFactoryClass_invalidate(AtkObjectFactory*);
-// void _gotk4_atk1_ObjectFactory_virtual_invalidate(void* fnptr, AtkObjectFactory* arg0) {
-//   ((void (*)(AtkObjectFactory*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeObjectFactory = coreglib.Type(C.atk_object_factory_get_type())
+	GTypeObjectFactory = coreglib.Type(girepository.MustFind("Atk", "ObjectFactory").RegisteredGType())
 )
 
 func init() {
@@ -32,17 +29,10 @@ func init() {
 
 // ObjectFactoryOverrides contains methods that are overridable.
 type ObjectFactoryOverrides struct {
-	// Invalidate: inform factory that it is no longer being used to create
-	// accessibles. When called, factory may need to inform Objects which it has
-	// created that they need to be re-instantiated. Note: primarily used for
-	// runtime replacement of ObjectFactorys in object registries.
-	Invalidate func()
 }
 
 func defaultObjectFactoryOverrides(v *ObjectFactory) ObjectFactoryOverrides {
-	return ObjectFactoryOverrides{
-		Invalidate: v.invalidate,
-	}
+	return ObjectFactoryOverrides{}
 }
 
 // ObjectFactory: this class is the base object class for a factory used to
@@ -68,12 +58,6 @@ func init() {
 }
 
 func initObjectFactoryClass(gclass unsafe.Pointer, overrides ObjectFactoryOverrides, classInitFunc func(*ObjectFactoryClass)) {
-	pclass := (*C.AtkObjectFactoryClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeObjectFactory))))
-
-	if overrides.Invalidate != nil {
-		pclass.invalidate = (*[0]byte)(C._gotk4_atk1_ObjectFactoryClass_invalidate)
-	}
-
 	if classInitFunc != nil {
 		class := (*ObjectFactoryClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -90,89 +74,6 @@ func marshalObjectFactory(p uintptr) (interface{}, error) {
 	return wrapObjectFactory(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// CreateAccessible provides an Object that implements an accessibility
-// interface on behalf of obj.
-//
-// The function takes the following parameters:
-//
-//    - obj: #GObject.
-//
-// The function returns the following values:
-//
-//    - object that implements an accessibility interface on behalf of obj.
-//
-func (factory *ObjectFactory) CreateAccessible(obj *coreglib.Object) *AtkObject {
-	var _arg0 *C.AtkObjectFactory // out
-	var _arg1 *C.GObject          // out
-	var _cret *C.AtkObject        // in
-
-	_arg0 = (*C.AtkObjectFactory)(unsafe.Pointer(coreglib.InternObject(factory).Native()))
-	_arg1 = (*C.GObject)(unsafe.Pointer(obj.Native()))
-
-	_cret = C.atk_object_factory_create_accessible(_arg0, _arg1)
-	runtime.KeepAlive(factory)
-	runtime.KeepAlive(obj)
-
-	var _object *AtkObject // out
-
-	_object = wrapObject(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _object
-}
-
-// AccessibleType gets the GType of the accessible which is created by the
-// factory.
-//
-// The function returns the following values:
-//
-//    - gType: type of the accessible which is created by the factory. The value
-//      G_TYPE_INVALID is returned if no type if found.
-//
-func (factory *ObjectFactory) AccessibleType() coreglib.Type {
-	var _arg0 *C.AtkObjectFactory // out
-	var _cret C.GType             // in
-
-	_arg0 = (*C.AtkObjectFactory)(unsafe.Pointer(coreglib.InternObject(factory).Native()))
-
-	_cret = C.atk_object_factory_get_accessible_type(_arg0)
-	runtime.KeepAlive(factory)
-
-	var _gType coreglib.Type // out
-
-	_gType = coreglib.Type(_cret)
-
-	return _gType
-}
-
-// Invalidate: inform factory that it is no longer being used to create
-// accessibles. When called, factory may need to inform Objects which it has
-// created that they need to be re-instantiated. Note: primarily used for
-// runtime replacement of ObjectFactorys in object registries.
-func (factory *ObjectFactory) Invalidate() {
-	var _arg0 *C.AtkObjectFactory // out
-
-	_arg0 = (*C.AtkObjectFactory)(unsafe.Pointer(coreglib.InternObject(factory).Native()))
-
-	C.atk_object_factory_invalidate(_arg0)
-	runtime.KeepAlive(factory)
-}
-
-// Invalidate: inform factory that it is no longer being used to create
-// accessibles. When called, factory may need to inform Objects which it has
-// created that they need to be re-instantiated. Note: primarily used for
-// runtime replacement of ObjectFactorys in object registries.
-func (factory *ObjectFactory) invalidate() {
-	gclass := (*C.AtkObjectFactoryClass)(coreglib.PeekParentClass(factory))
-	fnarg := gclass.invalidate
-
-	var _arg0 *C.AtkObjectFactory // out
-
-	_arg0 = (*C.AtkObjectFactory)(unsafe.Pointer(coreglib.InternObject(factory).Native()))
-
-	C._gotk4_atk1_ObjectFactory_virtual_invalidate(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(factory)
-}
-
 // ObjectFactoryClass: instance of this type is always passed by reference.
 type ObjectFactoryClass struct {
 	*objectFactoryClass
@@ -180,5 +81,7 @@ type ObjectFactoryClass struct {
 
 // objectFactoryClass is the struct that's finalized.
 type objectFactoryClass struct {
-	native *C.AtkObjectFactoryClass
+	native unsafe.Pointer
 }
+
+var GIRInfoObjectFactoryClass = girepository.MustFind("Atk", "ObjectFactoryClass")

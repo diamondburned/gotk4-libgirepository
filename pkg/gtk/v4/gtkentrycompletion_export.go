@@ -10,12 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_EntryCompletionMatchFunc
-func _gotk4_gtk4_EntryCompletionMatchFunc(arg1 *C.GtkEntryCompletion, arg2 *C.char, arg3 *C.GtkTreeIter, arg4 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_EntryCompletionMatchFunc(arg1 *C.void, arg2 *C.char, arg3 *C.void, arg4 C.gpointer) (cret C.gboolean) {
 	var fn EntryCompletionMatchFunc
 	{
 		v := gbox.Get(uintptr(arg4))
@@ -45,7 +47,7 @@ func _gotk4_gtk4_EntryCompletionMatchFunc(arg1 *C.GtkEntryCompletion, arg2 *C.ch
 }
 
 //export _gotk4_gtk4_EntryCompletion_ConnectCursorOnMatch
-func _gotk4_gtk4_EntryCompletion_ConnectCursorOnMatch(arg0 C.gpointer, arg1 *C.GtkTreeModel, arg2 *C.GtkTreeIter, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_EntryCompletion_ConnectCursorOnMatch(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(model TreeModeller, iter *TreeIter) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -119,7 +121,7 @@ func _gotk4_gtk4_EntryCompletion_ConnectInsertPrefix(arg0 C.gpointer, arg1 *C.gc
 }
 
 //export _gotk4_gtk4_EntryCompletion_ConnectMatchSelected
-func _gotk4_gtk4_EntryCompletion_ConnectMatchSelected(arg0 C.gpointer, arg1 *C.GtkTreeModel, arg2 *C.GtkTreeIter, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_EntryCompletion_ConnectMatchSelected(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(model TreeModeller, iter *TreeIter) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))

@@ -4,31 +4,24 @@ package gtk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
-// extern void _gotk4_gtk3_CssProvider_ConnectParsingError(gpointer, GtkCssSection*, GError*, guintptr);
-// extern void _gotk4_gtk3_CssProviderClass_parsing_error(GtkCssProvider*, GtkCssSection*, GError*);
-// void _gotk4_gtk3_CSSProvider_virtual_parsing_error(void* fnptr, GtkCssProvider* arg0, GtkCssSection* arg1, GError* arg2) {
-//   ((void (*)(GtkCssProvider*, GtkCssSection*, GError*))(fnptr))(arg0, arg1, arg2);
-// };
+// extern void _gotk4_gtk3_CssProvider_ConnectParsingError(gpointer, void*, GError*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeCSSProviderError = coreglib.Type(C.gtk_css_provider_error_get_type())
-	GTypeCSSProvider      = coreglib.Type(C.gtk_css_provider_get_type())
+	GTypeCSSProviderError = coreglib.Type(girepository.MustFind("Gtk", "CssProviderError").RegisteredGType())
+	GTypeCSSProvider      = coreglib.Type(girepository.MustFind("Gtk", "CssProvider").RegisteredGType())
 )
 
 func init() {
@@ -82,18 +75,10 @@ func (c CSSProviderError) String() string {
 
 // CSSProviderOverrides contains methods that are overridable.
 type CSSProviderOverrides struct {
-	// The function takes the following parameters:
-	//
-	//    - section
-	//    - err
-	//
-	ParsingError func(section *CSSSection, err error)
 }
 
 func defaultCSSProviderOverrides(v *CSSProvider) CSSProviderOverrides {
-	return CSSProviderOverrides{
-		ParsingError: v.parsingError,
-	}
+	return CSSProviderOverrides{}
 }
 
 // CSSProvider is an object implementing the StyleProvider interface. It is able
@@ -140,12 +125,6 @@ func init() {
 }
 
 func initCSSProviderClass(gclass unsafe.Pointer, overrides CSSProviderOverrides, classInitFunc func(*CSSProviderClass)) {
-	pclass := (*C.GtkCssProviderClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeCSSProvider))))
-
-	if overrides.ParsingError != nil {
-		pclass.parsing_error = (*[0]byte)(C._gotk4_gtk3_CssProviderClass_parsing_error)
-	}
-
 	if classInitFunc != nil {
 		class := (*CSSProviderClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -176,247 +155,8 @@ func marshalCSSProvider(p uintptr) (interface{}, error) {
 // Note that this signal may be emitted at any time as the css provider may opt
 // to defer parsing parts or all of the input to a later time than when a
 // loading function was called.
-func (cssProvider *CSSProvider) ConnectParsingError(f func(section *CSSSection, err error)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(cssProvider, "parsing-error", false, unsafe.Pointer(C._gotk4_gtk3_CssProvider_ConnectParsingError), f)
-}
-
-// NewCSSProvider returns a newly created CssProvider.
-//
-// The function returns the following values:
-//
-//    - cssProvider: new CssProvider.
-//
-func NewCSSProvider() *CSSProvider {
-	var _cret *C.GtkCssProvider // in
-
-	_cret = C.gtk_css_provider_new()
-
-	var _cssProvider *CSSProvider // out
-
-	_cssProvider = wrapCSSProvider(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _cssProvider
-}
-
-// LoadFromData loads data into css_provider, and by doing so clears any
-// previously loaded information.
-//
-// The function takes the following parameters:
-//
-//    - data: CSS data loaded in memory.
-//
-func (cssProvider *CSSProvider) LoadFromData(data string) error {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.gchar          // out
-	var _arg2 C.gssize
-	var _cerr *C.GError // in
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(cssProvider).Native()))
-	_arg2 = (C.gssize)(len(data))
-	_arg1 = (*C.gchar)(C.calloc(C.size_t((len(data) + 1)), C.size_t(C.sizeof_gchar)))
-	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg1)), len(data)), data)
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_css_provider_load_from_data(_arg0, _arg1, _arg2, &_cerr)
-	runtime.KeepAlive(cssProvider)
-	runtime.KeepAlive(data)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// LoadFromFile loads the data contained in file into css_provider, making it
-// clear any previously loaded information.
-//
-// The function takes the following parameters:
-//
-//    - file pointing to a file to load.
-//
-func (cssProvider *CSSProvider) LoadFromFile(file gio.Filer) error {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.GFile          // out
-	var _cerr *C.GError         // in
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(cssProvider).Native()))
-	_arg1 = (*C.GFile)(unsafe.Pointer(coreglib.InternObject(file).Native()))
-
-	C.gtk_css_provider_load_from_file(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(cssProvider)
-	runtime.KeepAlive(file)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// LoadFromPath loads the data contained in path into css_provider, making it
-// clear any previously loaded information.
-//
-// The function takes the following parameters:
-//
-//    - path of a filename to load, in the GLib filename encoding.
-//
-func (cssProvider *CSSProvider) LoadFromPath(path string) error {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.gchar          // out
-	var _cerr *C.GError         // in
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(cssProvider).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(path)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_css_provider_load_from_path(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(cssProvider)
-	runtime.KeepAlive(path)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// LoadFromResource loads the data contained in the resource at resource_path
-// into the CssProvider, clearing any previously loaded information.
-//
-// To track errors while loading CSS, connect to the CssProvider::parsing-error
-// signal.
-//
-// The function takes the following parameters:
-//
-//    - resourcePath resource path.
-//
-func (cssProvider *CSSProvider) LoadFromResource(resourcePath string) {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.gchar          // out
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(cssProvider).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(resourcePath)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_css_provider_load_from_resource(_arg0, _arg1)
-	runtime.KeepAlive(cssProvider)
-	runtime.KeepAlive(resourcePath)
-}
-
-// String converts the provider into a string representation in CSS format.
-//
-// Using gtk_css_provider_load_from_data() with the return value from this
-// function on a new provider created with gtk_css_provider_new() will basically
-// create a duplicate of this provider.
-//
-// The function returns the following values:
-//
-//    - utf8: new string representing the provider.
-//
-func (provider *CSSProvider) String() string {
-	var _arg0 *C.GtkCssProvider // out
-	var _cret *C.char           // in
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(provider).Native()))
-
-	_cret = C.gtk_css_provider_to_string(_arg0)
-	runtime.KeepAlive(provider)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
-
-	return _utf8
-}
-
-// The function takes the following parameters:
-//
-//    - section
-//    - err
-//
-func (provider *CSSProvider) parsingError(section *CSSSection, err error) {
-	gclass := (*C.GtkCssProviderClass)(coreglib.PeekParentClass(provider))
-	fnarg := gclass.parsing_error
-
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.GtkCssSection  // out
-	var _arg2 *C.GError         // out
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(provider).Native()))
-	_arg1 = (*C.GtkCssSection)(gextras.StructNative(unsafe.Pointer(section)))
-	if err != nil {
-		_arg2 = (*C.GError)(gerror.New(err))
-	}
-
-	C._gotk4_gtk3_CSSProvider_virtual_parsing_error(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(provider)
-	runtime.KeepAlive(section)
-	runtime.KeepAlive(err)
-}
-
-// CSSProviderGetDefault returns the provider containing the style settings used
-// as a fallback for all widgets.
-//
-// Deprecated: Use gtk_css_provider_new() instead.
-//
-// The function returns the following values:
-//
-//    - cssProvider: provider used for fallback styling. This memory is owned by
-//      GTK+, and you must not free it.
-//
-func CSSProviderGetDefault() *CSSProvider {
-	var _cret *C.GtkCssProvider // in
-
-	_cret = C.gtk_css_provider_get_default()
-
-	var _cssProvider *CSSProvider // out
-
-	_cssProvider = wrapCSSProvider(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _cssProvider
-}
-
-// CSSProviderGetNamed loads a theme from the usual theme paths.
-//
-// The function takes the following parameters:
-//
-//    - name: theme name.
-//    - variant (optional) to load, for example, "dark", or NULL for the default.
-//
-// The function returns the following values:
-//
-//    - cssProvider with the theme loaded. This memory is owned by GTK+, and you
-//      must not free it.
-//
-func CSSProviderGetNamed(name, variant string) *CSSProvider {
-	var _arg1 *C.gchar          // out
-	var _arg2 *C.gchar          // out
-	var _cret *C.GtkCssProvider // in
-
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if variant != "" {
-		_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(variant)))
-		defer C.free(unsafe.Pointer(_arg2))
-	}
-
-	_cret = C.gtk_css_provider_get_named(_arg1, _arg2)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(variant)
-
-	var _cssProvider *CSSProvider // out
-
-	_cssProvider = wrapCSSProvider(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _cssProvider
+func (v *CSSProvider) ConnectParsingError(f func(section *CSSSection, err error)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "parsing-error", false, unsafe.Pointer(C._gotk4_gtk3_CssProvider_ConnectParsingError), f)
 }
 
 // CSSProviderClass: instance of this type is always passed by reference.
@@ -426,5 +166,7 @@ type CSSProviderClass struct {
 
 // cssProviderClass is the struct that's finalized.
 type cssProviderClass struct {
-	native *C.GtkCssProviderClass
+	native unsafe.Pointer
 }
+
+var GIRInfoCSSProviderClass = girepository.MustFind("Gtk", "CssProviderClass")

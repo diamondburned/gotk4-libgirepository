@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFileChooserDialog = coreglib.Type(C.gtk_file_chooser_dialog_get_type())
+	GTypeFileChooserDialog = coreglib.Type(girepository.MustFind("Gtk", "FileChooserDialog").RegisteredGType())
 )
 
 func init() {
@@ -253,12 +253,7 @@ type FileChooserDialogClass struct {
 
 // fileChooserDialogClass is the struct that's finalized.
 type fileChooserDialogClass struct {
-	native *C.GtkFileChooserDialogClass
+	native unsafe.Pointer
 }
 
-func (f *FileChooserDialogClass) ParentClass() *DialogClass {
-	valptr := &f.native.parent_class
-	var _v *DialogClass // out
-	_v = (*DialogClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoFileChooserDialogClass = girepository.MustFind("Gtk", "FileChooserDialogClass")

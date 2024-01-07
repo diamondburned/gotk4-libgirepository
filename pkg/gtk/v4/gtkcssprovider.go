@@ -3,22 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// extern void _gotk4_gtk4_CssProvider_ConnectParsingError(gpointer, GtkCssSection*, GError*, guintptr);
+// extern void _gotk4_gtk4_CssProvider_ConnectParsingError(gpointer, void*, GError*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeCSSProvider = coreglib.Type(C.gtk_css_provider_get_type())
+	GTypeCSSProvider = coreglib.Type(girepository.MustFind("Gtk", "CssProvider").RegisteredGType())
 )
 
 func init() {
@@ -91,168 +91,6 @@ func marshalCSSProvider(p uintptr) (interface{}, error) {
 // Note that this signal may be emitted at any time as the css provider may opt
 // to defer parsing parts or all of the input to a later time than when a
 // loading function was called.
-func (cssProvider *CSSProvider) ConnectParsingError(f func(section *CSSSection, err error)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(cssProvider, "parsing-error", false, unsafe.Pointer(C._gotk4_gtk4_CssProvider_ConnectParsingError), f)
-}
-
-// NewCSSProvider returns a newly created GtkCssProvider.
-//
-// The function returns the following values:
-//
-//    - cssProvider: new GtkCssProvider.
-//
-func NewCSSProvider() *CSSProvider {
-	var _cret *C.GtkCssProvider // in
-
-	_cret = C.gtk_css_provider_new()
-
-	var _cssProvider *CSSProvider // out
-
-	_cssProvider = wrapCSSProvider(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _cssProvider
-}
-
-// LoadFromData loads data into css_provider.
-//
-// This clears any previously loaded information.
-//
-// The function takes the following parameters:
-//
-//    - data: CSS data loaded in memory.
-//
-func (cssProvider *CSSProvider) LoadFromData(data string) {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.char           // out
-	var _arg2 C.gssize
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(cssProvider).Native()))
-	_arg2 = (C.gssize)(len(data))
-	_arg1 = (*C.char)(C.calloc(C.size_t((len(data) + 1)), C.size_t(C.sizeof_char)))
-	copy(unsafe.Slice((*byte)(unsafe.Pointer(_arg1)), len(data)), data)
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_css_provider_load_from_data(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(cssProvider)
-	runtime.KeepAlive(data)
-}
-
-// LoadFromFile loads the data contained in file into css_provider.
-//
-// This clears any previously loaded information.
-//
-// The function takes the following parameters:
-//
-//    - file: GFile pointing to a file to load.
-//
-func (cssProvider *CSSProvider) LoadFromFile(file gio.Filer) {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.GFile          // out
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(cssProvider).Native()))
-	_arg1 = (*C.GFile)(unsafe.Pointer(coreglib.InternObject(file).Native()))
-
-	C.gtk_css_provider_load_from_file(_arg0, _arg1)
-	runtime.KeepAlive(cssProvider)
-	runtime.KeepAlive(file)
-}
-
-// LoadFromPath loads the data contained in path into css_provider.
-//
-// This clears any previously loaded information.
-//
-// The function takes the following parameters:
-//
-//    - path of a filename to load, in the GLib filename encoding.
-//
-func (cssProvider *CSSProvider) LoadFromPath(path string) {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.char           // out
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(cssProvider).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(path)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_css_provider_load_from_path(_arg0, _arg1)
-	runtime.KeepAlive(cssProvider)
-	runtime.KeepAlive(path)
-}
-
-// LoadFromResource loads the data contained in the resource at resource_path
-// into the css_provider.
-//
-// This clears any previously loaded information.
-//
-// The function takes the following parameters:
-//
-//    - resourcePath: GResource resource path.
-//
-func (cssProvider *CSSProvider) LoadFromResource(resourcePath string) {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.char           // out
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(cssProvider).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(resourcePath)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_css_provider_load_from_resource(_arg0, _arg1)
-	runtime.KeepAlive(cssProvider)
-	runtime.KeepAlive(resourcePath)
-}
-
-// LoadNamed loads a theme from the usual theme paths.
-//
-// The actual process of finding the theme might change between releases, but it
-// is guaranteed that this function uses the same mechanism to load the theme
-// that GTK uses for loading its own theme.
-//
-// The function takes the following parameters:
-//
-//    - name: theme name.
-//    - variant (optional) to load, for example, "dark", or NULL for the default.
-//
-func (provider *CSSProvider) LoadNamed(name, variant string) {
-	var _arg0 *C.GtkCssProvider // out
-	var _arg1 *C.char           // out
-	var _arg2 *C.char           // out
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(provider).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	if variant != "" {
-		_arg2 = (*C.char)(unsafe.Pointer(C.CString(variant)))
-		defer C.free(unsafe.Pointer(_arg2))
-	}
-
-	C.gtk_css_provider_load_named(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(provider)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(variant)
-}
-
-// String converts the provider into a string representation in CSS format.
-//
-// Using gtk.CSSProvider.LoadFromData() with the return value from this function
-// on a new provider created with gtk.CSSProvider.New will basically create a
-// duplicate of this provider.
-//
-// The function returns the following values:
-//
-//    - utf8: new string representing the provider.
-//
-func (provider *CSSProvider) String() string {
-	var _arg0 *C.GtkCssProvider // out
-	var _cret *C.char           // in
-
-	_arg0 = (*C.GtkCssProvider)(unsafe.Pointer(coreglib.InternObject(provider).Native()))
-
-	_cret = C.gtk_css_provider_to_string(_arg0)
-	runtime.KeepAlive(provider)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
-
-	return _utf8
+func (v *CSSProvider) ConnectParsingError(f func(section *CSSSection, err error)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "parsing-error", false, unsafe.Pointer(C._gotk4_gtk4_CssProvider_ConnectParsingError), f)
 }

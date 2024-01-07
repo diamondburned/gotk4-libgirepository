@@ -4,30 +4,26 @@ package gdk
 
 import (
 	"fmt"
-	"runtime"
 	_ "runtime/cgo"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// #cgo pkg-config: gdk-3.0 gtk+-3.0
-// #cgo CFLAGS: -Wno-deprecated-declarations
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 // extern void _gotk4_gdk3_DragContext_ConnectDropPerformed(gpointer, gint, guintptr);
 // extern void _gotk4_gdk3_DragContext_ConnectDNDFinished(gpointer, guintptr);
-// extern void _gotk4_gdk3_DragContext_ConnectCancel(gpointer, GdkDragCancelReason, guintptr);
-// extern void _gotk4_gdk3_DragContext_ConnectActionChanged(gpointer, GdkDragAction, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeStatus      = coreglib.Type(C.gdk_status_get_type())
-	GTypeDeviceTool  = coreglib.Type(C.gdk_device_tool_get_type())
-	GTypeDragContext = coreglib.Type(C.gdk_drag_context_get_type())
+	GTypeStatus      = coreglib.Type(girepository.MustFind("Gdk", "Status").RegisteredGType())
+	GTypeDeviceTool  = coreglib.Type(girepository.MustFind("Gdk", "DeviceTool").RegisteredGType())
+	GTypeDragContext = coreglib.Type(girepository.MustFind("Gdk", "DragContext").RegisteredGType())
 )
 
 func init() {
@@ -38,20 +34,8 @@ func init() {
 	})
 }
 
-// The function returns the following values:
-//
-func GLErrorQuark() glib.Quark {
-	var _cret C.GQuark // in
-
-	_cret = C.gdk_gl_error_quark()
-
-	var _quark glib.Quark // out
-
-	_quark = uint32(_cret)
-	type _ = glib.Quark
-	type _ = uint32
-
-	return _quark
+func init() {
+	girepository.Require("Gdk", "3.0", girepository.LoadFlagLazy)
 }
 
 type Status C.gint
@@ -105,82 +89,6 @@ func marshalDeviceTool(p uintptr) (interface{}, error) {
 	return wrapDeviceTool(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// HardwareID gets the hardware ID of this tool, or 0 if it's not known. When
-// non-zero, the identificator is unique for the given tool model, meaning that
-// two identical tools will share the same hardware_id, but will have different
-// serial numbers (see gdk_device_tool_get_serial()).
-//
-// This is a more concrete (and device specific) method to identify a DeviceTool
-// than gdk_device_tool_get_tool_type(), as a tablet may support multiple
-// devices with the same DeviceToolType, but having different hardware
-// identificators.
-//
-// The function returns the following values:
-//
-//    - guint64: hardware identificator of this tool.
-//
-func (tool *DeviceTool) HardwareID() uint64 {
-	var _arg0 *C.GdkDeviceTool // out
-	var _cret C.guint64        // in
-
-	_arg0 = (*C.GdkDeviceTool)(unsafe.Pointer(coreglib.InternObject(tool).Native()))
-
-	_cret = C.gdk_device_tool_get_hardware_id(_arg0)
-	runtime.KeepAlive(tool)
-
-	var _guint64 uint64 // out
-
-	_guint64 = uint64(_cret)
-
-	return _guint64
-}
-
-// Serial gets the serial of this tool, this value can be used to identify a
-// physical tool (eg. a tablet pen) across program executions.
-//
-// The function returns the following values:
-//
-//    - guint64: serial ID for this tool.
-//
-func (tool *DeviceTool) Serial() uint64 {
-	var _arg0 *C.GdkDeviceTool // out
-	var _cret C.guint64        // in
-
-	_arg0 = (*C.GdkDeviceTool)(unsafe.Pointer(coreglib.InternObject(tool).Native()))
-
-	_cret = C.gdk_device_tool_get_serial(_arg0)
-	runtime.KeepAlive(tool)
-
-	var _guint64 uint64 // out
-
-	_guint64 = uint64(_cret)
-
-	return _guint64
-}
-
-// ToolType gets the DeviceToolType of the tool.
-//
-// The function returns the following values:
-//
-//    - deviceToolType: physical type for this tool. This can be used to figure
-//      out what sort of pen is being used, such as an airbrush or a pencil.
-//
-func (tool *DeviceTool) ToolType() DeviceToolType {
-	var _arg0 *C.GdkDeviceTool    // out
-	var _cret C.GdkDeviceToolType // in
-
-	_arg0 = (*C.GdkDeviceTool)(unsafe.Pointer(coreglib.InternObject(tool).Native()))
-
-	_cret = C.gdk_device_tool_get_tool_type(_arg0)
-	runtime.KeepAlive(tool)
-
-	var _deviceToolType DeviceToolType // out
-
-	_deviceToolType = DeviceToolType(_cret)
-
-	return _deviceToolType
-}
-
 type DragContext struct {
 	_ [0]func() // equal guard
 	*coreglib.Object
@@ -200,31 +108,14 @@ func marshalDragContext(p uintptr) (interface{}, error) {
 	return wrapDragContext(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ConnectActionChanged: new action is being chosen for the drag and drop
-// operation.
-//
-// This signal will only be emitted if the DragContext manages the drag and drop
-// operation. See gdk_drag_context_manage_dnd() for more information.
-func (context *DragContext) ConnectActionChanged(f func(action DragAction)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(context, "action-changed", false, unsafe.Pointer(C._gotk4_gdk3_DragContext_ConnectActionChanged), f)
-}
-
-// ConnectCancel: drag and drop operation was cancelled.
-//
-// This signal will only be emitted if the DragContext manages the drag and drop
-// operation. See gdk_drag_context_manage_dnd() for more information.
-func (context *DragContext) ConnectCancel(f func(reason DragCancelReason)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(context, "cancel", false, unsafe.Pointer(C._gotk4_gdk3_DragContext_ConnectCancel), f)
-}
-
 // ConnectDNDFinished: drag and drop operation was finished, the drag
 // destination finished reading all data. The drag source can now free all
 // miscellaneous data.
 //
 // This signal will only be emitted if the DragContext manages the drag and drop
 // operation. See gdk_drag_context_manage_dnd() for more information.
-func (context *DragContext) ConnectDNDFinished(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(context, "dnd-finished", false, unsafe.Pointer(C._gotk4_gdk3_DragContext_ConnectDNDFinished), f)
+func (v *DragContext) ConnectDNDFinished(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "dnd-finished", false, unsafe.Pointer(C._gotk4_gdk3_DragContext_ConnectDNDFinished), f)
 }
 
 // ConnectDropPerformed: drag and drop operation was performed on an accepting
@@ -232,347 +123,6 @@ func (context *DragContext) ConnectDNDFinished(f func()) coreglib.SignalHandle {
 //
 // This signal will only be emitted if the DragContext manages the drag and drop
 // operation. See gdk_drag_context_manage_dnd() for more information.
-func (context *DragContext) ConnectDropPerformed(f func(time int)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(context, "drop-performed", false, unsafe.Pointer(C._gotk4_gdk3_DragContext_ConnectDropPerformed), f)
-}
-
-// Actions determines the bitmask of actions proposed by the source if
-// gdk_drag_context_get_suggested_action() returns GDK_ACTION_ASK.
-//
-// The function returns the following values:
-//
-//    - dragAction: DragAction flags.
-//
-func (context *DragContext) Actions() DragAction {
-	var _arg0 *C.GdkDragContext // out
-	var _cret C.GdkDragAction   // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C.gdk_drag_context_get_actions(_arg0)
-	runtime.KeepAlive(context)
-
-	var _dragAction DragAction // out
-
-	_dragAction = DragAction(_cret)
-
-	return _dragAction
-}
-
-// DestWindow returns the destination window for the DND operation.
-//
-// The function returns the following values:
-//
-//    - window: Window.
-//
-func (context *DragContext) DestWindow() Windower {
-	var _arg0 *C.GdkDragContext // out
-	var _cret *C.GdkWindow      // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C.gdk_drag_context_get_dest_window(_arg0)
-	runtime.KeepAlive(context)
-
-	var _window Windower // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_window = rv
-	}
-
-	return _window
-}
-
-// Device returns the Device associated to the drag context.
-//
-// The function returns the following values:
-//
-//    - device associated to context.
-//
-func (context *DragContext) Device() Devicer {
-	var _arg0 *C.GdkDragContext // out
-	var _cret *C.GdkDevice      // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C.gdk_drag_context_get_device(_arg0)
-	runtime.KeepAlive(context)
-
-	var _device Devicer // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gdk.Devicer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Devicer)
-			return ok
-		})
-		rv, ok := casted.(Devicer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Devicer")
-		}
-		_device = rv
-	}
-
-	return _device
-}
-
-// DragWindow returns the window on which the drag icon should be rendered
-// during the drag operation. Note that the window may not be available until
-// the drag operation has begun. GDK will move the window in accordance with the
-// ongoing drag operation. The window is owned by context and will be destroyed
-// when the drag operation is over.
-//
-// The function returns the following values:
-//
-//    - window (optional): drag window, or NULL.
-//
-func (context *DragContext) DragWindow() Windower {
-	var _arg0 *C.GdkDragContext // out
-	var _cret *C.GdkWindow      // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C.gdk_drag_context_get_drag_window(_arg0)
-	runtime.KeepAlive(context)
-
-	var _window Windower // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Windower)
-				return ok
-			})
-			rv, ok := casted.(Windower)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-			}
-			_window = rv
-		}
-	}
-
-	return _window
-}
-
-// Protocol returns the drag protocol that is used by this context.
-//
-// The function returns the following values:
-//
-//    - dragProtocol: drag protocol.
-//
-func (context *DragContext) Protocol() DragProtocol {
-	var _arg0 *C.GdkDragContext // out
-	var _cret C.GdkDragProtocol // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C.gdk_drag_context_get_protocol(_arg0)
-	runtime.KeepAlive(context)
-
-	var _dragProtocol DragProtocol // out
-
-	_dragProtocol = DragProtocol(_cret)
-
-	return _dragProtocol
-}
-
-// SelectedAction determines the action chosen by the drag destination.
-//
-// The function returns the following values:
-//
-//    - dragAction: DragAction value.
-//
-func (context *DragContext) SelectedAction() DragAction {
-	var _arg0 *C.GdkDragContext // out
-	var _cret C.GdkDragAction   // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C.gdk_drag_context_get_selected_action(_arg0)
-	runtime.KeepAlive(context)
-
-	var _dragAction DragAction // out
-
-	_dragAction = DragAction(_cret)
-
-	return _dragAction
-}
-
-// SourceWindow returns the Window where the DND operation started.
-//
-// The function returns the following values:
-//
-//    - window: Window.
-//
-func (context *DragContext) SourceWindow() Windower {
-	var _arg0 *C.GdkDragContext // out
-	var _cret *C.GdkWindow      // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C.gdk_drag_context_get_source_window(_arg0)
-	runtime.KeepAlive(context)
-
-	var _window Windower // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_window = rv
-	}
-
-	return _window
-}
-
-// SuggestedAction determines the suggested drag action of the context.
-//
-// The function returns the following values:
-//
-//    - dragAction: DragAction value.
-//
-func (context *DragContext) SuggestedAction() DragAction {
-	var _arg0 *C.GdkDragContext // out
-	var _cret C.GdkDragAction   // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C.gdk_drag_context_get_suggested_action(_arg0)
-	runtime.KeepAlive(context)
-
-	var _dragAction DragAction // out
-
-	_dragAction = DragAction(_cret)
-
-	return _dragAction
-}
-
-// ManageDND requests the drag and drop operation to be managed by context. When
-// a drag and drop operation becomes managed, the DragContext will internally
-// handle all input and source-side EventDND events as required by the windowing
-// system.
-//
-// Once the drag and drop operation is managed, the drag context will emit the
-// following signals:
-//
-// - The DragContext::action-changed signal whenever the final action to be
-// performed by the drag and drop operation changes.
-//
-// - The DragContext::drop-performed signal after the user performs the drag and
-// drop gesture (typically by releasing the mouse button).
-//
-// - The DragContext::dnd-finished signal after the drag and drop operation
-// concludes (after all Selection transfers happen).
-//
-// - The DragContext::cancel signal if the drag and drop operation is finished
-// but doesn't happen over an accepting destination, or is cancelled through
-// other means.
-//
-// The function takes the following parameters:
-//
-//    - ipcWindow: window to use for IPC messaging/events.
-//    - actions supported by the drag source.
-//
-// The function returns the following values:
-//
-//    - ok if the drag and drop operation is managed.
-//
-func (context *DragContext) ManageDND(ipcWindow Windower, actions DragAction) bool {
-	var _arg0 *C.GdkDragContext // out
-	var _arg1 *C.GdkWindow      // out
-	var _arg2 C.GdkDragAction   // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	_arg1 = (*C.GdkWindow)(unsafe.Pointer(coreglib.InternObject(ipcWindow).Native()))
-	_arg2 = C.GdkDragAction(actions)
-
-	_cret = C.gdk_drag_context_manage_dnd(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(ipcWindow)
-	runtime.KeepAlive(actions)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetDevice associates a Device to context, so all Drag and Drop events for
-// context are emitted as if they came from this device.
-//
-// The function takes the following parameters:
-//
-//    - device: Device.
-//
-func (context *DragContext) SetDevice(device Devicer) {
-	var _arg0 *C.GdkDragContext // out
-	var _arg1 *C.GdkDevice      // out
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	_arg1 = (*C.GdkDevice)(unsafe.Pointer(coreglib.InternObject(device).Native()))
-
-	C.gdk_drag_context_set_device(_arg0, _arg1)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(device)
-}
-
-// SetHotspot sets the position of the drag window that will be kept under the
-// cursor hotspot. Initially, the hotspot is at the top left corner of the drag
-// window.
-//
-// The function takes the following parameters:
-//
-//    - hotX: x coordinate of the drag window hotspot.
-//    - hotY: y coordinate of the drag window hotspot.
-//
-func (context *DragContext) SetHotspot(hotX, hotY int) {
-	var _arg0 *C.GdkDragContext // out
-	var _arg1 C.gint            // out
-	var _arg2 C.gint            // out
-
-	_arg0 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	_arg1 = C.gint(hotX)
-	_arg2 = C.gint(hotY)
-
-	C.gdk_drag_context_set_hotspot(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(hotX)
-	runtime.KeepAlive(hotY)
+func (v *DragContext) ConnectDropPerformed(f func(time int)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "drop-performed", false, unsafe.Pointer(C._gotk4_gdk3_DragContext_ConnectDropPerformed), f)
 }

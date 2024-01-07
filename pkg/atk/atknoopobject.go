@@ -3,21 +3,22 @@
 package atk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeNoOpObject = coreglib.Type(C.atk_no_op_object_get_type())
+	GTypeNoOpObject = coreglib.Type(girepository.MustFind("Atk", "NoOpObject").RegisteredGType())
 )
 
 func init() {
@@ -129,33 +130,6 @@ func marshalNoOpObject(p uintptr) (interface{}, error) {
 	return wrapNoOpObject(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewNoOpObject provides a default (non-functioning stub) Object. Application
-// maintainers should not use this method.
-//
-// The function takes the following parameters:
-//
-//    - obj: #GObject.
-//
-// The function returns the following values:
-//
-//    - noOpObject: default (non-functioning stub) Object.
-//
-func NewNoOpObject(obj *coreglib.Object) *NoOpObject {
-	var _arg1 *C.GObject   // out
-	var _cret *C.AtkObject // in
-
-	_arg1 = (*C.GObject)(unsafe.Pointer(obj.Native()))
-
-	_cret = C.atk_no_op_object_new(_arg1)
-	runtime.KeepAlive(obj)
-
-	var _noOpObject *NoOpObject // out
-
-	_noOpObject = wrapNoOpObject(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _noOpObject
-}
-
 // NoOpObjectClass: instance of this type is always passed by reference.
 type NoOpObjectClass struct {
 	*noOpObjectClass
@@ -163,12 +137,7 @@ type NoOpObjectClass struct {
 
 // noOpObjectClass is the struct that's finalized.
 type noOpObjectClass struct {
-	native *C.AtkNoOpObjectClass
+	native unsafe.Pointer
 }
 
-func (n *NoOpObjectClass) ParentClass() *ObjectClass {
-	valptr := &n.native.parent_class
-	var _v *ObjectClass // out
-	_v = (*ObjectClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoNoOpObjectClass = girepository.MustFind("Atk", "NoOpObjectClass")

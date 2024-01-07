@@ -10,12 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gio2_DatagramBasedSourceFunc
-func _gotk4_gio2_DatagramBasedSourceFunc(arg1 *C.GDatagramBased, arg2 C.GIOCondition, arg3 C.gpointer) (cret C.gboolean) {
+func _gotk4_gio2_DatagramBasedSourceFunc(arg1 *C.void, arg2 C.GIOCondition, arg3 C.gpointer) (cret C.gboolean) {
 	var fn DatagramBasedSourceFunc
 	{
 		v := gbox.Get(uintptr(arg3))

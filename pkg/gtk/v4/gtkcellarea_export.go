@@ -11,12 +11,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_CellAllocCallback
-func _gotk4_gtk4_CellAllocCallback(arg1 *C.GtkCellRenderer, arg2 *C.GdkRectangle, arg3 *C.GdkRectangle, arg4 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_CellAllocCallback(arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.gpointer) (cret C.gboolean) {
 	var fn CellAllocCallback
 	{
 		v := gbox.Get(uintptr(arg4))
@@ -62,7 +64,7 @@ func _gotk4_gtk4_CellAllocCallback(arg1 *C.GtkCellRenderer, arg2 *C.GdkRectangle
 }
 
 //export _gotk4_gtk4_CellCallback
-func _gotk4_gtk4_CellCallback(arg1 *C.GtkCellRenderer, arg2 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_CellCallback(arg1 *C.void, arg2 C.gpointer) (cret C.gboolean) {
 	var fn CellCallback
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -104,7 +106,7 @@ func _gotk4_gtk4_CellCallback(arg1 *C.GtkCellRenderer, arg2 C.gpointer) (cret C.
 }
 
 //export _gotk4_gtk4_CellArea_ConnectAddEditable
-func _gotk4_gtk4_CellArea_ConnectAddEditable(arg0 C.gpointer, arg1 *C.GtkCellRenderer, arg2 *C.GtkCellEditable, arg3 *C.GdkRectangle, arg4 *C.gchar, arg5 C.guintptr) {
+func _gotk4_gtk4_CellArea_ConnectAddEditable(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 *C.gchar, arg5 C.guintptr) {
 	var f func(renderer CellRendererer, editable CellEditabler, cellArea *gdk.Rectangle, path string)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -162,7 +164,7 @@ func _gotk4_gtk4_CellArea_ConnectAddEditable(arg0 C.gpointer, arg1 *C.GtkCellRen
 }
 
 //export _gotk4_gtk4_CellArea_ConnectApplyAttributes
-func _gotk4_gtk4_CellArea_ConnectApplyAttributes(arg0 C.gpointer, arg1 *C.GtkTreeModel, arg2 *C.GtkTreeIter, arg3 C.gboolean, arg4 C.gboolean, arg5 C.guintptr) {
+func _gotk4_gtk4_CellArea_ConnectApplyAttributes(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.gboolean, arg4 C.gboolean, arg5 C.guintptr) {
 	var f func(model TreeModeller, iter *TreeIter, isExpander, isExpanded bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -208,7 +210,7 @@ func _gotk4_gtk4_CellArea_ConnectApplyAttributes(arg0 C.gpointer, arg1 *C.GtkTre
 }
 
 //export _gotk4_gtk4_CellArea_ConnectFocusChanged
-func _gotk4_gtk4_CellArea_ConnectFocusChanged(arg0 C.gpointer, arg1 *C.GtkCellRenderer, arg2 *C.gchar, arg3 C.guintptr) {
+func _gotk4_gtk4_CellArea_ConnectFocusChanged(arg0 C.gpointer, arg1 *C.void, arg2 *C.gchar, arg3 C.guintptr) {
 	var f func(renderer CellRendererer, path string)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -246,7 +248,7 @@ func _gotk4_gtk4_CellArea_ConnectFocusChanged(arg0 C.gpointer, arg1 *C.GtkCellRe
 }
 
 //export _gotk4_gtk4_CellArea_ConnectRemoveEditable
-func _gotk4_gtk4_CellArea_ConnectRemoveEditable(arg0 C.gpointer, arg1 *C.GtkCellRenderer, arg2 *C.GtkCellEditable, arg3 C.guintptr) {
+func _gotk4_gtk4_CellArea_ConnectRemoveEditable(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(renderer CellRendererer, editable CellEditabler)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))

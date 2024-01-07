@@ -3,20 +3,21 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSimpleIOStream = coreglib.Type(C.g_simple_io_stream_get_type())
+	GTypeSimpleIOStream = coreglib.Type(girepository.MustFind("Gio", "SimpleIOStream").RegisteredGType())
 )
 
 func init() {
@@ -51,35 +52,4 @@ func wrapSimpleIOStream(obj *coreglib.Object) *SimpleIOStream {
 
 func marshalSimpleIOStream(p uintptr) (interface{}, error) {
 	return wrapSimpleIOStream(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewSimpleIOStream creates a new IOStream wrapping input_stream and
-// output_stream. See also OStream.
-//
-// The function takes the following parameters:
-//
-//    - inputStream: Stream.
-//    - outputStream: Stream.
-//
-// The function returns the following values:
-//
-//    - simpleIOStream: new IOStream instance.
-//
-func NewSimpleIOStream(inputStream InputStreamer, outputStream OutputStreamer) *SimpleIOStream {
-	var _arg1 *C.GInputStream  // out
-	var _arg2 *C.GOutputStream // out
-	var _cret *C.GIOStream     // in
-
-	_arg1 = (*C.GInputStream)(unsafe.Pointer(coreglib.InternObject(inputStream).Native()))
-	_arg2 = (*C.GOutputStream)(unsafe.Pointer(coreglib.InternObject(outputStream).Native()))
-
-	_cret = C.g_simple_io_stream_new(_arg1, _arg2)
-	runtime.KeepAlive(inputStream)
-	runtime.KeepAlive(outputStream)
-
-	var _simpleIOStream *SimpleIOStream // out
-
-	_simpleIOStream = wrapSimpleIOStream(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _simpleIOStream
 }

@@ -7,21 +7,21 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeInputPurpose = coreglib.Type(C.gtk_input_purpose_get_type())
-	GTypeLevelBarMode = coreglib.Type(C.gtk_level_bar_mode_get_type())
-	GTypeInputHints   = coreglib.Type(C.gtk_input_hints_get_type())
+	GTypeInputPurpose = coreglib.Type(girepository.MustFind("Gtk", "InputPurpose").RegisteredGType())
+	GTypeLevelBarMode = coreglib.Type(girepository.MustFind("Gtk", "LevelBarMode").RegisteredGType())
+	GTypeInputHints   = coreglib.Type(girepository.MustFind("Gtk", "InputHints").RegisteredGType())
 )
 
 func init() {

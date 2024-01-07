@@ -6,10 +6,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_Toolbar_ConnectFocusHomeOrEnd
@@ -42,26 +42,6 @@ func _gotk4_gtk3_Toolbar_ConnectFocusHomeOrEnd(arg0 C.gpointer, arg1 C.gboolean,
 	return cret
 }
 
-//export _gotk4_gtk3_Toolbar_ConnectOrientationChanged
-func _gotk4_gtk3_Toolbar_ConnectOrientationChanged(arg0 C.gpointer, arg1 C.GtkOrientation, arg2 C.guintptr) {
-	var f func(orientation Orientation)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(orientation Orientation))
-	}
-
-	var _orientation Orientation // out
-
-	_orientation = Orientation(arg1)
-
-	f(_orientation)
-}
-
 //export _gotk4_gtk3_Toolbar_ConnectPopupContextMenu
 func _gotk4_gtk3_Toolbar_ConnectPopupContextMenu(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.gint, arg4 C.guintptr) (cret C.gboolean) {
 	var f func(x, y, button int) (ok bool)
@@ -92,24 +72,4 @@ func _gotk4_gtk3_Toolbar_ConnectPopupContextMenu(arg0 C.gpointer, arg1 C.gint, a
 	}
 
 	return cret
-}
-
-//export _gotk4_gtk3_Toolbar_ConnectStyleChanged
-func _gotk4_gtk3_Toolbar_ConnectStyleChanged(arg0 C.gpointer, arg1 C.GtkToolbarStyle, arg2 C.guintptr) {
-	var f func(style ToolbarStyle)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(style ToolbarStyle))
-	}
-
-	var _style ToolbarStyle // out
-
-	_style = ToolbarStyle(arg1)
-
-	f(_style)
 }

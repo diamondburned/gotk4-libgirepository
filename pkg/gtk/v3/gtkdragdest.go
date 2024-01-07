@@ -7,19 +7,19 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDestDefaults = coreglib.Type(C.gtk_dest_defaults_get_type())
+	GTypeDestDefaults = coreglib.Type(girepository.MustFind("Gtk", "DestDefaults").RegisteredGType())
 )
 
 func init() {

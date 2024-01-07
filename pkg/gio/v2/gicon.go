@@ -3,37 +3,31 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// GVariant* _gotk4_gio2_Icon_virtual_serialize(void* fnptr, GIcon* arg0) {
-//   return ((GVariant* (*)(GIcon*))(fnptr))(arg0);
-// };
-// gboolean _gotk4_gio2_Icon_virtual_equal(void* fnptr, GIcon* arg0, GIcon* arg1) {
-//   return ((gboolean (*)(GIcon*, GIcon*))(fnptr))(arg0, arg1);
-// };
-// guint _gotk4_gio2_Icon_virtual_hash(void* fnptr, GIcon* arg0) {
-//   return ((guint (*)(GIcon*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeIcon = coreglib.Type(C.g_icon_get_type())
+	GTypeIcon = coreglib.Type(girepository.MustFind("Gio", "Icon").RegisteredGType())
 )
 
 func init() {
 	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
 		coreglib.TypeMarshaler{T: GTypeIcon, F: marshalIcon},
 	})
+}
+
+// IconOverrider contains methods that are overridable.
+type IconOverrider interface {
 }
 
 // Icon is a very minimal interface for icons. It provides functions for
@@ -77,17 +71,13 @@ var (
 type Iconner interface {
 	coreglib.Objector
 
-	// Equal checks if two icons are equal.
-	Equal(icon2 Iconner) bool
-	// Serialize serializes a #GIcon into a #GVariant.
-	Serialize() *glib.Variant
-	// String generates a textual representation of icon that can be used for
-	// serialization such as when passing icon to a different process or saving
-	// it to persistent storage.
-	String() string
+	baseIcon() *Icon
 }
 
 var _ Iconner = (*Icon)(nil)
+
+func ifaceInitIconner(gifacePtr, data C.gpointer) {
+}
 
 func wrapIcon(obj *coreglib.Object) *Icon {
 	return &Icon{
@@ -99,243 +89,13 @@ func marshalIcon(p uintptr) (interface{}, error) {
 	return wrapIcon(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Equal checks if two icons are equal.
-//
-// The function takes the following parameters:
-//
-//    - icon2 (optional): pointer to the second #GIcon.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if icon1 is equal to icon2. FALSE otherwise.
-//
-func (icon1 *Icon) Equal(icon2 Iconner) bool {
-	var _arg0 *C.GIcon   // out
-	var _arg1 *C.GIcon   // out
-	var _cret C.gboolean // in
-
-	if icon1 != nil {
-		_arg0 = (*C.GIcon)(unsafe.Pointer(coreglib.InternObject(icon1).Native()))
-	}
-	if icon2 != nil {
-		_arg1 = (*C.GIcon)(unsafe.Pointer(coreglib.InternObject(icon2).Native()))
-	}
-
-	_cret = C.g_icon_equal(_arg0, _arg1)
-	runtime.KeepAlive(icon1)
-	runtime.KeepAlive(icon2)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
+func (v *Icon) baseIcon() *Icon {
+	return v
 }
 
-// Serialize serializes a #GIcon into a #GVariant. An equivalent #GIcon can be
-// retrieved back by calling g_icon_deserialize() on the returned value. As
-// serialization will avoid using raw icon data when possible, it only makes
-// sense to transfer the #GVariant between processes on the same machine, (as
-// opposed to over the network), and within the same file system namespace.
-//
-// The function returns the following values:
-//
-//    - variant (optional) or NULL when serialization fails. The #GVariant will
-//      not be floating.
-//
-func (icon *Icon) Serialize() *glib.Variant {
-	var _arg0 *C.GIcon    // out
-	var _cret *C.GVariant // in
-
-	_arg0 = (*C.GIcon)(unsafe.Pointer(coreglib.InternObject(icon).Native()))
-
-	_cret = C.g_icon_serialize(_arg0)
-	runtime.KeepAlive(icon)
-
-	var _variant *glib.Variant // out
-
-	if _cret != nil {
-		_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_variant)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.g_variant_unref((*C.GVariant)(intern.C))
-			},
-		)
-	}
-
-	return _variant
-}
-
-// String generates a textual representation of icon that can be used for
-// serialization such as when passing icon to a different process or saving it
-// to persistent storage. Use g_icon_new_for_string() to get icon back from the
-// returned string.
-//
-// The encoding of the returned string is proprietary to #GIcon except in the
-// following two cases
-//
-// - If icon is a Icon, the returned string is a native path (such as
-// /path/to/my icon.png) without escaping if the #GFile for icon is a native
-// file. If the file is not native, the returned string is the result of
-// g_file_get_uri() (such as sftp://path/to/my20icon.png).
-//
-// - If icon is a Icon with exactly one name and no fallbacks, the encoding is
-// simply the name (such as network-server).
-//
-// The function returns the following values:
-//
-//    - utf8 (optional): allocated NUL-terminated UTF8 string or NULL if icon
-//      can't be serialized. Use g_free() to free.
-//
-func (icon *Icon) String() string {
-	var _arg0 *C.GIcon // out
-	var _cret *C.gchar // in
-
-	_arg0 = (*C.GIcon)(unsafe.Pointer(coreglib.InternObject(icon).Native()))
-
-	_cret = C.g_icon_to_string(_arg0)
-	runtime.KeepAlive(icon)
-
-	var _utf8 string // out
-
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-		defer C.free(unsafe.Pointer(_cret))
-	}
-
-	return _utf8
-}
-
-// Equal checks if two icons are equal.
-//
-// The function takes the following parameters:
-//
-//    - icon2 (optional): pointer to the second #GIcon.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if icon1 is equal to icon2. FALSE otherwise.
-//
-func (icon1 *Icon) equal(icon2 Iconner) bool {
-	gclass := (*C.GIconIface)(coreglib.PeekParentClass(icon1))
-	fnarg := gclass.equal
-
-	var _arg0 *C.GIcon   // out
-	var _arg1 *C.GIcon   // out
-	var _cret C.gboolean // in
-
-	if icon1 != nil {
-		_arg0 = (*C.GIcon)(unsafe.Pointer(coreglib.InternObject(icon1).Native()))
-	}
-	if icon2 != nil {
-		_arg1 = (*C.GIcon)(unsafe.Pointer(coreglib.InternObject(icon2).Native()))
-	}
-
-	_cret = C._gotk4_gio2_Icon_virtual_equal(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(icon1)
-	runtime.KeepAlive(icon2)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Hash gets a hash for an icon.
-//
-// The function returns the following values:
-//
-//    - guint containing a hash for the icon, suitable for use in a Table or
-//      similar data structure.
-//
-func (icon *Icon) hash() uint {
-	gclass := (*C.GIconIface)(coreglib.PeekParentClass(icon))
-	fnarg := gclass.hash
-
-	var _arg0 *C.GIcon // out
-	var _cret C.guint  // in
-
-	_arg0 = (*C.GIcon)(unsafe.Pointer(coreglib.InternObject(icon).Native()))
-
-	_cret = C._gotk4_gio2_Icon_virtual_hash(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(icon)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// Serialize serializes a #GIcon into a #GVariant. An equivalent #GIcon can be
-// retrieved back by calling g_icon_deserialize() on the returned value. As
-// serialization will avoid using raw icon data when possible, it only makes
-// sense to transfer the #GVariant between processes on the same machine, (as
-// opposed to over the network), and within the same file system namespace.
-//
-// The function returns the following values:
-//
-//    - variant (optional) or NULL when serialization fails. The #GVariant will
-//      not be floating.
-//
-func (icon *Icon) serialize() *glib.Variant {
-	gclass := (*C.GIconIface)(coreglib.PeekParentClass(icon))
-	fnarg := gclass.serialize
-
-	var _arg0 *C.GIcon    // out
-	var _cret *C.GVariant // in
-
-	_arg0 = (*C.GIcon)(unsafe.Pointer(coreglib.InternObject(icon).Native()))
-
-	_cret = C._gotk4_gio2_Icon_virtual_serialize(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(icon)
-
-	var _variant *glib.Variant // out
-
-	if _cret != nil {
-		_variant = (*glib.Variant)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_variant)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.g_variant_unref((*C.GVariant)(intern.C))
-			},
-		)
-	}
-
-	return _variant
-}
-
-// IconHash gets a hash for an icon.
-//
-// The function takes the following parameters:
-//
-//    - icon to an icon object.
-//
-// The function returns the following values:
-//
-//    - guint containing a hash for the icon, suitable for use in a Table or
-//      similar data structure.
-//
-func IconHash(icon unsafe.Pointer) uint {
-	var _arg1 C.gconstpointer // out
-	var _cret C.guint         // in
-
-	_arg1 = (C.gconstpointer)(unsafe.Pointer(icon))
-
-	_cret = C.g_icon_hash(_arg1)
-	runtime.KeepAlive(icon)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
+// BaseIcon returns the underlying base object.
+func BaseIcon(obj Iconner) *Icon {
+	return obj.baseIcon()
 }
 
 // IconIface is used to implement GIcon types for various different systems. See
@@ -348,5 +108,7 @@ type IconIface struct {
 
 // iconIface is the struct that's finalized.
 type iconIface struct {
-	native *C.GIconIface
+	native unsafe.Pointer
 }
+
+var GIRInfoIconIface = girepository.MustFind("Gio", "IconIface")

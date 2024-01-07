@@ -3,36 +3,31 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// GDBusInterfaceInfo* _gotk4_gio2_DBusInterface_virtual_get_info(void* fnptr, GDBusInterface* arg0) {
-//   return ((GDBusInterfaceInfo* (*)(GDBusInterface*))(fnptr))(arg0);
-// };
-// GDBusObject* _gotk4_gio2_DBusInterface_virtual_dup_object(void* fnptr, GDBusInterface* arg0) {
-//   return ((GDBusObject* (*)(GDBusInterface*))(fnptr))(arg0);
-// };
-// void _gotk4_gio2_DBusInterface_virtual_set_object(void* fnptr, GDBusInterface* arg0, GDBusObject* arg1) {
-//   ((void (*)(GDBusInterface*, GDBusObject*))(fnptr))(arg0, arg1);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeDBusInterface = coreglib.Type(C.g_dbus_interface_get_type())
+	GTypeDBusInterface = coreglib.Type(girepository.MustFind("Gio", "DBusInterface").RegisteredGType())
 )
 
 func init() {
 	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
 		coreglib.TypeMarshaler{T: GTypeDBusInterface, F: marshalDBusInterface},
 	})
+}
+
+// DBusInterfaceOverrider contains methods that are overridable.
+type DBusInterfaceOverrider interface {
 }
 
 // DBusInterface type is the base type for D-Bus interfaces both on the service
@@ -53,16 +48,13 @@ var (
 type DBusInterfacer interface {
 	coreglib.Objector
 
-	// GetObject gets the BusObject that interface_ belongs to, if any.
-	GetObject() *DBusObject
-	// Info gets D-Bus introspection information for the D-Bus interface
-	// implemented by interface_.
-	Info() *DBusInterfaceInfo
-	// SetObject sets the BusObject for interface_ to object.
-	SetObject(object DBusObjector)
+	baseDBusInterface() *DBusInterface
 }
 
 var _ DBusInterfacer = (*DBusInterface)(nil)
+
+func ifaceInitDBusInterfacer(gifacePtr, data C.gpointer) {
+}
 
 func wrapDBusInterface(obj *coreglib.Object) *DBusInterface {
 	return &DBusInterface{
@@ -74,167 +66,13 @@ func marshalDBusInterface(p uintptr) (interface{}, error) {
 	return wrapDBusInterface(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// GetObject gets the BusObject that interface_ belongs to, if any.
-//
-// The function returns the following values:
-//
-//    - dBusObject (optional) or NULL. The returned reference should be freed
-//      with g_object_unref().
-//
-func (interface_ *DBusInterface) GetObject() *DBusObject {
-	var _arg0 *C.GDBusInterface // out
-	var _cret *C.GDBusObject    // in
-
-	_arg0 = (*C.GDBusInterface)(unsafe.Pointer(coreglib.InternObject(interface_).Native()))
-
-	_cret = C.g_dbus_interface_dup_object(_arg0)
-	runtime.KeepAlive(interface_)
-
-	var _dBusObject *DBusObject // out
-
-	if _cret != nil {
-		_dBusObject = wrapDBusObject(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	}
-
-	return _dBusObject
+func (v *DBusInterface) baseDBusInterface() *DBusInterface {
+	return v
 }
 
-// Info gets D-Bus introspection information for the D-Bus interface implemented
-// by interface_.
-//
-// The function returns the following values:
-//
-//    - dBusInterfaceInfo Do not free.
-//
-func (interface_ *DBusInterface) Info() *DBusInterfaceInfo {
-	var _arg0 *C.GDBusInterface     // out
-	var _cret *C.GDBusInterfaceInfo // in
-
-	_arg0 = (*C.GDBusInterface)(unsafe.Pointer(coreglib.InternObject(interface_).Native()))
-
-	_cret = C.g_dbus_interface_get_info(_arg0)
-	runtime.KeepAlive(interface_)
-
-	var _dBusInterfaceInfo *DBusInterfaceInfo // out
-
-	_dBusInterfaceInfo = (*DBusInterfaceInfo)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.g_dbus_interface_info_ref(_cret)
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_dBusInterfaceInfo)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_dbus_interface_info_unref((*C.GDBusInterfaceInfo)(intern.C))
-		},
-	)
-
-	return _dBusInterfaceInfo
-}
-
-// SetObject sets the BusObject for interface_ to object.
-//
-// Note that interface_ will hold a weak reference to object.
-//
-// The function takes the following parameters:
-//
-//    - object (optional) or NULL.
-//
-func (interface_ *DBusInterface) SetObject(object DBusObjector) {
-	var _arg0 *C.GDBusInterface // out
-	var _arg1 *C.GDBusObject    // out
-
-	_arg0 = (*C.GDBusInterface)(unsafe.Pointer(coreglib.InternObject(interface_).Native()))
-	if object != nil {
-		_arg1 = (*C.GDBusObject)(unsafe.Pointer(coreglib.InternObject(object).Native()))
-	}
-
-	C.g_dbus_interface_set_object(_arg0, _arg1)
-	runtime.KeepAlive(interface_)
-	runtime.KeepAlive(object)
-}
-
-// dupObject gets the BusObject that interface_ belongs to, if any.
-//
-// The function returns the following values:
-//
-//    - dBusObject (optional) or NULL. The returned reference should be freed
-//      with g_object_unref().
-//
-func (interface_ *DBusInterface) dupObject() *DBusObject {
-	gclass := (*C.GDBusInterfaceIface)(coreglib.PeekParentClass(interface_))
-	fnarg := gclass.dup_object
-
-	var _arg0 *C.GDBusInterface // out
-	var _cret *C.GDBusObject    // in
-
-	_arg0 = (*C.GDBusInterface)(unsafe.Pointer(coreglib.InternObject(interface_).Native()))
-
-	_cret = C._gotk4_gio2_DBusInterface_virtual_dup_object(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(interface_)
-
-	var _dBusObject *DBusObject // out
-
-	if _cret != nil {
-		_dBusObject = wrapDBusObject(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	}
-
-	return _dBusObject
-}
-
-// Info gets D-Bus introspection information for the D-Bus interface implemented
-// by interface_.
-//
-// The function returns the following values:
-//
-//    - dBusInterfaceInfo Do not free.
-//
-func (interface_ *DBusInterface) info() *DBusInterfaceInfo {
-	gclass := (*C.GDBusInterfaceIface)(coreglib.PeekParentClass(interface_))
-	fnarg := gclass.get_info
-
-	var _arg0 *C.GDBusInterface     // out
-	var _cret *C.GDBusInterfaceInfo // in
-
-	_arg0 = (*C.GDBusInterface)(unsafe.Pointer(coreglib.InternObject(interface_).Native()))
-
-	_cret = C._gotk4_gio2_DBusInterface_virtual_get_info(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(interface_)
-
-	var _dBusInterfaceInfo *DBusInterfaceInfo // out
-
-	_dBusInterfaceInfo = (*DBusInterfaceInfo)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	C.g_dbus_interface_info_ref(_cret)
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_dBusInterfaceInfo)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_dbus_interface_info_unref((*C.GDBusInterfaceInfo)(intern.C))
-		},
-	)
-
-	return _dBusInterfaceInfo
-}
-
-// setObject sets the BusObject for interface_ to object.
-//
-// Note that interface_ will hold a weak reference to object.
-//
-// The function takes the following parameters:
-//
-//    - object (optional) or NULL.
-//
-func (interface_ *DBusInterface) setObject(object DBusObjector) {
-	gclass := (*C.GDBusInterfaceIface)(coreglib.PeekParentClass(interface_))
-	fnarg := gclass.set_object
-
-	var _arg0 *C.GDBusInterface // out
-	var _arg1 *C.GDBusObject    // out
-
-	_arg0 = (*C.GDBusInterface)(unsafe.Pointer(coreglib.InternObject(interface_).Native()))
-	if object != nil {
-		_arg1 = (*C.GDBusObject)(unsafe.Pointer(coreglib.InternObject(object).Native()))
-	}
-
-	C._gotk4_gio2_DBusInterface_virtual_set_object(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(interface_)
-	runtime.KeepAlive(object)
+// BaseDBusInterface returns the underlying base object.
+func BaseDBusInterface(obj DBusInterfacer) *DBusInterface {
+	return obj.baseDBusInterface()
 }
 
 // DBusInterfaceIface: base type for D-Bus interfaces.
@@ -246,5 +84,7 @@ type DBusInterfaceIface struct {
 
 // dBusInterfaceIface is the struct that's finalized.
 type dBusInterfaceIface struct {
-	native *C.GDBusInterfaceIface
+	native unsafe.Pointer
 }
+
+var GIRInfoDBusInterfaceIface = girepository.MustFind("Gio", "DBusInterfaceIface")

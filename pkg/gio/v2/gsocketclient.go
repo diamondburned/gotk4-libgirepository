@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // SocketClientClass: instance of this type is always passed by reference.
@@ -13,5 +21,7 @@ type SocketClientClass struct {
 
 // socketClientClass is the struct that's finalized.
 type socketClientClass struct {
-	native *C.GSocketClientClass
+	native unsafe.Pointer
 }
+
+var GIRInfoSocketClientClass = girepository.MustFind("Gio", "SocketClientClass")

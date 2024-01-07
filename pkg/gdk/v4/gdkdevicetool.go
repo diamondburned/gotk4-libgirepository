@@ -4,21 +4,22 @@ package gdk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDeviceToolType = coreglib.Type(C.gdk_device_tool_type_get_type())
-	GTypeDeviceTool     = coreglib.Type(C.gdk_device_tool_get_type())
+	GTypeDeviceToolType = coreglib.Type(girepository.MustFind("Gdk", "DeviceToolType").RegisteredGType())
+	GTypeDeviceTool     = coreglib.Type(girepository.MustFind("Gdk", "DeviceTool").RegisteredGType())
 )
 
 func init() {
@@ -97,105 +98,4 @@ func wrapDeviceTool(obj *coreglib.Object) *DeviceTool {
 
 func marshalDeviceTool(p uintptr) (interface{}, error) {
 	return wrapDeviceTool(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// Axes gets the axes of the tool.
-//
-// The function returns the following values:
-//
-//    - axisFlags axes of tool.
-//
-func (tool *DeviceTool) Axes() AxisFlags {
-	var _arg0 *C.GdkDeviceTool // out
-	var _cret C.GdkAxisFlags   // in
-
-	_arg0 = (*C.GdkDeviceTool)(unsafe.Pointer(coreglib.InternObject(tool).Native()))
-
-	_cret = C.gdk_device_tool_get_axes(_arg0)
-	runtime.KeepAlive(tool)
-
-	var _axisFlags AxisFlags // out
-
-	_axisFlags = AxisFlags(_cret)
-
-	return _axisFlags
-}
-
-// HardwareID gets the hardware ID of this tool, or 0 if it's not known.
-//
-// When non-zero, the identificator is unique for the given tool model, meaning
-// that two identical tools will share the same hardware_id, but will have
-// different serial numbers (see gdk.DeviceTool.GetSerial()).
-//
-// This is a more concrete (and device specific) method to identify a
-// GdkDeviceTool than gdk.DeviceTool.GetToolType(), as a tablet may support
-// multiple devices with the same GdkDeviceToolType, but different hardware
-// identificators.
-//
-// The function returns the following values:
-//
-//    - guint64: hardware identificator of this tool.
-//
-func (tool *DeviceTool) HardwareID() uint64 {
-	var _arg0 *C.GdkDeviceTool // out
-	var _cret C.guint64        // in
-
-	_arg0 = (*C.GdkDeviceTool)(unsafe.Pointer(coreglib.InternObject(tool).Native()))
-
-	_cret = C.gdk_device_tool_get_hardware_id(_arg0)
-	runtime.KeepAlive(tool)
-
-	var _guint64 uint64 // out
-
-	_guint64 = uint64(_cret)
-
-	return _guint64
-}
-
-// Serial gets the serial number of this tool.
-//
-// This value can be used to identify a physical tool (eg. a tablet pen) across
-// program executions.
-//
-// The function returns the following values:
-//
-//    - guint64: serial ID for this tool.
-//
-func (tool *DeviceTool) Serial() uint64 {
-	var _arg0 *C.GdkDeviceTool // out
-	var _cret C.guint64        // in
-
-	_arg0 = (*C.GdkDeviceTool)(unsafe.Pointer(coreglib.InternObject(tool).Native()))
-
-	_cret = C.gdk_device_tool_get_serial(_arg0)
-	runtime.KeepAlive(tool)
-
-	var _guint64 uint64 // out
-
-	_guint64 = uint64(_cret)
-
-	return _guint64
-}
-
-// ToolType gets the GdkDeviceToolType of the tool.
-//
-// The function returns the following values:
-//
-//    - deviceToolType: physical type for this tool. This can be used to figure
-//      out what sort of pen is being used, such as an airbrush or a pencil.
-//
-func (tool *DeviceTool) ToolType() DeviceToolType {
-	var _arg0 *C.GdkDeviceTool    // out
-	var _cret C.GdkDeviceToolType // in
-
-	_arg0 = (*C.GdkDeviceTool)(unsafe.Pointer(coreglib.InternObject(tool).Native()))
-
-	_cret = C.gdk_device_tool_get_tool_type(_arg0)
-	runtime.KeepAlive(tool)
-
-	var _deviceToolType DeviceToolType // out
-
-	_deviceToolType = DeviceToolType(_cret)
-
-	return _deviceToolType
 }

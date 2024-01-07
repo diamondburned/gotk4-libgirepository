@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_atk1_Component_ConnectBoundsChanged
-func _gotk4_atk1_Component_ConnectBoundsChanged(arg0 C.gpointer, arg1 *C.AtkRectangle, arg2 C.guintptr) {
+func _gotk4_atk1_Component_ConnectBoundsChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(arg1 *Rectangle)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

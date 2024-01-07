@@ -5,13 +5,13 @@ package gtk
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // SearchEntryClass: instance of this type is always passed by reference.
@@ -21,12 +21,7 @@ type SearchEntryClass struct {
 
 // searchEntryClass is the struct that's finalized.
 type searchEntryClass struct {
-	native *C.GtkSearchEntryClass
+	native unsafe.Pointer
 }
 
-func (s *SearchEntryClass) ParentClass() *EntryClass {
-	valptr := &s.native.parent_class
-	var _v *EntryClass // out
-	_v = (*EntryClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoSearchEntryClass = girepository.MustFind("Gtk", "SearchEntryClass")

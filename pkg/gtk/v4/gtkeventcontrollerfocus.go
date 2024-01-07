@@ -3,22 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_EventControllerFocus_ConnectLeave(gpointer, guintptr);
 // extern void _gotk4_gtk4_EventControllerFocus_ConnectEnter(gpointer, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeEventControllerFocus = coreglib.Type(C.gtk_event_controller_focus_get_type())
+	GTypeEventControllerFocus = coreglib.Type(girepository.MustFind("Gtk", "EventControllerFocus").RegisteredGType())
 )
 
 func init() {
@@ -64,8 +65,8 @@ func marshalEventControllerFocus(p uintptr) (interface{}, error) {
 // from a descendent of the widget to the widget itself). If you are interested
 // in these cases, you can monitor the gtk.EventControllerFocus:is-focus
 // property for changes.
-func (self *EventControllerFocus) ConnectEnter(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "enter", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerFocus_ConnectEnter), f)
+func (v *EventControllerFocus) ConnectEnter(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "enter", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerFocus_ConnectEnter), f)
 }
 
 // ConnectLeave is emitted whenever the focus leaves the widget hierarchy that
@@ -75,73 +76,6 @@ func (self *EventControllerFocus) ConnectEnter(f func()) coreglib.SignalHandle {
 // moves away from the widget, in certain cases (such as when the focus moves
 // from the widget to a descendent). If you are interested in these cases, you
 // can monitor the gtk.EventControllerFocus:is-focus property for changes.
-func (self *EventControllerFocus) ConnectLeave(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "leave", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerFocus_ConnectLeave), f)
-}
-
-// NewEventControllerFocus creates a new event controller that will handle focus
-// events.
-//
-// The function returns the following values:
-//
-//    - eventControllerFocus: new GtkEventControllerFocus.
-//
-func NewEventControllerFocus() *EventControllerFocus {
-	var _cret *C.GtkEventController // in
-
-	_cret = C.gtk_event_controller_focus_new()
-
-	var _eventControllerFocus *EventControllerFocus // out
-
-	_eventControllerFocus = wrapEventControllerFocus(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _eventControllerFocus
-}
-
-// ContainsFocus returns TRUE if focus is within self or one of its children.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if focus is within self or one of its children.
-//
-func (self *EventControllerFocus) ContainsFocus() bool {
-	var _arg0 *C.GtkEventControllerFocus // out
-	var _cret C.gboolean                 // in
-
-	_arg0 = (*C.GtkEventControllerFocus)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_event_controller_focus_contains_focus(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// IsFocus returns TRUE if focus is within self, but not one of its children.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if focus is within self, but not one of its children.
-//
-func (self *EventControllerFocus) IsFocus() bool {
-	var _arg0 *C.GtkEventControllerFocus // out
-	var _cret C.gboolean                 // in
-
-	_arg0 = (*C.GtkEventControllerFocus)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_event_controller_focus_is_focus(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
+func (v *EventControllerFocus) ConnectLeave(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "leave", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerFocus_ConnectLeave), f)
 }

@@ -8,10 +8,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_Window_ConnectActivateDefault
@@ -93,7 +93,7 @@ func _gotk4_gtk3_Window_ConnectKeysChanged(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_Window_ConnectSetFocus
-func _gotk4_gtk3_Window_ConnectSetFocus(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guintptr) {
+func _gotk4_gtk3_Window_ConnectSetFocus(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(widget Widgetter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

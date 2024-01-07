@@ -5,17 +5,19 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeVolumeButton = coreglib.Type(C.gtk_volume_button_get_type())
+	GTypeVolumeButton = coreglib.Type(girepository.MustFind("Gtk", "VolumeButton").RegisteredGType())
 )
 
 func init() {
@@ -66,25 +68,4 @@ func wrapVolumeButton(obj *coreglib.Object) *VolumeButton {
 
 func marshalVolumeButton(p uintptr) (interface{}, error) {
 	return wrapVolumeButton(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewVolumeButton creates a GtkVolumeButton.
-//
-// The button has a range between 0.0 and 1.0, with a stepping of 0.02. Volume
-// values can be obtained and modified using the functions from gtk.ScaleButton.
-//
-// The function returns the following values:
-//
-//    - volumeButton: new GtkVolumeButton.
-//
-func NewVolumeButton() *VolumeButton {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_volume_button_new()
-
-	var _volumeButton *VolumeButton // out
-
-	_volumeButton = wrapVolumeButton(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _volumeButton
 }

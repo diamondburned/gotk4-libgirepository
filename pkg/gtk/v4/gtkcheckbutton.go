@@ -3,31 +3,24 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_CheckButton_ConnectToggled(gpointer, guintptr);
 // extern void _gotk4_gtk4_CheckButton_ConnectActivate(gpointer, guintptr);
-// extern void _gotk4_gtk4_CheckButtonClass_toggled(GtkCheckButton*);
-// extern void _gotk4_gtk4_CheckButtonClass_activate(GtkCheckButton*);
-// void _gotk4_gtk4_CheckButton_virtual_activate(void* fnptr, GtkCheckButton* arg0) {
-//   ((void (*)(GtkCheckButton*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk4_CheckButton_virtual_toggled(void* fnptr, GtkCheckButton* arg0) {
-//   ((void (*)(GtkCheckButton*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeCheckButton = coreglib.Type(C.gtk_check_button_get_type())
+	GTypeCheckButton = coreglib.Type(girepository.MustFind("Gtk", "CheckButton").RegisteredGType())
 )
 
 func init() {
@@ -38,15 +31,10 @@ func init() {
 
 // CheckButtonOverrides contains methods that are overridable.
 type CheckButtonOverrides struct {
-	Activate func()
-	Toggled  func()
 }
 
 func defaultCheckButtonOverrides(v *CheckButton) CheckButtonOverrides {
-	return CheckButtonOverrides{
-		Activate: v.activate,
-		Toggled:  v.toggled,
-	}
+	return CheckButtonOverrides{}
 }
 
 // CheckButton: GtkCheckButton places a label next to an indicator.
@@ -124,16 +112,6 @@ func init() {
 }
 
 func initCheckButtonClass(gclass unsafe.Pointer, overrides CheckButtonOverrides, classInitFunc func(*CheckButtonClass)) {
-	pclass := (*C.GtkCheckButtonClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeCheckButton))))
-
-	if overrides.Activate != nil {
-		pclass.activate = (*[0]byte)(C._gotk4_gtk4_CheckButtonClass_activate)
-	}
-
-	if overrides.Toggled != nil {
-		pclass.toggled = (*[0]byte)(C._gotk4_gtk4_CheckButtonClass_toggled)
-	}
-
 	if classInitFunc != nil {
 		class := (*CheckButtonClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -189,340 +167,14 @@ func marshalCheckButton(p uintptr) (interface{}, error) {
 //
 // Applications should never connect to this signal, but use the
 // gtk.CheckButton::toggled signal.
-func (self *CheckButton) ConnectActivate(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "activate", false, unsafe.Pointer(C._gotk4_gtk4_CheckButton_ConnectActivate), f)
+func (v *CheckButton) ConnectActivate(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "activate", false, unsafe.Pointer(C._gotk4_gtk4_CheckButton_ConnectActivate), f)
 }
 
 // ConnectToggled is emitted when the buttons's gtk.CheckButton:active property
 // changes.
-func (self *CheckButton) ConnectToggled(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "toggled", false, unsafe.Pointer(C._gotk4_gtk4_CheckButton_ConnectToggled), f)
-}
-
-// NewCheckButton creates a new GtkCheckButton.
-//
-// The function returns the following values:
-//
-//    - checkButton: new GtkCheckButton.
-//
-func NewCheckButton() *CheckButton {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_check_button_new()
-
-	var _checkButton *CheckButton // out
-
-	_checkButton = wrapCheckButton(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _checkButton
-}
-
-// NewCheckButtonWithLabel creates a new GtkCheckButton with the given text.
-//
-// The function takes the following parameters:
-//
-//    - label (optional): text for the check button.
-//
-// The function returns the following values:
-//
-//    - checkButton: new GtkCheckButton.
-//
-func NewCheckButtonWithLabel(label string) *CheckButton {
-	var _arg1 *C.char      // out
-	var _cret *C.GtkWidget // in
-
-	if label != "" {
-		_arg1 = (*C.char)(unsafe.Pointer(C.CString(label)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	_cret = C.gtk_check_button_new_with_label(_arg1)
-	runtime.KeepAlive(label)
-
-	var _checkButton *CheckButton // out
-
-	_checkButton = wrapCheckButton(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _checkButton
-}
-
-// NewCheckButtonWithMnemonic creates a new GtkCheckButton with the given text
-// and a mnemonic.
-//
-// The function takes the following parameters:
-//
-//    - label (optional): text of the button, with an underscore in front of the
-//      mnemonic character.
-//
-// The function returns the following values:
-//
-//    - checkButton: new GtkCheckButton.
-//
-func NewCheckButtonWithMnemonic(label string) *CheckButton {
-	var _arg1 *C.char      // out
-	var _cret *C.GtkWidget // in
-
-	if label != "" {
-		_arg1 = (*C.char)(unsafe.Pointer(C.CString(label)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	_cret = C.gtk_check_button_new_with_mnemonic(_arg1)
-	runtime.KeepAlive(label)
-
-	var _checkButton *CheckButton // out
-
-	_checkButton = wrapCheckButton(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _checkButton
-}
-
-// Active returns whether the check button is active.
-//
-// The function returns the following values:
-//
-//    - ok: whether the check button is active.
-//
-func (self *CheckButton) Active() bool {
-	var _arg0 *C.GtkCheckButton // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_check_button_get_active(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Inconsistent returns whether the check button is in an inconsistent state.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if check_button is currently in an inconsistent state.
-//
-func (checkButton *CheckButton) Inconsistent() bool {
-	var _arg0 *C.GtkCheckButton // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(checkButton).Native()))
-
-	_cret = C.gtk_check_button_get_inconsistent(_arg0)
-	runtime.KeepAlive(checkButton)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Label returns the label of the check button.
-//
-// The function returns the following values:
-//
-//    - utf8 (optional): label self shows next to the indicator. If no label is
-//      shown, NULL will be returned.
-//
-func (self *CheckButton) Label() string {
-	var _arg0 *C.GtkCheckButton // out
-	var _cret *C.char           // in
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_check_button_get_label(_arg0)
-	runtime.KeepAlive(self)
-
-	var _utf8 string // out
-
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	}
-
-	return _utf8
-}
-
-// UseUnderline returns whether underlines in the label indicate mnemonics.
-//
-// The function returns the following values:
-//
-//    - ok: value of the gtk.CheckButton:use-underline property. See
-//      gtk.CheckButton.SetUseUnderline() for details on how to set a new value.
-//
-func (self *CheckButton) UseUnderline() bool {
-	var _arg0 *C.GtkCheckButton // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_check_button_get_use_underline(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetActive changes the check buttons active state.
-//
-// The function takes the following parameters:
-//
-//    - setting: new value to set.
-//
-func (self *CheckButton) SetActive(setting bool) {
-	var _arg0 *C.GtkCheckButton // out
-	var _arg1 C.gboolean        // out
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if setting {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_check_button_set_active(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(setting)
-}
-
-// SetGroup adds self to the group of group.
-//
-// In a group of multiple check buttons, only one button can be active at a
-// time. The behavior of a checkbutton in a group is also commonly known as a
-// *radio button*.
-//
-// Setting the group of a check button also changes the css name of the
-// indicator widget's CSS node to 'radio'.
-//
-// Setting up groups in a cycle leads to undefined behavior.
-//
-// Note that the same effect can be achieved via the gtk.Actionable API, by
-// using the same action with parameter type and state type 's' for all buttons
-// in the group, and giving each button its own target value.
-//
-// The function takes the following parameters:
-//
-//    - group (optional): another GtkCheckButton to form a group with.
-//
-func (self *CheckButton) SetGroup(group *CheckButton) {
-	var _arg0 *C.GtkCheckButton // out
-	var _arg1 *C.GtkCheckButton // out
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if group != nil {
-		_arg1 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(group).Native()))
-	}
-
-	C.gtk_check_button_set_group(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(group)
-}
-
-// SetInconsistent sets the GtkCheckButton to inconsistent state.
-//
-// You shoud turn off the inconsistent state again if the user checks the check
-// button. This has to be done manually.
-//
-// The function takes the following parameters:
-//
-//    - inconsistent: TRUE if state is inconsistent.
-//
-func (checkButton *CheckButton) SetInconsistent(inconsistent bool) {
-	var _arg0 *C.GtkCheckButton // out
-	var _arg1 C.gboolean        // out
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(checkButton).Native()))
-	if inconsistent {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_check_button_set_inconsistent(_arg0, _arg1)
-	runtime.KeepAlive(checkButton)
-	runtime.KeepAlive(inconsistent)
-}
-
-// SetLabel sets the text of self.
-//
-// If gtk.CheckButton:use-underline is TRUE, an underscore in label is
-// interpreted as mnemonic indicator, see gtk.CheckButton.SetUseUnderline() for
-// details on this behavior.
-//
-// The function takes the following parameters:
-//
-//    - label (optional): text shown next to the indicator, or NULL to show no
-//      text.
-//
-func (self *CheckButton) SetLabel(label string) {
-	var _arg0 *C.GtkCheckButton // out
-	var _arg1 *C.char           // out
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if label != "" {
-		_arg1 = (*C.char)(unsafe.Pointer(C.CString(label)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	C.gtk_check_button_set_label(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(label)
-}
-
-// SetUseUnderline sets whether underlines in the label indicate mnemonics.
-//
-// If setting is TRUE, an underscore character in self's label indicates a
-// mnemonic accelerator key. This behavior is similar to
-// gtk.Label:use-underline.
-//
-// The function takes the following parameters:
-//
-//    - setting: new value to set.
-//
-func (self *CheckButton) SetUseUnderline(setting bool) {
-	var _arg0 *C.GtkCheckButton // out
-	var _arg1 C.gboolean        // out
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if setting {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_check_button_set_use_underline(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(setting)
-}
-
-func (checkButton *CheckButton) activate() {
-	gclass := (*C.GtkCheckButtonClass)(coreglib.PeekParentClass(checkButton))
-	fnarg := gclass.activate
-
-	var _arg0 *C.GtkCheckButton // out
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(checkButton).Native()))
-
-	C._gotk4_gtk4_CheckButton_virtual_activate(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(checkButton)
-}
-
-func (checkButton *CheckButton) toggled() {
-	gclass := (*C.GtkCheckButtonClass)(coreglib.PeekParentClass(checkButton))
-	fnarg := gclass.toggled
-
-	var _arg0 *C.GtkCheckButton // out
-
-	_arg0 = (*C.GtkCheckButton)(unsafe.Pointer(coreglib.InternObject(checkButton).Native()))
-
-	C._gotk4_gtk4_CheckButton_virtual_toggled(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(checkButton)
+func (v *CheckButton) ConnectToggled(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "toggled", false, unsafe.Pointer(C._gotk4_gtk4_CheckButton_ConnectToggled), f)
 }
 
 // CheckButtonClass: instance of this type is always passed by reference.
@@ -532,12 +184,7 @@ type CheckButtonClass struct {
 
 // checkButtonClass is the struct that's finalized.
 type checkButtonClass struct {
-	native *C.GtkCheckButtonClass
+	native unsafe.Pointer
 }
 
-func (c *CheckButtonClass) ParentClass() *WidgetClass {
-	valptr := &c.native.parent_class
-	var _v *WidgetClass // out
-	_v = (*WidgetClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoCheckButtonClass = girepository.MustFind("Gtk", "CheckButtonClass")

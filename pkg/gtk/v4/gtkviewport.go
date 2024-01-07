@@ -3,20 +3,21 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeViewport = coreglib.Type(C.gtk_viewport_get_type())
+	GTypeViewport = coreglib.Type(girepository.MustFind("Gtk", "Viewport").RegisteredGType())
 )
 
 func init() {
@@ -81,144 +82,4 @@ func wrapViewport(obj *coreglib.Object) *Viewport {
 
 func marshalViewport(p uintptr) (interface{}, error) {
 	return wrapViewport(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewViewport creates a new GtkViewport.
-//
-// The new viewport uses the given adjustments, or default adjustments if none
-// are given.
-//
-// The function takes the following parameters:
-//
-//    - hadjustment (optional): horizontal adjustment.
-//    - vadjustment (optional): vertical adjustment.
-//
-// The function returns the following values:
-//
-//    - viewport: new GtkViewport.
-//
-func NewViewport(hadjustment, vadjustment *Adjustment) *Viewport {
-	var _arg1 *C.GtkAdjustment // out
-	var _arg2 *C.GtkAdjustment // out
-	var _cret *C.GtkWidget     // in
-
-	if hadjustment != nil {
-		_arg1 = (*C.GtkAdjustment)(unsafe.Pointer(coreglib.InternObject(hadjustment).Native()))
-	}
-	if vadjustment != nil {
-		_arg2 = (*C.GtkAdjustment)(unsafe.Pointer(coreglib.InternObject(vadjustment).Native()))
-	}
-
-	_cret = C.gtk_viewport_new(_arg1, _arg2)
-	runtime.KeepAlive(hadjustment)
-	runtime.KeepAlive(vadjustment)
-
-	var _viewport *Viewport // out
-
-	_viewport = wrapViewport(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _viewport
-}
-
-// Child gets the child widget of viewport.
-//
-// The function returns the following values:
-//
-//    - widget (optional): child widget of viewport.
-//
-func (viewport *Viewport) Child() Widgetter {
-	var _arg0 *C.GtkViewport // out
-	var _cret *C.GtkWidget   // in
-
-	_arg0 = (*C.GtkViewport)(unsafe.Pointer(coreglib.InternObject(viewport).Native()))
-
-	_cret = C.gtk_viewport_get_child(_arg0)
-	runtime.KeepAlive(viewport)
-
-	var _widget Widgetter // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Widgetter)
-				return ok
-			})
-			rv, ok := casted.(Widgetter)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-			}
-			_widget = rv
-		}
-	}
-
-	return _widget
-}
-
-// ScrollToFocus gets whether the viewport is scrolling to keep the focused
-// child in view.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the viewport keeps the focus child scrolled to view.
-//
-func (viewport *Viewport) ScrollToFocus() bool {
-	var _arg0 *C.GtkViewport // out
-	var _cret C.gboolean     // in
-
-	_arg0 = (*C.GtkViewport)(unsafe.Pointer(coreglib.InternObject(viewport).Native()))
-
-	_cret = C.gtk_viewport_get_scroll_to_focus(_arg0)
-	runtime.KeepAlive(viewport)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetChild sets the child widget of viewport.
-//
-// The function takes the following parameters:
-//
-//    - child (optional) widget.
-//
-func (viewport *Viewport) SetChild(child Widgetter) {
-	var _arg0 *C.GtkViewport // out
-	var _arg1 *C.GtkWidget   // out
-
-	_arg0 = (*C.GtkViewport)(unsafe.Pointer(coreglib.InternObject(viewport).Native()))
-	if child != nil {
-		_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-	}
-
-	C.gtk_viewport_set_child(_arg0, _arg1)
-	runtime.KeepAlive(viewport)
-	runtime.KeepAlive(child)
-}
-
-// SetScrollToFocus sets whether the viewport should automatically scroll to
-// keep the focused child in view.
-//
-// The function takes the following parameters:
-//
-//    - scrollToFocus: whether to keep the focus widget scrolled to view.
-//
-func (viewport *Viewport) SetScrollToFocus(scrollToFocus bool) {
-	var _arg0 *C.GtkViewport // out
-	var _arg1 C.gboolean     // out
-
-	_arg0 = (*C.GtkViewport)(unsafe.Pointer(coreglib.InternObject(viewport).Native()))
-	if scrollToFocus {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_viewport_set_scroll_to_focus(_arg0, _arg1)
-	runtime.KeepAlive(viewport)
-	runtime.KeepAlive(scrollToFocus)
 }

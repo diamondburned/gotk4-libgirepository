@@ -7,19 +7,19 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeApplicationInhibitFlags = coreglib.Type(C.gtk_application_inhibit_flags_get_type())
+	GTypeApplicationInhibitFlags = coreglib.Type(girepository.MustFind("Gtk", "ApplicationInhibitFlags").RegisteredGType())
 )
 
 func init() {

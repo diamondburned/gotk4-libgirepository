@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeNotebookPageAccessible = coreglib.Type(C.gtk_notebook_page_accessible_get_type())
+	GTypeNotebookPageAccessible = coreglib.Type(girepository.MustFind("Gtk", "NotebookPageAccessible").RegisteredGType())
 )
 
 func init() {
@@ -81,41 +80,6 @@ func marshalNotebookPageAccessible(p uintptr) (interface{}, error) {
 	return wrapNotebookPageAccessible(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// The function takes the following parameters:
-//
-//    - notebook
-//    - child
-//
-// The function returns the following values:
-//
-func NewNotebookPageAccessible(notebook *NotebookAccessible, child Widgetter) *NotebookPageAccessible {
-	var _arg1 *C.GtkNotebookAccessible // out
-	var _arg2 *C.GtkWidget             // out
-	var _cret *C.AtkObject             // in
-
-	_arg1 = (*C.GtkNotebookAccessible)(unsafe.Pointer(coreglib.InternObject(notebook).Native()))
-	_arg2 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	_cret = C.gtk_notebook_page_accessible_new(_arg1, _arg2)
-	runtime.KeepAlive(notebook)
-	runtime.KeepAlive(child)
-
-	var _notebookPageAccessible *NotebookPageAccessible // out
-
-	_notebookPageAccessible = wrapNotebookPageAccessible(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _notebookPageAccessible
-}
-
-func (page *NotebookPageAccessible) Invalidate() {
-	var _arg0 *C.GtkNotebookPageAccessible // out
-
-	_arg0 = (*C.GtkNotebookPageAccessible)(unsafe.Pointer(coreglib.InternObject(page).Native()))
-
-	C.gtk_notebook_page_accessible_invalidate(_arg0)
-	runtime.KeepAlive(page)
-}
-
 // NotebookPageAccessibleClass: instance of this type is always passed by
 // reference.
 type NotebookPageAccessibleClass struct {
@@ -124,12 +88,7 @@ type NotebookPageAccessibleClass struct {
 
 // notebookPageAccessibleClass is the struct that's finalized.
 type notebookPageAccessibleClass struct {
-	native *C.GtkNotebookPageAccessibleClass
+	native unsafe.Pointer
 }
 
-func (n *NotebookPageAccessibleClass) ParentClass() *atk.ObjectClass {
-	valptr := &n.native.parent_class
-	var _v *atk.ObjectClass // out
-	_v = (*atk.ObjectClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoNotebookPageAccessibleClass = girepository.MustFind("Gtk", "NotebookPageAccessibleClass")

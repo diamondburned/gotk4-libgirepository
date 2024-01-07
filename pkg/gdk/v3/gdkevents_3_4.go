@@ -2,8 +2,10 @@
 
 package gdk
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // BUTTON_MIDDLE: middle button.

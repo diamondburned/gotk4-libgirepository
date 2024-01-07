@@ -2,8 +2,16 @@
 
 package atk
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // TableCellIface: atkTableCell is an interface for cells inside an Table.
@@ -15,5 +23,7 @@ type TableCellIface struct {
 
 // tableCellIface is the struct that's finalized.
 type tableCellIface struct {
-	native *C.AtkTableCellIface
+	native unsafe.Pointer
 }
+
+var GIRInfoTableCellIface = girepository.MustFind("Atk", "TableCellIface")

@@ -3,32 +3,31 @@
 package gio
 
 import (
-	"context"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gcancel"
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// gboolean _gotk4_gio2_Initable_virtual_init(void* fnptr, GInitable* arg0, GCancellable* arg1, GError** arg2) {
-//   return ((gboolean (*)(GInitable*, GCancellable*, GError**))(fnptr))(arg0, arg1, arg2);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeInitable = coreglib.Type(C.g_initable_get_type())
+	GTypeInitable = coreglib.Type(girepository.MustFind("Gio", "Initable").RegisteredGType())
 )
 
 func init() {
 	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
 		coreglib.TypeMarshaler{T: GTypeInitable, F: marshalInitable},
 	})
+}
+
+// InitableOverrider contains methods that are overridable.
+type InitableOverrider interface {
 }
 
 // Initable is implemented by objects that can fail during initialization. If an
@@ -69,11 +68,13 @@ var (
 type Initabler interface {
 	coreglib.Objector
 
-	// Init initializes the object implementing the interface.
-	Init(ctx context.Context) error
+	baseInitable() *Initable
 }
 
 var _ Initabler = (*Initable)(nil)
+
+func ifaceInitInitabler(gifacePtr, data C.gpointer) {
+}
 
 func wrapInitable(obj *coreglib.Object) *Initable {
 	return &Initable{
@@ -85,141 +86,13 @@ func marshalInitable(p uintptr) (interface{}, error) {
 	return wrapInitable(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Init initializes the object implementing the interface.
-//
-// This method is intended for language bindings. If writing in C,
-// g_initable_new() should typically be used instead.
-//
-// The object must be initialized before any real use after initial
-// construction, either with this function or g_async_initable_init_async().
-//
-// Implementations may also support cancellation. If cancellable is not NULL,
-// then initialization can be cancelled by triggering the cancellable object
-// from another thread. If the operation was cancelled, the error
-// G_IO_ERROR_CANCELLED will be returned. If cancellable is not NULL and the
-// object doesn't support cancellable initialization the error
-// G_IO_ERROR_NOT_SUPPORTED will be returned.
-//
-// If the object is not initialized, or initialization returns with an error,
-// then all operations on the object except g_object_ref() and g_object_unref()
-// are considered to be invalid, and have undefined behaviour. See the
-// [introduction][ginitable] for more details.
-//
-// Callers should not assume that a class which implements #GInitable can be
-// initialized multiple times, unless the class explicitly documents itself as
-// supporting this. Generally, a class’ implementation of init() can assume (and
-// assert) that it will only be called once. Previously, this documentation
-// recommended all #GInitable implementations should be idempotent; that
-// recommendation was relaxed in GLib 2.54.
-//
-// If a class explicitly supports being initialized multiple times, it is
-// recommended that the method is idempotent: multiple calls with the same
-// arguments should return the same results. Only the first call initializes the
-// object; further calls return the result of the first call.
-//
-// One reason why a class might need to support idempotent initialization is if
-// it is designed to be used via the singleton pattern, with a Class.constructor
-// that sometimes returns an existing instance. In this pattern, a caller would
-// expect to be able to call g_initable_init() on the result of g_object_new(),
-// regardless of whether it is in fact a new instance.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): optional #GCancellable object, NULL to ignore.
-//
-func (initable *Initable) Init(ctx context.Context) error {
-	var _arg0 *C.GInitable    // out
-	var _arg1 *C.GCancellable // out
-	var _cerr *C.GError       // in
-
-	_arg0 = (*C.GInitable)(unsafe.Pointer(coreglib.InternObject(initable).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-
-	C.g_initable_init(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(initable)
-	runtime.KeepAlive(ctx)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
+func (v *Initable) baseInitable() *Initable {
+	return v
 }
 
-// Init initializes the object implementing the interface.
-//
-// This method is intended for language bindings. If writing in C,
-// g_initable_new() should typically be used instead.
-//
-// The object must be initialized before any real use after initial
-// construction, either with this function or g_async_initable_init_async().
-//
-// Implementations may also support cancellation. If cancellable is not NULL,
-// then initialization can be cancelled by triggering the cancellable object
-// from another thread. If the operation was cancelled, the error
-// G_IO_ERROR_CANCELLED will be returned. If cancellable is not NULL and the
-// object doesn't support cancellable initialization the error
-// G_IO_ERROR_NOT_SUPPORTED will be returned.
-//
-// If the object is not initialized, or initialization returns with an error,
-// then all operations on the object except g_object_ref() and g_object_unref()
-// are considered to be invalid, and have undefined behaviour. See the
-// [introduction][ginitable] for more details.
-//
-// Callers should not assume that a class which implements #GInitable can be
-// initialized multiple times, unless the class explicitly documents itself as
-// supporting this. Generally, a class’ implementation of init() can assume (and
-// assert) that it will only be called once. Previously, this documentation
-// recommended all #GInitable implementations should be idempotent; that
-// recommendation was relaxed in GLib 2.54.
-//
-// If a class explicitly supports being initialized multiple times, it is
-// recommended that the method is idempotent: multiple calls with the same
-// arguments should return the same results. Only the first call initializes the
-// object; further calls return the result of the first call.
-//
-// One reason why a class might need to support idempotent initialization is if
-// it is designed to be used via the singleton pattern, with a Class.constructor
-// that sometimes returns an existing instance. In this pattern, a caller would
-// expect to be able to call g_initable_init() on the result of g_object_new(),
-// regardless of whether it is in fact a new instance.
-//
-// The function takes the following parameters:
-//
-//    - ctx (optional): optional #GCancellable object, NULL to ignore.
-//
-func (initable *Initable) init(ctx context.Context) error {
-	gclass := (*C.GInitableIface)(coreglib.PeekParentClass(initable))
-	fnarg := gclass.init
-
-	var _arg0 *C.GInitable    // out
-	var _arg1 *C.GCancellable // out
-	var _cerr *C.GError       // in
-
-	_arg0 = (*C.GInitable)(unsafe.Pointer(coreglib.InternObject(initable).Native()))
-	{
-		cancellable := gcancel.GCancellableFromContext(ctx)
-		defer runtime.KeepAlive(cancellable)
-		_arg1 = (*C.GCancellable)(unsafe.Pointer(cancellable.Native()))
-	}
-
-	C._gotk4_gio2_Initable_virtual_init(unsafe.Pointer(fnarg), _arg0, _arg1, &_cerr)
-	runtime.KeepAlive(initable)
-	runtime.KeepAlive(ctx)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
+// BaseInitable returns the underlying base object.
+func BaseInitable(obj Initabler) *Initable {
+	return obj.baseInitable()
 }
 
 // InitableIface provides an interface for initializing object such that
@@ -232,5 +105,7 @@ type InitableIface struct {
 
 // initableIface is the struct that's finalized.
 type initableIface struct {
-	native *C.GInitableIface
+	native unsafe.Pointer
 }
+
+var GIRInfoInitableIface = girepository.MustFind("Gio", "InitableIface")

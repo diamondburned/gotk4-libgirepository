@@ -3,20 +3,21 @@
 package gdk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeGLTexture = coreglib.Type(C.gdk_gl_texture_get_type())
+	GTypeGLTexture = coreglib.Type(girepository.MustFind("Gdk", "GLTexture").RegisteredGType())
 )
 
 func init() {
@@ -48,17 +49,4 @@ func wrapGLTexture(obj *coreglib.Object) *GLTexture {
 
 func marshalGLTexture(p uintptr) (interface{}, error) {
 	return wrapGLTexture(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// Release releases the GL resources held by a GdkGLTexture.
-//
-// The texture contents are still available via the gdk.Texture.Download()
-// function, after this function has been called.
-func (self *GLTexture) Release() {
-	var _arg0 *C.GdkGLTexture // out
-
-	_arg0 = (*C.GdkGLTexture)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	C.gdk_gl_texture_release(_arg0)
-	runtime.KeepAlive(self)
 }

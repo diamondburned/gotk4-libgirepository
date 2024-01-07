@@ -8,8 +8,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_Text_ConnectActivate
@@ -76,28 +78,6 @@ func _gotk4_gtk4_Text_ConnectCutClipboard(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gtk4_Text_ConnectDeleteFromCursor
-func _gotk4_gtk4_Text_ConnectDeleteFromCursor(arg0 C.gpointer, arg1 C.GtkDeleteType, arg2 C.gint, arg3 C.guintptr) {
-	var f func(typ DeleteType, count int)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(typ DeleteType, count int))
-	}
-
-	var _typ DeleteType // out
-	var _count int      // out
-
-	_typ = DeleteType(arg1)
-	_count = int(arg2)
-
-	f(_typ, _count)
-}
-
 //export _gotk4_gtk4_Text_ConnectInsertAtCursor
 func _gotk4_gtk4_Text_ConnectInsertAtCursor(arg0 C.gpointer, arg1 *C.gchar, arg2 C.guintptr) {
 	var f func(str string)
@@ -132,32 +112,6 @@ func _gotk4_gtk4_Text_ConnectInsertEmoji(arg0 C.gpointer, arg1 C.guintptr) {
 	}
 
 	f()
-}
-
-//export _gotk4_gtk4_Text_ConnectMoveCursor
-func _gotk4_gtk4_Text_ConnectMoveCursor(arg0 C.gpointer, arg1 C.GtkMovementStep, arg2 C.gint, arg3 C.gboolean, arg4 C.guintptr) {
-	var f func(step MovementStep, count int, extend bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(step MovementStep, count int, extend bool))
-	}
-
-	var _step MovementStep // out
-	var _count int         // out
-	var _extend bool       // out
-
-	_step = MovementStep(arg1)
-	_count = int(arg2)
-	if arg3 != 0 {
-		_extend = true
-	}
-
-	f(_step, _count, _extend)
 }
 
 //export _gotk4_gtk4_Text_ConnectPasteClipboard

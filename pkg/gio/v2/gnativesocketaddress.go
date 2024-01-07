@@ -3,21 +3,22 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeNativeSocketAddress = coreglib.Type(C.g_native_socket_address_get_type())
+	GTypeNativeSocketAddress = coreglib.Type(girepository.MustFind("Gio", "NativeSocketAddress").RegisteredGType())
 )
 
 func init() {
@@ -75,36 +76,6 @@ func marshalNativeSocketAddress(p uintptr) (interface{}, error) {
 	return wrapNativeSocketAddress(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewNativeSocketAddress creates a new SocketAddress for native and len.
-//
-// The function takes the following parameters:
-//
-//    - native (optional) address object.
-//    - len: length of native, in bytes.
-//
-// The function returns the following values:
-//
-//    - nativeSocketAddress: new SocketAddress.
-//
-func NewNativeSocketAddress(native unsafe.Pointer, len uint) *NativeSocketAddress {
-	var _arg1 C.gpointer        // out
-	var _arg2 C.gsize           // out
-	var _cret *C.GSocketAddress // in
-
-	_arg1 = (C.gpointer)(unsafe.Pointer(native))
-	_arg2 = C.gsize(len)
-
-	_cret = C.g_native_socket_address_new(_arg1, _arg2)
-	runtime.KeepAlive(native)
-	runtime.KeepAlive(len)
-
-	var _nativeSocketAddress *NativeSocketAddress // out
-
-	_nativeSocketAddress = wrapNativeSocketAddress(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _nativeSocketAddress
-}
-
 // NativeSocketAddressClass: instance of this type is always passed by
 // reference.
 type NativeSocketAddressClass struct {
@@ -113,12 +84,7 @@ type NativeSocketAddressClass struct {
 
 // nativeSocketAddressClass is the struct that's finalized.
 type nativeSocketAddressClass struct {
-	native *C.GNativeSocketAddressClass
+	native unsafe.Pointer
 }
 
-func (n *NativeSocketAddressClass) ParentClass() *SocketAddressClass {
-	valptr := &n.native.parent_class
-	var _v *SocketAddressClass // out
-	_v = (*SocketAddressClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoNativeSocketAddressClass = girepository.MustFind("Gio", "NativeSocketAddressClass")

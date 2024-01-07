@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_PageSetupDoneFunc
-func _gotk4_gtk4_PageSetupDoneFunc(arg1 *C.GtkPageSetup, arg2 C.gpointer) {
+func _gotk4_gtk4_PageSetupDoneFunc(arg1 *C.void, arg2 C.gpointer) {
 	var fn PageSetupDoneFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -32,7 +34,7 @@ func _gotk4_gtk4_PageSetupDoneFunc(arg1 *C.GtkPageSetup, arg2 C.gpointer) {
 }
 
 //export _gotk4_gtk4_PrintOperation_ConnectBeginPrint
-func _gotk4_gtk4_PrintOperation_ConnectBeginPrint(arg0 C.gpointer, arg1 *C.GtkPrintContext, arg2 C.guintptr) {
+func _gotk4_gtk4_PrintOperation_ConnectBeginPrint(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(context *PrintContext)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -74,7 +76,7 @@ func _gotk4_gtk4_PrintOperation_ConnectCreateCustomWidget(arg0 C.gpointer, arg1 
 }
 
 //export _gotk4_gtk4_PrintOperation_ConnectCustomWidgetApply
-func _gotk4_gtk4_PrintOperation_ConnectCustomWidgetApply(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guintptr) {
+func _gotk4_gtk4_PrintOperation_ConnectCustomWidgetApply(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(widget Widgetter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -109,28 +111,8 @@ func _gotk4_gtk4_PrintOperation_ConnectCustomWidgetApply(arg0 C.gpointer, arg1 *
 	f(_widget)
 }
 
-//export _gotk4_gtk4_PrintOperation_ConnectDone
-func _gotk4_gtk4_PrintOperation_ConnectDone(arg0 C.gpointer, arg1 C.GtkPrintOperationResult, arg2 C.guintptr) {
-	var f func(result PrintOperationResult)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(result PrintOperationResult))
-	}
-
-	var _result PrintOperationResult // out
-
-	_result = PrintOperationResult(arg1)
-
-	f(_result)
-}
-
 //export _gotk4_gtk4_PrintOperation_ConnectDrawPage
-func _gotk4_gtk4_PrintOperation_ConnectDrawPage(arg0 C.gpointer, arg1 *C.GtkPrintContext, arg2 C.gint, arg3 C.guintptr) {
+func _gotk4_gtk4_PrintOperation_ConnectDrawPage(arg0 C.gpointer, arg1 *C.void, arg2 C.gint, arg3 C.guintptr) {
 	var f func(context *PrintContext, pageNr int)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -152,7 +134,7 @@ func _gotk4_gtk4_PrintOperation_ConnectDrawPage(arg0 C.gpointer, arg1 *C.GtkPrin
 }
 
 //export _gotk4_gtk4_PrintOperation_ConnectEndPrint
-func _gotk4_gtk4_PrintOperation_ConnectEndPrint(arg0 C.gpointer, arg1 *C.GtkPrintContext, arg2 C.guintptr) {
+func _gotk4_gtk4_PrintOperation_ConnectEndPrint(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(context *PrintContext)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -172,7 +154,7 @@ func _gotk4_gtk4_PrintOperation_ConnectEndPrint(arg0 C.gpointer, arg1 *C.GtkPrin
 }
 
 //export _gotk4_gtk4_PrintOperation_ConnectPaginate
-func _gotk4_gtk4_PrintOperation_ConnectPaginate(arg0 C.gpointer, arg1 *C.GtkPrintContext, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_PrintOperation_ConnectPaginate(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(context *PrintContext) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -200,7 +182,7 @@ func _gotk4_gtk4_PrintOperation_ConnectPaginate(arg0 C.gpointer, arg1 *C.GtkPrin
 }
 
 //export _gotk4_gtk4_PrintOperation_ConnectPreview
-func _gotk4_gtk4_PrintOperation_ConnectPreview(arg0 C.gpointer, arg1 *C.GtkPrintOperationPreview, arg2 *C.GtkPrintContext, arg3 *C.GtkWindow, arg4 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_PrintOperation_ConnectPreview(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.guintptr) (cret C.gboolean) {
 	var f func(preview PrintOperationPreviewer, context *PrintContext, parent *Window) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
@@ -250,7 +232,7 @@ func _gotk4_gtk4_PrintOperation_ConnectPreview(arg0 C.gpointer, arg1 *C.GtkPrint
 }
 
 //export _gotk4_gtk4_PrintOperation_ConnectRequestPageSetup
-func _gotk4_gtk4_PrintOperation_ConnectRequestPageSetup(arg0 C.gpointer, arg1 *C.GtkPrintContext, arg2 C.gint, arg3 *C.GtkPageSetup, arg4 C.guintptr) {
+func _gotk4_gtk4_PrintOperation_ConnectRequestPageSetup(arg0 C.gpointer, arg1 *C.void, arg2 C.gint, arg3 *C.void, arg4 C.guintptr) {
 	var f func(context *PrintContext, pageNr int, setup *PageSetup)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
@@ -290,7 +272,7 @@ func _gotk4_gtk4_PrintOperation_ConnectStatusChanged(arg0 C.gpointer, arg1 C.gui
 }
 
 //export _gotk4_gtk4_PrintOperation_ConnectUpdateCustomWidget
-func _gotk4_gtk4_PrintOperation_ConnectUpdateCustomWidget(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 *C.GtkPageSetup, arg3 *C.GtkPrintSettings, arg4 C.guintptr) {
+func _gotk4_gtk4_PrintOperation_ConnectUpdateCustomWidget(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.guintptr) {
 	var f func(widget Widgetter, setup *PageSetup, settings *PrintSettings)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))

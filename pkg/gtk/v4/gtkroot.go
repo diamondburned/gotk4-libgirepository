@@ -3,21 +3,21 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeRoot = coreglib.Type(C.gtk_root_get_type())
+	GTypeRoot = coreglib.Type(girepository.MustFind("Gtk", "Root").RegisteredGType())
 )
 
 func init() {
@@ -53,13 +53,7 @@ var ()
 type Rooter interface {
 	coreglib.Objector
 
-	// Display returns the display that this GtkRoot is on.
-	Display() *gdk.Display
-	// Focus retrieves the current focused widget within the root.
-	Focus() Widgetter
-	// SetFocus: if focus is not the current focus widget, and is focusable,
-	// sets it as the focus widget for the root.
-	SetFocus(focus Widgetter)
+	baseRoot() *Root
 }
 
 var _ Rooter = (*Root)(nil)
@@ -90,97 +84,11 @@ func marshalRoot(p uintptr) (interface{}, error) {
 	return wrapRoot(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Display returns the display that this GtkRoot is on.
-//
-// The function returns the following values:
-//
-//    - display of root.
-//
-func (self *Root) Display() *gdk.Display {
-	var _arg0 *C.GtkRoot    // out
-	var _cret *C.GdkDisplay // in
-
-	_arg0 = (*C.GtkRoot)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_root_get_display(_arg0)
-	runtime.KeepAlive(self)
-
-	var _display *gdk.Display // out
-
-	{
-		obj := coreglib.Take(unsafe.Pointer(_cret))
-		_display = &gdk.Display{
-			Object: obj,
-		}
-	}
-
-	return _display
+func (v *Root) baseRoot() *Root {
+	return v
 }
 
-// Focus retrieves the current focused widget within the root.
-//
-// Note that this is the widget that would have the focus if the root is active;
-// if the root is not focused then gtk_widget_has_focus (widget) will be FALSE
-// for the widget.
-//
-// The function returns the following values:
-//
-//    - widget (optional): currently focused widget, or NULL if there is none.
-//
-func (self *Root) Focus() Widgetter {
-	var _arg0 *C.GtkRoot   // out
-	var _cret *C.GtkWidget // in
-
-	_arg0 = (*C.GtkRoot)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_root_get_focus(_arg0)
-	runtime.KeepAlive(self)
-
-	var _widget Widgetter // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Widgetter)
-				return ok
-			})
-			rv, ok := casted.(Widgetter)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-			}
-			_widget = rv
-		}
-	}
-
-	return _widget
-}
-
-// SetFocus: if focus is not the current focus widget, and is focusable, sets it
-// as the focus widget for the root.
-//
-// If focus is NULL, unsets the focus widget for the root.
-//
-// To set the focus to a particular widget in the root, it is usually more
-// convenient to use gtk.Widget.GrabFocus() instead of this function.
-//
-// The function takes the following parameters:
-//
-//    - focus (optional): widget to be the new focus widget, or NULL to unset the
-//      focus widget.
-//
-func (self *Root) SetFocus(focus Widgetter) {
-	var _arg0 *C.GtkRoot   // out
-	var _arg1 *C.GtkWidget // out
-
-	_arg0 = (*C.GtkRoot)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if focus != nil {
-		_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(focus).Native()))
-	}
-
-	C.gtk_root_set_focus(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(focus)
+// BaseRoot returns the underlying base object.
+func BaseRoot(obj Rooter) *Root {
+	return obj.baseRoot()
 }

@@ -10,14 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_TreeSelectionForEachFunc
-func _gotk4_gtk3_TreeSelectionForEachFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreePath, arg3 *C.GtkTreeIter, arg4 C.gpointer) {
+func _gotk4_gtk3_TreeSelectionForEachFunc(arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.gpointer) {
 	var fn TreeSelectionForEachFunc
 	{
 		v := gbox.Get(uintptr(arg4))
@@ -55,7 +55,7 @@ func _gotk4_gtk3_TreeSelectionForEachFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreeP
 }
 
 //export _gotk4_gtk3_TreeSelectionFunc
-func _gotk4_gtk3_TreeSelectionFunc(arg1 *C.GtkTreeSelection, arg2 *C.GtkTreeModel, arg3 *C.GtkTreePath, arg4 C.gboolean, arg5 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk3_TreeSelectionFunc(arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.gboolean, arg5 C.gpointer) (cret C.gboolean) {
 	var fn TreeSelectionFunc
 	{
 		v := gbox.Get(uintptr(arg5))

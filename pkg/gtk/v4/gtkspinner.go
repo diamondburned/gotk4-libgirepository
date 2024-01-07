@@ -3,20 +3,21 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSpinner = coreglib.Type(C.gtk_spinner_get_type())
+	GTypeSpinner = coreglib.Type(girepository.MustFind("Gtk", "Spinner").RegisteredGType())
 )
 
 func init() {
@@ -71,86 +72,4 @@ func wrapSpinner(obj *coreglib.Object) *Spinner {
 
 func marshalSpinner(p uintptr) (interface{}, error) {
 	return wrapSpinner(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewSpinner returns a new spinner widget. Not yet started.
-//
-// The function returns the following values:
-//
-//    - spinner: new GtkSpinner.
-//
-func NewSpinner() *Spinner {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_spinner_new()
-
-	var _spinner *Spinner // out
-
-	_spinner = wrapSpinner(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _spinner
-}
-
-// Spinning returns whether the spinner is spinning.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the spinner is active.
-//
-func (spinner *Spinner) Spinning() bool {
-	var _arg0 *C.GtkSpinner // out
-	var _cret C.gboolean    // in
-
-	_arg0 = (*C.GtkSpinner)(unsafe.Pointer(coreglib.InternObject(spinner).Native()))
-
-	_cret = C.gtk_spinner_get_spinning(_arg0)
-	runtime.KeepAlive(spinner)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetSpinning sets the activity of the spinner.
-//
-// The function takes the following parameters:
-//
-//    - spinning: whether the spinner should be spinning.
-//
-func (spinner *Spinner) SetSpinning(spinning bool) {
-	var _arg0 *C.GtkSpinner // out
-	var _arg1 C.gboolean    // out
-
-	_arg0 = (*C.GtkSpinner)(unsafe.Pointer(coreglib.InternObject(spinner).Native()))
-	if spinning {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_spinner_set_spinning(_arg0, _arg1)
-	runtime.KeepAlive(spinner)
-	runtime.KeepAlive(spinning)
-}
-
-// Start starts the animation of the spinner.
-func (spinner *Spinner) Start() {
-	var _arg0 *C.GtkSpinner // out
-
-	_arg0 = (*C.GtkSpinner)(unsafe.Pointer(coreglib.InternObject(spinner).Native()))
-
-	C.gtk_spinner_start(_arg0)
-	runtime.KeepAlive(spinner)
-}
-
-// Stop stops the animation of the spinner.
-func (spinner *Spinner) Stop() {
-	var _arg0 *C.GtkSpinner // out
-
-	_arg0 = (*C.GtkSpinner)(unsafe.Pointer(coreglib.InternObject(spinner).Native()))
-
-	C.gtk_spinner_stop(_arg0)
-	runtime.KeepAlive(spinner)
 }

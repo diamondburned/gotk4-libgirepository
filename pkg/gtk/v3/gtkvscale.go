@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeVScale = coreglib.Type(C.gtk_vscale_get_type())
+	GTypeVScale = coreglib.Type(girepository.MustFind("Gtk", "VScale").RegisteredGType())
 )
 
 func init() {
@@ -98,78 +97,6 @@ func marshalVScale(p uintptr) (interface{}, error) {
 	return wrapVScale(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewVScale creates a new VScale.
-//
-// Deprecated: Use gtk_scale_new() with GTK_ORIENTATION_VERTICAL instead.
-//
-// The function takes the following parameters:
-//
-//    - adjustment which sets the range of the scale.
-//
-// The function returns the following values:
-//
-//    - vScale: new VScale.
-//
-func NewVScale(adjustment *Adjustment) *VScale {
-	var _arg1 *C.GtkAdjustment // out
-	var _cret *C.GtkWidget     // in
-
-	_arg1 = (*C.GtkAdjustment)(unsafe.Pointer(coreglib.InternObject(adjustment).Native()))
-
-	_cret = C.gtk_vscale_new(_arg1)
-	runtime.KeepAlive(adjustment)
-
-	var _vScale *VScale // out
-
-	_vScale = wrapVScale(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _vScale
-}
-
-// NewVScaleWithRange creates a new vertical scale widget that lets the user
-// input a number between min and max (including min and max) with the increment
-// step. step must be nonzero; it’s the distance the slider moves when using the
-// arrow keys to adjust the scale value.
-//
-// Note that the way in which the precision is derived works best if step is a
-// power of ten. If the resulting precision is not suitable for your needs, use
-// gtk_scale_set_digits() to correct it.
-//
-// Deprecated: Use gtk_scale_new_with_range() with GTK_ORIENTATION_VERTICAL
-// instead.
-//
-// The function takes the following parameters:
-//
-//    - min: minimum value.
-//    - max: maximum value.
-//    - step increment (tick size) used with keyboard shortcuts.
-//
-// The function returns the following values:
-//
-//    - vScale: new VScale.
-//
-func NewVScaleWithRange(min, max, step float64) *VScale {
-	var _arg1 C.gdouble    // out
-	var _arg2 C.gdouble    // out
-	var _arg3 C.gdouble    // out
-	var _cret *C.GtkWidget // in
-
-	_arg1 = C.gdouble(min)
-	_arg2 = C.gdouble(max)
-	_arg3 = C.gdouble(step)
-
-	_cret = C.gtk_vscale_new_with_range(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(min)
-	runtime.KeepAlive(max)
-	runtime.KeepAlive(step)
-
-	var _vScale *VScale // out
-
-	_vScale = wrapVScale(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _vScale
-}
-
 // VScaleClass: instance of this type is always passed by reference.
 type VScaleClass struct {
 	*vScaleClass
@@ -177,12 +104,7 @@ type VScaleClass struct {
 
 // vScaleClass is the struct that's finalized.
 type vScaleClass struct {
-	native *C.GtkVScaleClass
+	native unsafe.Pointer
 }
 
-func (v *VScaleClass) ParentClass() *ScaleClass {
-	valptr := &v.native.parent_class
-	var _v *ScaleClass // out
-	_v = (*ScaleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoVScaleClass = girepository.MustFind("Gtk", "VScaleClass")

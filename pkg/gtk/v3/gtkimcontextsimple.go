@@ -3,23 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeIMContextSimple = coreglib.Type(C.gtk_im_context_simple_get_type())
+	GTypeIMContextSimple = coreglib.Type(girepository.MustFind("Gtk", "IMContextSimple").RegisteredGType())
 )
 
 func init() {
@@ -93,43 +92,6 @@ func marshalIMContextSimple(p uintptr) (interface{}, error) {
 	return wrapIMContextSimple(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewIMContextSimple creates a new IMContextSimple.
-//
-// The function returns the following values:
-//
-//    - imContextSimple: new IMContextSimple.
-//
-func NewIMContextSimple() *IMContextSimple {
-	var _cret *C.GtkIMContext // in
-
-	_cret = C.gtk_im_context_simple_new()
-
-	var _imContextSimple *IMContextSimple // out
-
-	_imContextSimple = wrapIMContextSimple(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _imContextSimple
-}
-
-// AddComposeFile adds an additional table from the X11 compose file.
-//
-// The function takes the following parameters:
-//
-//    - composeFile: path of compose file.
-//
-func (contextSimple *IMContextSimple) AddComposeFile(composeFile string) {
-	var _arg0 *C.GtkIMContextSimple // out
-	var _arg1 *C.gchar              // out
-
-	_arg0 = (*C.GtkIMContextSimple)(unsafe.Pointer(coreglib.InternObject(contextSimple).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(composeFile)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_im_context_simple_add_compose_file(_arg0, _arg1)
-	runtime.KeepAlive(contextSimple)
-	runtime.KeepAlive(composeFile)
-}
-
 // IMContextSimpleClass: instance of this type is always passed by reference.
 type IMContextSimpleClass struct {
 	*imContextSimpleClass
@@ -137,12 +99,7 @@ type IMContextSimpleClass struct {
 
 // imContextSimpleClass is the struct that's finalized.
 type imContextSimpleClass struct {
-	native *C.GtkIMContextSimpleClass
+	native unsafe.Pointer
 }
 
-func (i *IMContextSimpleClass) ParentClass() *IMContextClass {
-	valptr := &i.native.parent_class
-	var _v *IMContextClass // out
-	_v = (*IMContextClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoIMContextSimpleClass = girepository.MustFind("Gtk", "IMContextSimpleClass")

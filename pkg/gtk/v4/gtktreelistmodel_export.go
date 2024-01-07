@@ -10,12 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_TreeListModelCreateModelFunc
-func _gotk4_gtk4_TreeListModelCreateModelFunc(arg1 C.gpointer, arg2 C.gpointer) (cret *C.GListModel) {
+func _gotk4_gtk4_TreeListModelCreateModelFunc(arg1 C.gpointer, arg2 C.gpointer) (cret *C.void) {
 	var fn TreeListModelCreateModelFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -34,7 +36,7 @@ func _gotk4_gtk4_TreeListModelCreateModelFunc(arg1 C.gpointer, arg2 C.gpointer) 
 	var _ *gio.ListModel
 
 	if listModel != nil {
-		cret = (*C.GListModel)(unsafe.Pointer(coreglib.InternObject(listModel).Native()))
+		cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(listModel).Native()))
 		C.g_object_ref(C.gpointer(coreglib.InternObject(listModel).Native()))
 	}
 

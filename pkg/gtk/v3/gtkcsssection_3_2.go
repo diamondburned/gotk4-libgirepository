@@ -4,25 +4,22 @@ package gtk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeCSSSectionType = coreglib.Type(C.gtk_css_section_type_get_type())
-	GTypeCSSSection     = coreglib.Type(C.gtk_css_section_get_type())
+	GTypeCSSSectionType = coreglib.Type(girepository.MustFind("Gtk", "CssSectionType").RegisteredGType())
+	GTypeCSSSection     = coreglib.Type(girepository.MustFind("Gtk", "CssSection").RegisteredGType())
 )
 
 func init() {
@@ -108,199 +105,12 @@ type CSSSection struct {
 
 // cssSection is the struct that's finalized.
 type cssSection struct {
-	native *C.GtkCssSection
+	native unsafe.Pointer
 }
+
+var GIRInfoCSSSection = girepository.MustFind("Gtk", "CssSection")
 
 func marshalCSSSection(p uintptr) (interface{}, error) {
 	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
-	return &CSSSection{&cssSection{(*C.GtkCssSection)(b)}}, nil
-}
-
-// EndLine returns the line in the CSS document where this section end. The line
-// number is 0-indexed, so the first line of the document will return 0. This
-// value may change in future invocations of this function if section is not yet
-// parsed completely. This will for example happen in the
-// GtkCssProvider::parsing-error signal. The end position and line may be
-// identical to the start position and line for sections which failed to parse
-// anything successfully.
-//
-// The function returns the following values:
-//
-//    - guint: line number.
-//
-func (section *CSSSection) EndLine() uint {
-	var _arg0 *C.GtkCssSection // out
-	var _cret C.guint          // in
-
-	_arg0 = (*C.GtkCssSection)(gextras.StructNative(unsafe.Pointer(section)))
-
-	_cret = C.gtk_css_section_get_end_line(_arg0)
-	runtime.KeepAlive(section)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// EndPosition returns the offset in bytes from the start of the current line
-// returned via gtk_css_section_get_end_line(). This value may change in future
-// invocations of this function if section is not yet parsed completely. This
-// will for example happen in the GtkCssProvider::parsing-error signal. The end
-// position and line may be identical to the start position and line for
-// sections which failed to parse anything successfully.
-//
-// The function returns the following values:
-//
-//    - guint: offset in bytes from the start of the line.
-//
-func (section *CSSSection) EndPosition() uint {
-	var _arg0 *C.GtkCssSection // out
-	var _cret C.guint          // in
-
-	_arg0 = (*C.GtkCssSection)(gextras.StructNative(unsafe.Pointer(section)))
-
-	_cret = C.gtk_css_section_get_end_position(_arg0)
-	runtime.KeepAlive(section)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// File gets the file that section was parsed from. If no such file exists, for
-// example because the CSS was loaded via gtk_css_provider_load_from_data(),
-// then NULL is returned.
-//
-// The function returns the following values:
-//
-//    - file that section was parsed from or NULL if section was parsed from
-//      other data.
-//
-func (section *CSSSection) File() *gio.File {
-	var _arg0 *C.GtkCssSection // out
-	var _cret *C.GFile         // in
-
-	_arg0 = (*C.GtkCssSection)(gextras.StructNative(unsafe.Pointer(section)))
-
-	_cret = C.gtk_css_section_get_file(_arg0)
-	runtime.KeepAlive(section)
-
-	var _file *gio.File // out
-
-	{
-		obj := coreglib.Take(unsafe.Pointer(_cret))
-		_file = &gio.File{
-			Object: obj,
-		}
-	}
-
-	return _file
-}
-
-// Parent gets the parent section for the given section. The parent section is
-// the section that contains this section. A special case are sections of type
-// K_CSS_SECTION_DOCUMENT. Their parent will either be NULL if they are the
-// original CSS document that was loaded by gtk_css_provider_load_from_file() or
-// a section of type K_CSS_SECTION_IMPORT if it was loaded with an import rule
-// from a different file.
-//
-// The function returns the following values:
-//
-//    - cssSection (optional): parent section or NULL if none.
-//
-func (section *CSSSection) Parent() *CSSSection {
-	var _arg0 *C.GtkCssSection // out
-	var _cret *C.GtkCssSection // in
-
-	_arg0 = (*C.GtkCssSection)(gextras.StructNative(unsafe.Pointer(section)))
-
-	_cret = C.gtk_css_section_get_parent(_arg0)
-	runtime.KeepAlive(section)
-
-	var _cssSection *CSSSection // out
-
-	if _cret != nil {
-		_cssSection = (*CSSSection)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		C.gtk_css_section_ref(_cret)
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_cssSection)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.gtk_css_section_unref((*C.GtkCssSection)(intern.C))
-			},
-		)
-	}
-
-	return _cssSection
-}
-
-// SectionType gets the type of information that section describes.
-//
-// The function returns the following values:
-//
-//    - cssSectionType: type of section.
-//
-func (section *CSSSection) SectionType() CSSSectionType {
-	var _arg0 *C.GtkCssSection    // out
-	var _cret C.GtkCssSectionType // in
-
-	_arg0 = (*C.GtkCssSection)(gextras.StructNative(unsafe.Pointer(section)))
-
-	_cret = C.gtk_css_section_get_section_type(_arg0)
-	runtime.KeepAlive(section)
-
-	var _cssSectionType CSSSectionType // out
-
-	_cssSectionType = CSSSectionType(_cret)
-
-	return _cssSectionType
-}
-
-// StartLine returns the line in the CSS document where this section starts. The
-// line number is 0-indexed, so the first line of the document will return 0.
-//
-// The function returns the following values:
-//
-//    - guint: line number.
-//
-func (section *CSSSection) StartLine() uint {
-	var _arg0 *C.GtkCssSection // out
-	var _cret C.guint          // in
-
-	_arg0 = (*C.GtkCssSection)(gextras.StructNative(unsafe.Pointer(section)))
-
-	_cret = C.gtk_css_section_get_start_line(_arg0)
-	runtime.KeepAlive(section)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// StartPosition returns the offset in bytes from the start of the current line
-// returned via gtk_css_section_get_start_line().
-//
-// The function returns the following values:
-//
-//    - guint: offset in bytes from the start of the line.
-//
-func (section *CSSSection) StartPosition() uint {
-	var _arg0 *C.GtkCssSection // out
-	var _cret C.guint          // in
-
-	_arg0 = (*C.GtkCssSection)(gextras.StructNative(unsafe.Pointer(section)))
-
-	_cret = C.gtk_css_section_get_start_position(_arg0)
-	runtime.KeepAlive(section)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
+	return &CSSSection{&cssSection{(unsafe.Pointer)(b)}}, nil
 }

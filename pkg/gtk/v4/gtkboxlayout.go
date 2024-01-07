@@ -3,21 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeBoxLayout = coreglib.Type(C.gtk_box_layout_get_type())
+	GTypeBoxLayout = coreglib.Type(girepository.MustFind("Gtk", "BoxLayout").RegisteredGType())
 )
 
 func init() {
@@ -92,163 +93,6 @@ func marshalBoxLayout(p uintptr) (interface{}, error) {
 	return wrapBoxLayout(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewBoxLayout creates a new GtkBoxLayout.
-//
-// The function takes the following parameters:
-//
-//    - orientation for the new layout.
-//
-// The function returns the following values:
-//
-//    - boxLayout: new box layout.
-//
-func NewBoxLayout(orientation Orientation) *BoxLayout {
-	var _arg1 C.GtkOrientation    // out
-	var _cret *C.GtkLayoutManager // in
-
-	_arg1 = C.GtkOrientation(orientation)
-
-	_cret = C.gtk_box_layout_new(_arg1)
-	runtime.KeepAlive(orientation)
-
-	var _boxLayout *BoxLayout // out
-
-	_boxLayout = wrapBoxLayout(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _boxLayout
-}
-
-// BaselinePosition gets the value set by
-// gtk_box_layout_set_baseline_position().
-//
-// The function returns the following values:
-//
-//    - baselinePosition: baseline position.
-//
-func (boxLayout *BoxLayout) BaselinePosition() BaselinePosition {
-	var _arg0 *C.GtkBoxLayout       // out
-	var _cret C.GtkBaselinePosition // in
-
-	_arg0 = (*C.GtkBoxLayout)(unsafe.Pointer(coreglib.InternObject(boxLayout).Native()))
-
-	_cret = C.gtk_box_layout_get_baseline_position(_arg0)
-	runtime.KeepAlive(boxLayout)
-
-	var _baselinePosition BaselinePosition // out
-
-	_baselinePosition = BaselinePosition(_cret)
-
-	return _baselinePosition
-}
-
-// Homogeneous returns whether the layout is set to be homogeneous.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the layout is homogeneous.
-//
-func (boxLayout *BoxLayout) Homogeneous() bool {
-	var _arg0 *C.GtkBoxLayout // out
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GtkBoxLayout)(unsafe.Pointer(coreglib.InternObject(boxLayout).Native()))
-
-	_cret = C.gtk_box_layout_get_homogeneous(_arg0)
-	runtime.KeepAlive(boxLayout)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Spacing returns the space that box_layout puts between children.
-//
-// The function returns the following values:
-//
-//    - guint: spacing of the layout.
-//
-func (boxLayout *BoxLayout) Spacing() uint {
-	var _arg0 *C.GtkBoxLayout // out
-	var _cret C.guint         // in
-
-	_arg0 = (*C.GtkBoxLayout)(unsafe.Pointer(coreglib.InternObject(boxLayout).Native()))
-
-	_cret = C.gtk_box_layout_get_spacing(_arg0)
-	runtime.KeepAlive(boxLayout)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// SetBaselinePosition sets the baseline position of a box layout.
-//
-// The baseline position affects only horizontal boxes with at least one
-// baseline aligned child. If there is more vertical space available than
-// requested, and the baseline is not allocated by the parent then the given
-// position is used to allocate the baseline within the extra space available.
-//
-// The function takes the following parameters:
-//
-//    - position: GtkBaselinePosition.
-//
-func (boxLayout *BoxLayout) SetBaselinePosition(position BaselinePosition) {
-	var _arg0 *C.GtkBoxLayout       // out
-	var _arg1 C.GtkBaselinePosition // out
-
-	_arg0 = (*C.GtkBoxLayout)(unsafe.Pointer(coreglib.InternObject(boxLayout).Native()))
-	_arg1 = C.GtkBaselinePosition(position)
-
-	C.gtk_box_layout_set_baseline_position(_arg0, _arg1)
-	runtime.KeepAlive(boxLayout)
-	runtime.KeepAlive(position)
-}
-
-// SetHomogeneous sets whether the box layout will allocate the same size to all
-// children.
-//
-// The function takes the following parameters:
-//
-//    - homogeneous: TRUE to set the box layout as homogeneous.
-//
-func (boxLayout *BoxLayout) SetHomogeneous(homogeneous bool) {
-	var _arg0 *C.GtkBoxLayout // out
-	var _arg1 C.gboolean      // out
-
-	_arg0 = (*C.GtkBoxLayout)(unsafe.Pointer(coreglib.InternObject(boxLayout).Native()))
-	if homogeneous {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_box_layout_set_homogeneous(_arg0, _arg1)
-	runtime.KeepAlive(boxLayout)
-	runtime.KeepAlive(homogeneous)
-}
-
-// SetSpacing sets how much spacing to put between children.
-//
-// The function takes the following parameters:
-//
-//    - spacing to apply between children.
-//
-func (boxLayout *BoxLayout) SetSpacing(spacing uint) {
-	var _arg0 *C.GtkBoxLayout // out
-	var _arg1 C.guint         // out
-
-	_arg0 = (*C.GtkBoxLayout)(unsafe.Pointer(coreglib.InternObject(boxLayout).Native()))
-	_arg1 = C.guint(spacing)
-
-	C.gtk_box_layout_set_spacing(_arg0, _arg1)
-	runtime.KeepAlive(boxLayout)
-	runtime.KeepAlive(spacing)
-}
-
 // BoxLayoutClass: instance of this type is always passed by reference.
 type BoxLayoutClass struct {
 	*boxLayoutClass
@@ -256,12 +100,7 @@ type BoxLayoutClass struct {
 
 // boxLayoutClass is the struct that's finalized.
 type boxLayoutClass struct {
-	native *C.GtkBoxLayoutClass
+	native unsafe.Pointer
 }
 
-func (b *BoxLayoutClass) ParentClass() *LayoutManagerClass {
-	valptr := &b.native.parent_class
-	var _v *LayoutManagerClass // out
-	_v = (*LayoutManagerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoBoxLayoutClass = girepository.MustFind("Gtk", "BoxLayoutClass")

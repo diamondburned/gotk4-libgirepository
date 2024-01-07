@@ -9,14 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_ListBoxForEachFunc
-func _gotk4_gtk3_ListBoxForEachFunc(arg1 *C.GtkListBox, arg2 *C.GtkListBoxRow, arg3 C.gpointer) {
+func _gotk4_gtk3_ListBoxForEachFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) {
 	var fn ListBoxForEachFunc
 	{
 		v := gbox.Get(uintptr(arg3))

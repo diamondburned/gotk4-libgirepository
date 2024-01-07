@@ -127,7 +127,7 @@ func (conv *Converter) Header() *file.Header {
 }
 
 // ConvertAll converts all values.
-func (conv *Converter) ConvertAll() []ValueConverted {
+func (conv *Converter) ConvertAll() ValuesConverted {
 	// Allow calling with a nil Converter to allow the constructor to return
 	// a nil, but make it convenient enough that the caller wouldn't have to
 	// check.

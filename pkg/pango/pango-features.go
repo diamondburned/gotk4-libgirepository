@@ -2,8 +2,10 @@
 
 package pango
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <pango/pango.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // VERSION_MAJOR: major component of the version of Pango available at

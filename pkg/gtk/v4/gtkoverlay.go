@@ -3,22 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// extern gboolean _gotk4_gtk4_Overlay_ConnectGetChildPosition(gpointer, GtkWidget*, GdkRectangle*, guintptr);
+// extern gboolean _gotk4_gtk4_Overlay_ConnectGetChildPosition(gpointer, void*, void*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeOverlay = coreglib.Type(C.gtk_overlay_get_type())
+	GTypeOverlay = coreglib.Type(girepository.MustFind("Gtk", "Overlay").RegisteredGType())
 )
 
 func init() {
@@ -103,240 +104,6 @@ func marshalOverlay(p uintptr) (interface{}, error) {
 // (except that an alignment of GTK_ALIGN_FILL will cause the overlay to be
 // full-width/height). If the main child is a GtkScrolledWindow, the overlays
 // are placed relative to its contents.
-func (overlay *Overlay) ConnectGetChildPosition(f func(widget Widgetter) (allocation *gdk.Rectangle, ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(overlay, "get-child-position", false, unsafe.Pointer(C._gotk4_gtk4_Overlay_ConnectGetChildPosition), f)
-}
-
-// NewOverlay creates a new GtkOverlay.
-//
-// The function returns the following values:
-//
-//    - overlay: new GtkOverlay object.
-//
-func NewOverlay() *Overlay {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_overlay_new()
-
-	var _overlay *Overlay // out
-
-	_overlay = wrapOverlay(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _overlay
-}
-
-// AddOverlay adds widget to overlay.
-//
-// The widget will be stacked on top of the main widget added with
-// gtk.Overlay.SetChild().
-//
-// The position at which widget is placed is determined from its
-// gtk.Widget:halign and gtk.Widget:valign properties.
-//
-// The function takes the following parameters:
-//
-//    - widget: GtkWidget to be added to the container.
-//
-func (overlay *Overlay) AddOverlay(widget Widgetter) {
-	var _arg0 *C.GtkOverlay // out
-	var _arg1 *C.GtkWidget  // out
-
-	_arg0 = (*C.GtkOverlay)(unsafe.Pointer(coreglib.InternObject(overlay).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-
-	C.gtk_overlay_add_overlay(_arg0, _arg1)
-	runtime.KeepAlive(overlay)
-	runtime.KeepAlive(widget)
-}
-
-// Child gets the child widget of overlay.
-//
-// The function returns the following values:
-//
-//    - widget (optional): child widget of overlay.
-//
-func (overlay *Overlay) Child() Widgetter {
-	var _arg0 *C.GtkOverlay // out
-	var _cret *C.GtkWidget  // in
-
-	_arg0 = (*C.GtkOverlay)(unsafe.Pointer(coreglib.InternObject(overlay).Native()))
-
-	_cret = C.gtk_overlay_get_child(_arg0)
-	runtime.KeepAlive(overlay)
-
-	var _widget Widgetter // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Widgetter)
-				return ok
-			})
-			rv, ok := casted.(Widgetter)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-			}
-			_widget = rv
-		}
-	}
-
-	return _widget
-}
-
-// ClipOverlay gets whether widget should be clipped within the parent.
-//
-// The function takes the following parameters:
-//
-//    - widget: overlay child of GtkOverlay.
-//
-// The function returns the following values:
-//
-//    - ok: whether the widget is clipped within the parent.
-//
-func (overlay *Overlay) ClipOverlay(widget Widgetter) bool {
-	var _arg0 *C.GtkOverlay // out
-	var _arg1 *C.GtkWidget  // out
-	var _cret C.gboolean    // in
-
-	_arg0 = (*C.GtkOverlay)(unsafe.Pointer(coreglib.InternObject(overlay).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-
-	_cret = C.gtk_overlay_get_clip_overlay(_arg0, _arg1)
-	runtime.KeepAlive(overlay)
-	runtime.KeepAlive(widget)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// MeasureOverlay gets whether widget's size is included in the measurement of
-// overlay.
-//
-// The function takes the following parameters:
-//
-//    - widget: overlay child of GtkOverlay.
-//
-// The function returns the following values:
-//
-//    - ok: whether the widget is measured.
-//
-func (overlay *Overlay) MeasureOverlay(widget Widgetter) bool {
-	var _arg0 *C.GtkOverlay // out
-	var _arg1 *C.GtkWidget  // out
-	var _cret C.gboolean    // in
-
-	_arg0 = (*C.GtkOverlay)(unsafe.Pointer(coreglib.InternObject(overlay).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-
-	_cret = C.gtk_overlay_get_measure_overlay(_arg0, _arg1)
-	runtime.KeepAlive(overlay)
-	runtime.KeepAlive(widget)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// RemoveOverlay removes an overlay that was added with
-// gtk_overlay_add_overlay().
-//
-// The function takes the following parameters:
-//
-//    - widget: GtkWidget to be removed.
-//
-func (overlay *Overlay) RemoveOverlay(widget Widgetter) {
-	var _arg0 *C.GtkOverlay // out
-	var _arg1 *C.GtkWidget  // out
-
-	_arg0 = (*C.GtkOverlay)(unsafe.Pointer(coreglib.InternObject(overlay).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-
-	C.gtk_overlay_remove_overlay(_arg0, _arg1)
-	runtime.KeepAlive(overlay)
-	runtime.KeepAlive(widget)
-}
-
-// SetChild sets the child widget of overlay.
-//
-// The function takes the following parameters:
-//
-//    - child (optional) widget.
-//
-func (overlay *Overlay) SetChild(child Widgetter) {
-	var _arg0 *C.GtkOverlay // out
-	var _arg1 *C.GtkWidget  // out
-
-	_arg0 = (*C.GtkOverlay)(unsafe.Pointer(coreglib.InternObject(overlay).Native()))
-	if child != nil {
-		_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-	}
-
-	C.gtk_overlay_set_child(_arg0, _arg1)
-	runtime.KeepAlive(overlay)
-	runtime.KeepAlive(child)
-}
-
-// SetClipOverlay sets whether widget should be clipped within the parent.
-//
-// The function takes the following parameters:
-//
-//    - widget: overlay child of GtkOverlay.
-//    - clipOverlay: whether the child should be clipped.
-//
-func (overlay *Overlay) SetClipOverlay(widget Widgetter, clipOverlay bool) {
-	var _arg0 *C.GtkOverlay // out
-	var _arg1 *C.GtkWidget  // out
-	var _arg2 C.gboolean    // out
-
-	_arg0 = (*C.GtkOverlay)(unsafe.Pointer(coreglib.InternObject(overlay).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-	if clipOverlay {
-		_arg2 = C.TRUE
-	}
-
-	C.gtk_overlay_set_clip_overlay(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(overlay)
-	runtime.KeepAlive(widget)
-	runtime.KeepAlive(clipOverlay)
-}
-
-// SetMeasureOverlay sets whether widget is included in the measured size of
-// overlay.
-//
-// The overlay will request the size of the largest child that has this property
-// set to TRUE. Children who are not included may be drawn outside of overlay's
-// allocation if they are too large.
-//
-// The function takes the following parameters:
-//
-//    - widget: overlay child of GtkOverlay.
-//    - measure: whether the child should be measured.
-//
-func (overlay *Overlay) SetMeasureOverlay(widget Widgetter, measure bool) {
-	var _arg0 *C.GtkOverlay // out
-	var _arg1 *C.GtkWidget  // out
-	var _arg2 C.gboolean    // out
-
-	_arg0 = (*C.GtkOverlay)(unsafe.Pointer(coreglib.InternObject(overlay).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-	if measure {
-		_arg2 = C.TRUE
-	}
-
-	C.gtk_overlay_set_measure_overlay(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(overlay)
-	runtime.KeepAlive(widget)
-	runtime.KeepAlive(measure)
+func (v *Overlay) ConnectGetChildPosition(f func(widget Widgetter) (allocation *gdk.Rectangle, ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "get-child-position", false, unsafe.Pointer(C._gotk4_gtk4_Overlay_ConnectGetChildPosition), f)
 }

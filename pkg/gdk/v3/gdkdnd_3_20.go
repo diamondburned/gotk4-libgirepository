@@ -4,20 +4,21 @@ package gdk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDragCancelReason = coreglib.Type(C.gdk_drag_cancel_reason_get_type())
+	GTypeDragCancelReason = coreglib.Type(girepository.MustFind("Gdk", "DragCancelReason").RegisteredGType())
 )
 
 func init() {
@@ -55,33 +56,4 @@ func (d DragCancelReason) String() string {
 	default:
 		return fmt.Sprintf("DragCancelReason(%d)", d)
 	}
-}
-
-// DragDropDone: inform GDK if the drop ended successfully. Passing FALSE for
-// success may trigger a drag cancellation animation.
-//
-// This function is called by the drag source, and should be the last call
-// before dropping the reference to the context.
-//
-// The DragContext will only take the first gdk_drag_drop_done() call as
-// effective, if this function is called multiple times, all subsequent calls
-// will be ignored.
-//
-// The function takes the following parameters:
-//
-//    - context: DragContext.
-//    - success: whether the drag was ultimatively successful.
-//
-func DragDropDone(context *DragContext, success bool) {
-	var _arg1 *C.GdkDragContext // out
-	var _arg2 C.gboolean        // out
-
-	_arg1 = (*C.GdkDragContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-	if success {
-		_arg2 = C.TRUE
-	}
-
-	C.gdk_drag_drop_done(_arg1, _arg2)
-	runtime.KeepAlive(context)
-	runtime.KeepAlive(success)
 }

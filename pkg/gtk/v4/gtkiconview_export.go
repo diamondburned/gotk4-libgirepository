@@ -10,12 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_IconViewForEachFunc
-func _gotk4_gtk4_IconViewForEachFunc(arg1 *C.GtkIconView, arg2 *C.GtkTreePath, arg3 C.gpointer) {
+func _gotk4_gtk4_IconViewForEachFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) {
 	var fn IconViewForEachFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -59,7 +61,7 @@ func _gotk4_gtk4_IconView_ConnectActivateCursorItem(arg0 C.gpointer, arg1 C.guin
 }
 
 //export _gotk4_gtk4_IconView_ConnectItemActivated
-func _gotk4_gtk4_IconView_ConnectItemActivated(arg0 C.gpointer, arg1 *C.GtkTreePath, arg2 C.guintptr) {
+func _gotk4_gtk4_IconView_ConnectItemActivated(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(path *TreePath)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -76,44 +78,6 @@ func _gotk4_gtk4_IconView_ConnectItemActivated(arg0 C.gpointer, arg1 *C.GtkTreeP
 	_path = (*TreePath)(gextras.NewStructNative(unsafe.Pointer(arg1)))
 
 	f(_path)
-}
-
-//export _gotk4_gtk4_IconView_ConnectMoveCursor
-func _gotk4_gtk4_IconView_ConnectMoveCursor(arg0 C.gpointer, arg1 C.GtkMovementStep, arg2 C.gint, arg3 C.gboolean, arg4 C.gboolean, arg5 C.guintptr) (cret C.gboolean) {
-	var f func(step MovementStep, count int, extend, modify bool) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(step MovementStep, count int, extend, modify bool) (ok bool))
-	}
-
-	var _step MovementStep // out
-	var _count int         // out
-	var _extend bool       // out
-	var _modify bool       // out
-
-	_step = MovementStep(arg1)
-	_count = int(arg2)
-	if arg3 != 0 {
-		_extend = true
-	}
-	if arg4 != 0 {
-		_modify = true
-	}
-
-	ok := f(_step, _count, _extend, _modify)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
 }
 
 //export _gotk4_gtk4_IconView_ConnectSelectAll

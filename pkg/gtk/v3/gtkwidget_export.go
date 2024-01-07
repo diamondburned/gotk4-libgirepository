@@ -13,14 +13,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_Callback
-func _gotk4_gtk3_Callback(arg1 *C.GtkWidget, arg2 C.gpointer) {
+func _gotk4_gtk3_Callback(arg1 *C.void, arg2 C.gpointer) {
 	var fn Callback
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -54,7 +54,7 @@ func _gotk4_gtk3_Callback(arg1 *C.GtkWidget, arg2 C.gpointer) {
 }
 
 //export _gotk4_gtk3_Widget_ConnectButtonPressEvent
-func _gotk4_gtk3_Widget_ConnectButtonPressEvent(arg0 C.gpointer, arg1 *C.GdkEventButton, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectButtonPressEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventButton) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -82,7 +82,7 @@ func _gotk4_gtk3_Widget_ConnectButtonPressEvent(arg0 C.gpointer, arg1 *C.GdkEven
 }
 
 //export _gotk4_gtk3_Widget_ConnectButtonReleaseEvent
-func _gotk4_gtk3_Widget_ConnectButtonReleaseEvent(arg0 C.gpointer, arg1 *C.GdkEventButton, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectButtonReleaseEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventButton) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -154,7 +154,7 @@ func _gotk4_gtk3_Widget_ConnectCompositedChanged(arg0 C.gpointer, arg1 C.guintpt
 }
 
 //export _gotk4_gtk3_Widget_ConnectConfigureEvent
-func _gotk4_gtk3_Widget_ConnectConfigureEvent(arg0 C.gpointer, arg1 *C.GdkEventConfigure, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectConfigureEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventConfigure) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -182,7 +182,7 @@ func _gotk4_gtk3_Widget_ConnectConfigureEvent(arg0 C.gpointer, arg1 *C.GdkEventC
 }
 
 //export _gotk4_gtk3_Widget_ConnectDamageEvent
-func _gotk4_gtk3_Widget_ConnectDamageEvent(arg0 C.gpointer, arg1 *C.GdkEventExpose, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectDamageEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventExpose) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -197,38 +197,6 @@ func _gotk4_gtk3_Widget_ConnectDamageEvent(arg0 C.gpointer, arg1 *C.GdkEventExpo
 	var _event *gdk.EventExpose // out
 
 	_event = (*gdk.EventExpose)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-
-	ok := f(_event)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_gtk3_Widget_ConnectDeleteEvent
-func _gotk4_gtk3_Widget_ConnectDeleteEvent(arg0 C.gpointer, arg1 C.GdkEvent, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(event *gdk.Event) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(event *gdk.Event) (ok bool))
-	}
-
-	var _event *gdk.Event // out
-
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer((&arg1))))
-		v = gdk.CopyEventer(v)
-		_event = v
-	}
 
 	ok := f(_event)
 
@@ -257,60 +225,8 @@ func _gotk4_gtk3_Widget_ConnectDestroy(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gtk3_Widget_ConnectDestroyEvent
-func _gotk4_gtk3_Widget_ConnectDestroyEvent(arg0 C.gpointer, arg1 C.GdkEvent, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(event *gdk.Event) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(event *gdk.Event) (ok bool))
-	}
-
-	var _event *gdk.Event // out
-
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer((&arg1))))
-		v = gdk.CopyEventer(v)
-		_event = v
-	}
-
-	ok := f(_event)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_gtk3_Widget_ConnectDirectionChanged
-func _gotk4_gtk3_Widget_ConnectDirectionChanged(arg0 C.gpointer, arg1 C.GtkTextDirection, arg2 C.guintptr) {
-	var f func(previousDirection TextDirection)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(previousDirection TextDirection))
-	}
-
-	var _previousDirection TextDirection // out
-
-	_previousDirection = TextDirection(arg1)
-
-	f(_previousDirection)
-}
-
 //export _gotk4_gtk3_Widget_ConnectDragBegin
-func _gotk4_gtk3_Widget_ConnectDragBegin(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectDragBegin(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(context *gdk.DragContext)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -335,7 +251,7 @@ func _gotk4_gtk3_Widget_ConnectDragBegin(arg0 C.gpointer, arg1 *C.GdkDragContext
 }
 
 //export _gotk4_gtk3_Widget_ConnectDragDataDelete
-func _gotk4_gtk3_Widget_ConnectDragDataDelete(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectDragDataDelete(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(context *gdk.DragContext)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -360,7 +276,7 @@ func _gotk4_gtk3_Widget_ConnectDragDataDelete(arg0 C.gpointer, arg1 *C.GdkDragCo
 }
 
 //export _gotk4_gtk3_Widget_ConnectDragDataGet
-func _gotk4_gtk3_Widget_ConnectDragDataGet(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 *C.GtkSelectionData, arg3 C.guint, arg4 C.guint, arg5 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectDragDataGet(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guint, arg4 C.guint, arg5 C.guintptr) {
 	var f func(context *gdk.DragContext, data *SelectionData, info, time uint)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -391,7 +307,7 @@ func _gotk4_gtk3_Widget_ConnectDragDataGet(arg0 C.gpointer, arg1 *C.GdkDragConte
 }
 
 //export _gotk4_gtk3_Widget_ConnectDragDataReceived
-func _gotk4_gtk3_Widget_ConnectDragDataReceived(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 C.gint, arg3 C.gint, arg4 *C.GtkSelectionData, arg5 C.guint, arg6 C.guint, arg7 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectDragDataReceived(arg0 C.gpointer, arg1 *C.void, arg2 C.gint, arg3 C.gint, arg4 *C.void, arg5 C.guint, arg6 C.guint, arg7 C.guintptr) {
 	var f func(context *gdk.DragContext, x, y int, data *SelectionData, info, time uint)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg7))
@@ -426,7 +342,7 @@ func _gotk4_gtk3_Widget_ConnectDragDataReceived(arg0 C.gpointer, arg1 *C.GdkDrag
 }
 
 //export _gotk4_gtk3_Widget_ConnectDragDrop
-func _gotk4_gtk3_Widget_ConnectDragDrop(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 C.gint, arg3 C.gint, arg4 C.guint, arg5 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectDragDrop(arg0 C.gpointer, arg1 *C.void, arg2 C.gint, arg3 C.gint, arg4 C.guint, arg5 C.guintptr) (cret C.gboolean) {
 	var f func(context *gdk.DragContext, x, y int, time uint) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -465,7 +381,7 @@ func _gotk4_gtk3_Widget_ConnectDragDrop(arg0 C.gpointer, arg1 *C.GdkDragContext,
 }
 
 //export _gotk4_gtk3_Widget_ConnectDragEnd
-func _gotk4_gtk3_Widget_ConnectDragEnd(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectDragEnd(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(context *gdk.DragContext)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -489,43 +405,8 @@ func _gotk4_gtk3_Widget_ConnectDragEnd(arg0 C.gpointer, arg1 *C.GdkDragContext, 
 	f(_context)
 }
 
-//export _gotk4_gtk3_Widget_ConnectDragFailed
-func _gotk4_gtk3_Widget_ConnectDragFailed(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 C.GtkDragResult, arg3 C.guintptr) (cret C.gboolean) {
-	var f func(context *gdk.DragContext, result DragResult) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(context *gdk.DragContext, result DragResult) (ok bool))
-	}
-
-	var _context *gdk.DragContext // out
-	var _result DragResult        // out
-
-	{
-		obj := coreglib.Take(unsafe.Pointer(arg1))
-		_context = &gdk.DragContext{
-			Object: obj,
-		}
-	}
-	_result = DragResult(arg2)
-
-	ok := f(_context, _result)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
 //export _gotk4_gtk3_Widget_ConnectDragLeave
-func _gotk4_gtk3_Widget_ConnectDragLeave(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 C.guint, arg3 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectDragLeave(arg0 C.gpointer, arg1 *C.void, arg2 C.guint, arg3 C.guintptr) {
 	var f func(context *gdk.DragContext, time uint)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -552,7 +433,7 @@ func _gotk4_gtk3_Widget_ConnectDragLeave(arg0 C.gpointer, arg1 *C.GdkDragContext
 }
 
 //export _gotk4_gtk3_Widget_ConnectDragMotion
-func _gotk4_gtk3_Widget_ConnectDragMotion(arg0 C.gpointer, arg1 *C.GdkDragContext, arg2 C.gint, arg3 C.gint, arg4 C.guint, arg5 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectDragMotion(arg0 C.gpointer, arg1 *C.void, arg2 C.gint, arg3 C.gint, arg4 C.guint, arg5 C.guintptr) (cret C.gboolean) {
 	var f func(context *gdk.DragContext, x, y int, time uint) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -591,7 +472,7 @@ func _gotk4_gtk3_Widget_ConnectDragMotion(arg0 C.gpointer, arg1 *C.GdkDragContex
 }
 
 //export _gotk4_gtk3_Widget_ConnectDraw
-func _gotk4_gtk3_Widget_ConnectDraw(arg0 C.gpointer, arg1 *C.cairo_t, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectDraw(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(cr *cairo.Context) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -608,7 +489,7 @@ func _gotk4_gtk3_Widget_ConnectDraw(arg0 C.gpointer, arg1 *C.cairo_t, arg2 C.gui
 	_cr = cairo.WrapContext(uintptr(unsafe.Pointer(arg1)))
 	C.cairo_reference(arg1)
 	runtime.SetFinalizer(_cr, func(v *cairo.Context) {
-		C.cairo_destroy((*C.cairo_t)(unsafe.Pointer(v.Native())))
+		C.cairo_destroy((*C.void)(unsafe.Pointer(v.Native())))
 	})
 
 	ok := f(_cr)
@@ -623,7 +504,7 @@ func _gotk4_gtk3_Widget_ConnectDraw(arg0 C.gpointer, arg1 *C.cairo_t, arg2 C.gui
 }
 
 //export _gotk4_gtk3_Widget_ConnectEnterNotifyEvent
-func _gotk4_gtk3_Widget_ConnectEnterNotifyEvent(arg0 C.gpointer, arg1 *C.GdkEventCrossing, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectEnterNotifyEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventCrossing) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -650,64 +531,8 @@ func _gotk4_gtk3_Widget_ConnectEnterNotifyEvent(arg0 C.gpointer, arg1 *C.GdkEven
 	return cret
 }
 
-//export _gotk4_gtk3_Widget_ConnectEvent
-func _gotk4_gtk3_Widget_ConnectEvent(arg0 C.gpointer, arg1 C.GdkEvent, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(event *gdk.Event) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(event *gdk.Event) (ok bool))
-	}
-
-	var _event *gdk.Event // out
-
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer((&arg1))))
-		v = gdk.CopyEventer(v)
-		_event = v
-	}
-
-	ok := f(_event)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
-//export _gotk4_gtk3_Widget_ConnectEventAfter
-func _gotk4_gtk3_Widget_ConnectEventAfter(arg0 C.gpointer, arg1 C.GdkEvent, arg2 C.guintptr) {
-	var f func(event *gdk.Event)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(event *gdk.Event))
-	}
-
-	var _event *gdk.Event // out
-
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer((&arg1))))
-		v = gdk.CopyEventer(v)
-		_event = v
-	}
-
-	f(_event)
-}
-
 //export _gotk4_gtk3_Widget_ConnectFocusInEvent
-func _gotk4_gtk3_Widget_ConnectFocusInEvent(arg0 C.gpointer, arg1 *C.GdkEventFocus, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectFocusInEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventFocus) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -735,7 +560,7 @@ func _gotk4_gtk3_Widget_ConnectFocusInEvent(arg0 C.gpointer, arg1 *C.GdkEventFoc
 }
 
 //export _gotk4_gtk3_Widget_ConnectFocusOutEvent
-func _gotk4_gtk3_Widget_ConnectFocusOutEvent(arg0 C.gpointer, arg1 *C.GdkEventFocus, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectFocusOutEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventFocus) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -763,7 +588,7 @@ func _gotk4_gtk3_Widget_ConnectFocusOutEvent(arg0 C.gpointer, arg1 *C.GdkEventFo
 }
 
 //export _gotk4_gtk3_Widget_ConnectGrabBrokenEvent
-func _gotk4_gtk3_Widget_ConnectGrabBrokenEvent(arg0 C.gpointer, arg1 *C.GdkEventGrabBroken, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectGrabBrokenEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventGrabBroken) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -829,7 +654,7 @@ func _gotk4_gtk3_Widget_ConnectHide(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_Widget_ConnectHierarchyChanged
-func _gotk4_gtk3_Widget_ConnectHierarchyChanged(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectHierarchyChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(previousToplevel Widgetter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -864,7 +689,7 @@ func _gotk4_gtk3_Widget_ConnectHierarchyChanged(arg0 C.gpointer, arg1 *C.GtkWidg
 }
 
 //export _gotk4_gtk3_Widget_ConnectKeyPressEvent
-func _gotk4_gtk3_Widget_ConnectKeyPressEvent(arg0 C.gpointer, arg1 *C.GdkEventKey, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectKeyPressEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventKey) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -892,7 +717,7 @@ func _gotk4_gtk3_Widget_ConnectKeyPressEvent(arg0 C.gpointer, arg1 *C.GdkEventKe
 }
 
 //export _gotk4_gtk3_Widget_ConnectKeyReleaseEvent
-func _gotk4_gtk3_Widget_ConnectKeyReleaseEvent(arg0 C.gpointer, arg1 *C.GdkEventKey, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectKeyReleaseEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventKey) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -919,36 +744,8 @@ func _gotk4_gtk3_Widget_ConnectKeyReleaseEvent(arg0 C.gpointer, arg1 *C.GdkEvent
 	return cret
 }
 
-//export _gotk4_gtk3_Widget_ConnectKeynavFailed
-func _gotk4_gtk3_Widget_ConnectKeynavFailed(arg0 C.gpointer, arg1 C.GtkDirectionType, arg2 C.guintptr) (cret C.gboolean) {
-	var f func(direction DirectionType) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(direction DirectionType) (ok bool))
-	}
-
-	var _direction DirectionType // out
-
-	_direction = DirectionType(arg1)
-
-	ok := f(_direction)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
 //export _gotk4_gtk3_Widget_ConnectLeaveNotifyEvent
-func _gotk4_gtk3_Widget_ConnectLeaveNotifyEvent(arg0 C.gpointer, arg1 *C.GdkEventCrossing, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectLeaveNotifyEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventCrossing) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -992,7 +789,7 @@ func _gotk4_gtk3_Widget_ConnectMap(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_Widget_ConnectMapEvent
-func _gotk4_gtk3_Widget_ConnectMapEvent(arg0 C.gpointer, arg1 *C.GdkEventAny, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectMapEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventAny) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1050,7 +847,7 @@ func _gotk4_gtk3_Widget_ConnectMnemonicActivate(arg0 C.gpointer, arg1 C.gboolean
 }
 
 //export _gotk4_gtk3_Widget_ConnectMotionNotifyEvent
-func _gotk4_gtk3_Widget_ConnectMotionNotifyEvent(arg0 C.gpointer, arg1 *C.GdkEventMotion, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectMotionNotifyEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventMotion) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1078,7 +875,7 @@ func _gotk4_gtk3_Widget_ConnectMotionNotifyEvent(arg0 C.gpointer, arg1 *C.GdkEve
 }
 
 //export _gotk4_gtk3_Widget_ConnectParentSet
-func _gotk4_gtk3_Widget_ConnectParentSet(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectParentSet(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(oldParent Widgetter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1137,7 +934,7 @@ func _gotk4_gtk3_Widget_ConnectPopupMenu(arg0 C.gpointer, arg1 C.guintptr) (cret
 }
 
 //export _gotk4_gtk3_Widget_ConnectPropertyNotifyEvent
-func _gotk4_gtk3_Widget_ConnectPropertyNotifyEvent(arg0 C.gpointer, arg1 *C.GdkEventProperty, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectPropertyNotifyEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventProperty) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1165,7 +962,7 @@ func _gotk4_gtk3_Widget_ConnectPropertyNotifyEvent(arg0 C.gpointer, arg1 *C.GdkE
 }
 
 //export _gotk4_gtk3_Widget_ConnectProximityInEvent
-func _gotk4_gtk3_Widget_ConnectProximityInEvent(arg0 C.gpointer, arg1 *C.GdkEventProximity, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectProximityInEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventProximity) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1193,7 +990,7 @@ func _gotk4_gtk3_Widget_ConnectProximityInEvent(arg0 C.gpointer, arg1 *C.GdkEven
 }
 
 //export _gotk4_gtk3_Widget_ConnectProximityOutEvent
-func _gotk4_gtk3_Widget_ConnectProximityOutEvent(arg0 C.gpointer, arg1 *C.GdkEventProximity, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectProximityOutEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventProximity) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1221,7 +1018,7 @@ func _gotk4_gtk3_Widget_ConnectProximityOutEvent(arg0 C.gpointer, arg1 *C.GdkEve
 }
 
 //export _gotk4_gtk3_Widget_ConnectQueryTooltip
-func _gotk4_gtk3_Widget_ConnectQueryTooltip(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.gboolean, arg4 *C.GtkTooltip, arg5 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectQueryTooltip(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.gboolean, arg4 *C.void, arg5 C.guintptr) (cret C.gboolean) {
 	var f func(x, y int, keyboardMode bool, tooltip *Tooltip) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -1273,7 +1070,7 @@ func _gotk4_gtk3_Widget_ConnectRealize(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_Widget_ConnectScreenChanged
-func _gotk4_gtk3_Widget_ConnectScreenChanged(arg0 C.gpointer, arg1 *C.GdkScreen, arg2 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectScreenChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(previousScreen *gdk.Screen)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1300,7 +1097,7 @@ func _gotk4_gtk3_Widget_ConnectScreenChanged(arg0 C.gpointer, arg1 *C.GdkScreen,
 }
 
 //export _gotk4_gtk3_Widget_ConnectScrollEvent
-func _gotk4_gtk3_Widget_ConnectScrollEvent(arg0 C.gpointer, arg1 *C.GdkEventScroll, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectScrollEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventScroll) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1328,7 +1125,7 @@ func _gotk4_gtk3_Widget_ConnectScrollEvent(arg0 C.gpointer, arg1 *C.GdkEventScro
 }
 
 //export _gotk4_gtk3_Widget_ConnectSelectionClearEvent
-func _gotk4_gtk3_Widget_ConnectSelectionClearEvent(arg0 C.gpointer, arg1 *C.GdkEventSelection, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectSelectionClearEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventSelection) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1356,7 +1153,7 @@ func _gotk4_gtk3_Widget_ConnectSelectionClearEvent(arg0 C.gpointer, arg1 *C.GdkE
 }
 
 //export _gotk4_gtk3_Widget_ConnectSelectionRequestEvent
-func _gotk4_gtk3_Widget_ConnectSelectionRequestEvent(arg0 C.gpointer, arg1 *C.GdkEventSelection, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectSelectionRequestEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventSelection) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1399,48 +1196,8 @@ func _gotk4_gtk3_Widget_ConnectShow(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gtk3_Widget_ConnectStateChanged
-func _gotk4_gtk3_Widget_ConnectStateChanged(arg0 C.gpointer, arg1 C.GtkStateType, arg2 C.guintptr) {
-	var f func(state StateType)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(state StateType))
-	}
-
-	var _state StateType // out
-
-	_state = StateType(arg1)
-
-	f(_state)
-}
-
-//export _gotk4_gtk3_Widget_ConnectStateFlagsChanged
-func _gotk4_gtk3_Widget_ConnectStateFlagsChanged(arg0 C.gpointer, arg1 C.GtkStateFlags, arg2 C.guintptr) {
-	var f func(flags StateFlags)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(flags StateFlags))
-	}
-
-	var _flags StateFlags // out
-
-	_flags = StateFlags(arg1)
-
-	f(_flags)
-}
-
 //export _gotk4_gtk3_Widget_ConnectStyleSet
-func _gotk4_gtk3_Widget_ConnectStyleSet(arg0 C.gpointer, arg1 *C.GtkStyle, arg2 C.guintptr) {
+func _gotk4_gtk3_Widget_ConnectStyleSet(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(previousStyle *Style)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1494,7 +1251,7 @@ func _gotk4_gtk3_Widget_ConnectUnmap(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_Widget_ConnectUnmapEvent
-func _gotk4_gtk3_Widget_ConnectUnmapEvent(arg0 C.gpointer, arg1 *C.GdkEventAny, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectUnmapEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventAny) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1538,7 +1295,7 @@ func _gotk4_gtk3_Widget_ConnectUnrealize(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_Widget_ConnectVisibilityNotifyEvent
-func _gotk4_gtk3_Widget_ConnectVisibilityNotifyEvent(arg0 C.gpointer, arg1 *C.GdkEventVisibility, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectVisibilityNotifyEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventVisibility) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -1566,7 +1323,7 @@ func _gotk4_gtk3_Widget_ConnectVisibilityNotifyEvent(arg0 C.gpointer, arg1 *C.Gd
 }
 
 //export _gotk4_gtk3_Widget_ConnectWindowStateEvent
-func _gotk4_gtk3_Widget_ConnectWindowStateEvent(arg0 C.gpointer, arg1 *C.GdkEventWindowState, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_Widget_ConnectWindowStateEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventWindowState) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

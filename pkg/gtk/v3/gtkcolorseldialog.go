@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeColorSelectionDialog = coreglib.Type(C.gtk_color_selection_dialog_get_type())
+	GTypeColorSelectionDialog = coreglib.Type(girepository.MustFind("Gtk", "ColorSelectionDialog").RegisteredGType())
 )
 
 func init() {
@@ -91,71 +90,6 @@ func marshalColorSelectionDialog(p uintptr) (interface{}, error) {
 	return wrapColorSelectionDialog(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewColorSelectionDialog creates a new ColorSelectionDialog.
-//
-// The function takes the following parameters:
-//
-//    - title: string containing the title text for the dialog.
-//
-// The function returns the following values:
-//
-//    - colorSelectionDialog: ColorSelectionDialog.
-//
-func NewColorSelectionDialog(title string) *ColorSelectionDialog {
-	var _arg1 *C.gchar     // out
-	var _cret *C.GtkWidget // in
-
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(title)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.gtk_color_selection_dialog_new(_arg1)
-	runtime.KeepAlive(title)
-
-	var _colorSelectionDialog *ColorSelectionDialog // out
-
-	_colorSelectionDialog = wrapColorSelectionDialog(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _colorSelectionDialog
-}
-
-// ColorSelection retrieves the ColorSelection widget embedded in the dialog.
-//
-// The function returns the following values:
-//
-//    - widget: embedded ColorSelection.
-//
-func (colorsel *ColorSelectionDialog) ColorSelection() Widgetter {
-	var _arg0 *C.GtkColorSelectionDialog // out
-	var _cret *C.GtkWidget               // in
-
-	_arg0 = (*C.GtkColorSelectionDialog)(unsafe.Pointer(coreglib.InternObject(colorsel).Native()))
-
-	_cret = C.gtk_color_selection_dialog_get_color_selection(_arg0)
-	runtime.KeepAlive(colorsel)
-
-	var _widget Widgetter // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gtk.Widgetter is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Widgetter)
-			return ok
-		})
-		rv, ok := casted.(Widgetter)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-		}
-		_widget = rv
-	}
-
-	return _widget
-}
-
 // ColorSelectionDialogClass: instance of this type is always passed by
 // reference.
 type ColorSelectionDialogClass struct {
@@ -164,12 +98,7 @@ type ColorSelectionDialogClass struct {
 
 // colorSelectionDialogClass is the struct that's finalized.
 type colorSelectionDialogClass struct {
-	native *C.GtkColorSelectionDialogClass
+	native unsafe.Pointer
 }
 
-func (c *ColorSelectionDialogClass) ParentClass() *DialogClass {
-	valptr := &c.native.parent_class
-	var _v *DialogClass // out
-	_v = (*DialogClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoColorSelectionDialogClass = girepository.MustFind("Gtk", "ColorSelectionDialogClass")

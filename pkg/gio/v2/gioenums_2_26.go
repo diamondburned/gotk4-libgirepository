@@ -7,34 +7,36 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeBusType                = coreglib.Type(C.g_bus_type_get_type())
-	GTypeCredentialsType        = coreglib.Type(C.g_credentials_type_get_type())
-	GTypeDBusError              = coreglib.Type(C.g_dbus_error_get_type())
-	GTypeDBusMessageByteOrder   = coreglib.Type(C.g_dbus_message_byte_order_get_type())
-	GTypeDBusMessageHeaderField = coreglib.Type(C.g_dbus_message_header_field_get_type())
-	GTypeDBusMessageType        = coreglib.Type(C.g_dbus_message_type_get_type())
-	GTypeBusNameOwnerFlags      = coreglib.Type(C.g_bus_name_owner_flags_get_type())
-	GTypeBusNameWatcherFlags    = coreglib.Type(C.g_bus_name_watcher_flags_get_type())
-	GTypeDBusCallFlags          = coreglib.Type(C.g_dbus_call_flags_get_type())
-	GTypeDBusCapabilityFlags    = coreglib.Type(C.g_dbus_capability_flags_get_type())
-	GTypeDBusConnectionFlags    = coreglib.Type(C.g_dbus_connection_flags_get_type())
-	GTypeDBusMessageFlags       = coreglib.Type(C.g_dbus_message_flags_get_type())
-	GTypeDBusPropertyInfoFlags  = coreglib.Type(C.g_dbus_property_info_flags_get_type())
-	GTypeDBusProxyFlags         = coreglib.Type(C.g_dbus_proxy_flags_get_type())
-	GTypeDBusSendMessageFlags   = coreglib.Type(C.g_dbus_send_message_flags_get_type())
-	GTypeDBusServerFlags        = coreglib.Type(C.g_dbus_server_flags_get_type())
-	GTypeDBusSignalFlags        = coreglib.Type(C.g_dbus_signal_flags_get_type())
-	GTypeDBusSubtreeFlags       = coreglib.Type(C.g_dbus_subtree_flags_get_type())
+	GTypeBusType                = coreglib.Type(girepository.MustFind("Gio", "BusType").RegisteredGType())
+	GTypeCredentialsType        = coreglib.Type(girepository.MustFind("Gio", "CredentialsType").RegisteredGType())
+	GTypeDBusError              = coreglib.Type(girepository.MustFind("Gio", "DBusError").RegisteredGType())
+	GTypeDBusMessageByteOrder   = coreglib.Type(girepository.MustFind("Gio", "DBusMessageByteOrder").RegisteredGType())
+	GTypeDBusMessageHeaderField = coreglib.Type(girepository.MustFind("Gio", "DBusMessageHeaderField").RegisteredGType())
+	GTypeDBusMessageType        = coreglib.Type(girepository.MustFind("Gio", "DBusMessageType").RegisteredGType())
+	GTypeBusNameOwnerFlags      = coreglib.Type(girepository.MustFind("Gio", "BusNameOwnerFlags").RegisteredGType())
+	GTypeBusNameWatcherFlags    = coreglib.Type(girepository.MustFind("Gio", "BusNameWatcherFlags").RegisteredGType())
+	GTypeDBusCallFlags          = coreglib.Type(girepository.MustFind("Gio", "DBusCallFlags").RegisteredGType())
+	GTypeDBusCapabilityFlags    = coreglib.Type(girepository.MustFind("Gio", "DBusCapabilityFlags").RegisteredGType())
+	GTypeDBusConnectionFlags    = coreglib.Type(girepository.MustFind("Gio", "DBusConnectionFlags").RegisteredGType())
+	GTypeDBusMessageFlags       = coreglib.Type(girepository.MustFind("Gio", "DBusMessageFlags").RegisteredGType())
+	GTypeDBusPropertyInfoFlags  = coreglib.Type(girepository.MustFind("Gio", "DBusPropertyInfoFlags").RegisteredGType())
+	GTypeDBusProxyFlags         = coreglib.Type(girepository.MustFind("Gio", "DBusProxyFlags").RegisteredGType())
+	GTypeDBusSendMessageFlags   = coreglib.Type(girepository.MustFind("Gio", "DBusSendMessageFlags").RegisteredGType())
+	GTypeDBusServerFlags        = coreglib.Type(girepository.MustFind("Gio", "DBusServerFlags").RegisteredGType())
+	GTypeDBusSignalFlags        = coreglib.Type(girepository.MustFind("Gio", "DBusSignalFlags").RegisteredGType())
+	GTypeDBusSubtreeFlags       = coreglib.Type(girepository.MustFind("Gio", "DBusSubtreeFlags").RegisteredGType())
 )
 
 func init() {

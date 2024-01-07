@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 // extern void _gotk4_gtk3_GestureLongPress_ConnectPressed(gpointer, gdouble, gdouble, guintptr);
 // extern void _gotk4_gtk3_GestureLongPress_ConnectCancelled(gpointer, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeGestureLongPress = coreglib.Type(C.gtk_gesture_long_press_get_type())
+	GTypeGestureLongPress = coreglib.Type(girepository.MustFind("Gtk", "GestureLongPress").RegisteredGType())
 )
 
 func init() {
@@ -70,31 +69,4 @@ func (v *GestureLongPress) ConnectCancelled(f func()) coreglib.SignalHandle {
 // unmoved/unreleased longer than what the GTK+ defaults tell.
 func (v *GestureLongPress) ConnectPressed(f func(x, y float64)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "pressed", false, unsafe.Pointer(C._gotk4_gtk3_GestureLongPress_ConnectPressed), f)
-}
-
-// NewGestureLongPress returns a newly created Gesture that recognizes long
-// presses.
-//
-// The function takes the following parameters:
-//
-//    - widget: Widget.
-//
-// The function returns the following values:
-//
-//    - gestureLongPress: newly created GestureLongPress.
-//
-func NewGestureLongPress(widget Widgetter) *GestureLongPress {
-	var _arg1 *C.GtkWidget  // out
-	var _cret *C.GtkGesture // in
-
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-
-	_cret = C.gtk_gesture_long_press_new(_arg1)
-	runtime.KeepAlive(widget)
-
-	var _gestureLongPress *GestureLongPress // out
-
-	_gestureLongPress = wrapGestureLongPress(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _gestureLongPress
 }

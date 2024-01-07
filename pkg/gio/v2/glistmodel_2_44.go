@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ListModelInterface: virtual function table for Model.
@@ -15,5 +23,7 @@ type ListModelInterface struct {
 
 // listModelInterface is the struct that's finalized.
 type listModelInterface struct {
-	native *C.GListModelInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoListModelInterface = girepository.MustFind("Gio", "ListModelInterface")

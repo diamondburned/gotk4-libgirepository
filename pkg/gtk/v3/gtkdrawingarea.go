@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDrawingArea = coreglib.Type(C.gtk_drawing_area_get_type())
+	GTypeDrawingArea = coreglib.Type(girepository.MustFind("Gtk", "DrawingArea").RegisteredGType())
 )
 
 func init() {
@@ -158,24 +158,6 @@ func marshalDrawingArea(p uintptr) (interface{}, error) {
 	return wrapDrawingArea(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewDrawingArea creates a new drawing area.
-//
-// The function returns the following values:
-//
-//    - drawingArea: new DrawingArea.
-//
-func NewDrawingArea() *DrawingArea {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_drawing_area_new()
-
-	var _drawingArea *DrawingArea // out
-
-	_drawingArea = wrapDrawingArea(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _drawingArea
-}
-
 // DrawingAreaClass: instance of this type is always passed by reference.
 type DrawingAreaClass struct {
 	*drawingAreaClass
@@ -183,12 +165,7 @@ type DrawingAreaClass struct {
 
 // drawingAreaClass is the struct that's finalized.
 type drawingAreaClass struct {
-	native *C.GtkDrawingAreaClass
+	native unsafe.Pointer
 }
 
-func (d *DrawingAreaClass) ParentClass() *WidgetClass {
-	valptr := &d.native.parent_class
-	var _v *WidgetClass // out
-	_v = (*WidgetClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoDrawingAreaClass = girepository.MustFind("Gtk", "DrawingAreaClass")

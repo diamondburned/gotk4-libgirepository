@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // SocketControlMessageClass class structure for ControlMessage.
@@ -15,5 +23,7 @@ type SocketControlMessageClass struct {
 
 // socketControlMessageClass is the struct that's finalized.
 type socketControlMessageClass struct {
-	native *C.GSocketControlMessageClass
+	native unsafe.Pointer
 }
+
+var GIRInfoSocketControlMessageClass = girepository.MustFind("Gio", "SocketControlMessageClass")

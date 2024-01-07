@@ -4,8 +4,10 @@ package gdkwayland
 
 import ()
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/wayland/gdkwayland.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // WaylandToplevelExported: callback that gets called when the handle for a

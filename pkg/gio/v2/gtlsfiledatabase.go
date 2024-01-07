@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // TLSFileDatabaseInterface provides an interface for FileDatabase
@@ -16,5 +24,7 @@ type TLSFileDatabaseInterface struct {
 
 // tlsFileDatabaseInterface is the struct that's finalized.
 type tlsFileDatabaseInterface struct {
-	native *C.GTlsFileDatabaseInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoTLSFileDatabaseInterface = girepository.MustFind("Gio", "TlsFileDatabaseInterface")

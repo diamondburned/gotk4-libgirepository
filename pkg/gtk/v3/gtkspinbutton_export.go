@@ -6,31 +6,11 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
-
-//export _gotk4_gtk3_SpinButton_ConnectChangeValue
-func _gotk4_gtk3_SpinButton_ConnectChangeValue(arg0 C.gpointer, arg1 C.GtkScrollType, arg2 C.guintptr) {
-	var f func(scroll ScrollType)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(scroll ScrollType))
-	}
-
-	var _scroll ScrollType // out
-
-	_scroll = ScrollType(arg1)
-
-	f(_scroll)
-}
 
 //export _gotk4_gtk3_SpinButton_ConnectOutput
 func _gotk4_gtk3_SpinButton_ConnectOutput(arg0 C.gpointer, arg1 C.guintptr) (cret C.gboolean) {

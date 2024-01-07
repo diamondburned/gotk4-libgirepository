@@ -3,24 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// extern void callbackDelete(gpointer);
-// extern gboolean _gotk4_gtk4_CustomFilterFunc(gpointer, gpointer);
 import "C"
 
 // GType values.
 var (
-	GTypeCustomFilter = coreglib.Type(C.gtk_custom_filter_get_type())
+	GTypeCustomFilter = coreglib.Type(girepository.MustFind("Gtk", "CustomFilter").RegisteredGType())
 )
 
 func init() {
@@ -83,75 +81,6 @@ func marshalCustomFilter(p uintptr) (interface{}, error) {
 	return wrapCustomFilter(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewCustomFilter creates a new filter using the given match_func to filter
-// items.
-//
-// If match_func is NULL, the filter matches all items.
-//
-// If the filter func changes its filtering behavior, gtk_filter_changed() needs
-// to be called.
-//
-// The function takes the following parameters:
-//
-//    - matchFunc (optional): function to filter items.
-//
-// The function returns the following values:
-//
-//    - customFilter: new GtkCustomFilter.
-//
-func NewCustomFilter(matchFunc CustomFilterFunc) *CustomFilter {
-	var _arg1 C.GtkCustomFilterFunc // out
-	var _arg2 C.gpointer
-	var _arg3 C.GDestroyNotify
-	var _cret *C.GtkCustomFilter // in
-
-	if matchFunc != nil {
-		_arg1 = (*[0]byte)(C._gotk4_gtk4_CustomFilterFunc)
-		_arg2 = C.gpointer(gbox.Assign(matchFunc))
-		_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-	}
-
-	_cret = C.gtk_custom_filter_new(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(matchFunc)
-
-	var _customFilter *CustomFilter // out
-
-	_customFilter = wrapCustomFilter(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _customFilter
-}
-
-// SetFilterFunc sets the function used for filtering items.
-//
-// If match_func is NULL, the filter matches all items.
-//
-// If the filter func changes its filtering behavior, gtk_filter_changed() needs
-// to be called.
-//
-// If a previous function was set, its user_destroy will be called now.
-//
-// The function takes the following parameters:
-//
-//    - matchFunc (optional): function to filter items.
-//
-func (self *CustomFilter) SetFilterFunc(matchFunc CustomFilterFunc) {
-	var _arg0 *C.GtkCustomFilter    // out
-	var _arg1 C.GtkCustomFilterFunc // out
-	var _arg2 C.gpointer
-	var _arg3 C.GDestroyNotify
-
-	_arg0 = (*C.GtkCustomFilter)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if matchFunc != nil {
-		_arg1 = (*[0]byte)(C._gotk4_gtk4_CustomFilterFunc)
-		_arg2 = C.gpointer(gbox.Assign(matchFunc))
-		_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-	}
-
-	C.gtk_custom_filter_set_filter_func(_arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(matchFunc)
-}
-
 // CustomFilterClass: instance of this type is always passed by reference.
 type CustomFilterClass struct {
 	*customFilterClass
@@ -159,12 +88,7 @@ type CustomFilterClass struct {
 
 // customFilterClass is the struct that's finalized.
 type customFilterClass struct {
-	native *C.GtkCustomFilterClass
+	native unsafe.Pointer
 }
 
-func (c *CustomFilterClass) ParentClass() *FilterClass {
-	valptr := &c.native.parent_class
-	var _v *FilterClass // out
-	_v = (*FilterClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoCustomFilterClass = girepository.MustFind("Gtk", "CustomFilterClass")

@@ -3,21 +3,22 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeBufferedOutputStream = coreglib.Type(C.g_buffered_output_stream_get_type())
+	GTypeBufferedOutputStream = coreglib.Type(girepository.MustFind("Gio", "BufferedOutputStream").RegisteredGType())
 )
 
 func init() {
@@ -92,151 +93,6 @@ func marshalBufferedOutputStream(p uintptr) (interface{}, error) {
 	return wrapBufferedOutputStream(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewBufferedOutputStream creates a new buffered output stream for a base
-// stream.
-//
-// The function takes the following parameters:
-//
-//    - baseStream: Stream.
-//
-// The function returns the following values:
-//
-//    - bufferedOutputStream for the given base_stream.
-//
-func NewBufferedOutputStream(baseStream OutputStreamer) *BufferedOutputStream {
-	var _arg1 *C.GOutputStream // out
-	var _cret *C.GOutputStream // in
-
-	_arg1 = (*C.GOutputStream)(unsafe.Pointer(coreglib.InternObject(baseStream).Native()))
-
-	_cret = C.g_buffered_output_stream_new(_arg1)
-	runtime.KeepAlive(baseStream)
-
-	var _bufferedOutputStream *BufferedOutputStream // out
-
-	_bufferedOutputStream = wrapBufferedOutputStream(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _bufferedOutputStream
-}
-
-// NewBufferedOutputStreamSized creates a new buffered output stream with a
-// given buffer size.
-//
-// The function takes the following parameters:
-//
-//    - baseStream: Stream.
-//    - size: #gsize.
-//
-// The function returns the following values:
-//
-//    - bufferedOutputStream with an internal buffer set to size.
-//
-func NewBufferedOutputStreamSized(baseStream OutputStreamer, size uint) *BufferedOutputStream {
-	var _arg1 *C.GOutputStream // out
-	var _arg2 C.gsize          // out
-	var _cret *C.GOutputStream // in
-
-	_arg1 = (*C.GOutputStream)(unsafe.Pointer(coreglib.InternObject(baseStream).Native()))
-	_arg2 = C.gsize(size)
-
-	_cret = C.g_buffered_output_stream_new_sized(_arg1, _arg2)
-	runtime.KeepAlive(baseStream)
-	runtime.KeepAlive(size)
-
-	var _bufferedOutputStream *BufferedOutputStream // out
-
-	_bufferedOutputStream = wrapBufferedOutputStream(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _bufferedOutputStream
-}
-
-// AutoGrow checks if the buffer automatically grows as data is added.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the stream's buffer automatically grows, FALSE otherwise.
-//
-func (stream *BufferedOutputStream) AutoGrow() bool {
-	var _arg0 *C.GBufferedOutputStream // out
-	var _cret C.gboolean               // in
-
-	_arg0 = (*C.GBufferedOutputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-
-	_cret = C.g_buffered_output_stream_get_auto_grow(_arg0)
-	runtime.KeepAlive(stream)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// BufferSize gets the size of the buffer in the stream.
-//
-// The function returns the following values:
-//
-//    - gsize: current size of the buffer.
-//
-func (stream *BufferedOutputStream) BufferSize() uint {
-	var _arg0 *C.GBufferedOutputStream // out
-	var _cret C.gsize                  // in
-
-	_arg0 = (*C.GBufferedOutputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-
-	_cret = C.g_buffered_output_stream_get_buffer_size(_arg0)
-	runtime.KeepAlive(stream)
-
-	var _gsize uint // out
-
-	_gsize = uint(_cret)
-
-	return _gsize
-}
-
-// SetAutoGrow sets whether or not the stream's buffer should automatically
-// grow. If auto_grow is true, then each write will just make the buffer larger,
-// and you must manually flush the buffer to actually write out the data to the
-// underlying stream.
-//
-// The function takes the following parameters:
-//
-//    - autoGrow: #gboolean.
-//
-func (stream *BufferedOutputStream) SetAutoGrow(autoGrow bool) {
-	var _arg0 *C.GBufferedOutputStream // out
-	var _arg1 C.gboolean               // out
-
-	_arg0 = (*C.GBufferedOutputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	if autoGrow {
-		_arg1 = C.TRUE
-	}
-
-	C.g_buffered_output_stream_set_auto_grow(_arg0, _arg1)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(autoGrow)
-}
-
-// SetBufferSize sets the size of the internal buffer to size.
-//
-// The function takes the following parameters:
-//
-//    - size: #gsize.
-//
-func (stream *BufferedOutputStream) SetBufferSize(size uint) {
-	var _arg0 *C.GBufferedOutputStream // out
-	var _arg1 C.gsize                  // out
-
-	_arg0 = (*C.GBufferedOutputStream)(unsafe.Pointer(coreglib.InternObject(stream).Native()))
-	_arg1 = C.gsize(size)
-
-	C.g_buffered_output_stream_set_buffer_size(_arg0, _arg1)
-	runtime.KeepAlive(stream)
-	runtime.KeepAlive(size)
-}
-
 // BufferedOutputStreamClass: instance of this type is always passed by
 // reference.
 type BufferedOutputStreamClass struct {
@@ -245,12 +101,7 @@ type BufferedOutputStreamClass struct {
 
 // bufferedOutputStreamClass is the struct that's finalized.
 type bufferedOutputStreamClass struct {
-	native *C.GBufferedOutputStreamClass
+	native unsafe.Pointer
 }
 
-func (b *BufferedOutputStreamClass) ParentClass() *FilterOutputStreamClass {
-	valptr := &b.native.parent_class
-	var _v *FilterOutputStreamClass // out
-	_v = (*FilterOutputStreamClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoBufferedOutputStreamClass = girepository.MustFind("Gio", "BufferedOutputStreamClass")

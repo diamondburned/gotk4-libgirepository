@@ -4,20 +4,21 @@ package gdk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypePropMode = coreglib.Type(C.gdk_prop_mode_get_type())
+	GTypePropMode = coreglib.Type(girepository.MustFind("Gdk", "PropMode").RegisteredGType())
 )
 
 func init() {
@@ -55,39 +56,4 @@ func (p PropMode) String() string {
 	default:
 		return fmt.Sprintf("PropMode(%d)", p)
 	}
-}
-
-// UTF8ToStringTarget converts an UTF-8 string into the best possible
-// representation as a STRING. The representation of characters not in STRING is
-// not specified; it may be as pseudo-escape sequences \x{ABCD}, or it may be in
-// some other form of approximation.
-//
-// The function takes the following parameters:
-//
-//    - str: UTF-8 string.
-//
-// The function returns the following values:
-//
-//    - utf8 (optional): newly-allocated string, or NULL if the conversion
-//      failed. (It should not fail for any properly formed UTF-8 string unless
-//      system limits like memory or file descriptors are exceeded.).
-//
-func UTF8ToStringTarget(str string) string {
-	var _arg1 *C.gchar // out
-	var _cret *C.gchar // in
-
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(str)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.gdk_utf8_to_string_target(_arg1)
-	runtime.KeepAlive(str)
-
-	var _utf8 string // out
-
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-		defer C.free(unsafe.Pointer(_cret))
-	}
-
-	return _utf8
 }

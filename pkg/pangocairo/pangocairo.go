@@ -6,14 +6,19 @@ import (
 	_ "runtime/cgo"
 
 	"github.com/diamondburned/gotk4/pkg/cairo"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	"github.com/diamondburned/gotk4/pkg/pango"
 )
 
-// #cgo pkg-config: pangocairo pango
-// #cgo CFLAGS: -Wno-deprecated-declarations
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <pango/pangocairo.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
+
+func init() {
+	girepository.Require("PangoCairo", "1.0", girepository.LoadFlagLazy)
+}
 
 // ShapeRendererFunc: function type for rendering attributes of type
 // PANGO_ATTR_SHAPE with Pango's Cairo renderer.

@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // PROXY_RESOLVER_EXTENSION_POINT_NAME: extension point for proxy resolving
@@ -19,5 +27,7 @@ type ProxyResolverInterface struct {
 
 // proxyResolverInterface is the struct that's finalized.
 type proxyResolverInterface struct {
-	native *C.GProxyResolverInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoProxyResolverInterface = girepository.MustFind("Gio", "ProxyResolverInterface")

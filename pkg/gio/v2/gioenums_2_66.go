@@ -6,18 +6,20 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTLSChannelBindingError = coreglib.Type(C.g_tls_channel_binding_error_get_type())
-	GTypeTLSChannelBindingType  = coreglib.Type(C.g_tls_channel_binding_type_get_type())
+	GTypeTLSChannelBindingError = coreglib.Type(girepository.MustFind("Gio", "TlsChannelBindingError").RegisteredGType())
+	GTypeTLSChannelBindingType  = coreglib.Type(girepository.MustFind("Gio", "TlsChannelBindingType").RegisteredGType())
 )
 
 func init() {

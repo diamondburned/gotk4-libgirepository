@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeStackSidebar = coreglib.Type(C.gtk_stack_sidebar_get_type())
+	GTypeStackSidebar = coreglib.Type(girepository.MustFind("Gtk", "StackSidebar").RegisteredGType())
 )
 
 func init() {
@@ -100,68 +99,4 @@ func wrapStackSidebar(obj *coreglib.Object) *StackSidebar {
 
 func marshalStackSidebar(p uintptr) (interface{}, error) {
 	return wrapStackSidebar(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewStackSidebar creates a new sidebar.
-//
-// The function returns the following values:
-//
-//    - stackSidebar: new StackSidebar.
-//
-func NewStackSidebar() *StackSidebar {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_stack_sidebar_new()
-
-	var _stackSidebar *StackSidebar // out
-
-	_stackSidebar = wrapStackSidebar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _stackSidebar
-}
-
-// Stack retrieves the stack. See gtk_stack_sidebar_set_stack().
-//
-// The function returns the following values:
-//
-//    - stack (optional): associated Stack or NULL if none has been set
-//      explicitly.
-//
-func (sidebar *StackSidebar) Stack() *Stack {
-	var _arg0 *C.GtkStackSidebar // out
-	var _cret *C.GtkStack        // in
-
-	_arg0 = (*C.GtkStackSidebar)(unsafe.Pointer(coreglib.InternObject(sidebar).Native()))
-
-	_cret = C.gtk_stack_sidebar_get_stack(_arg0)
-	runtime.KeepAlive(sidebar)
-
-	var _stack *Stack // out
-
-	if _cret != nil {
-		_stack = wrapStack(coreglib.Take(unsafe.Pointer(_cret)))
-	}
-
-	return _stack
-}
-
-// SetStack: set the Stack associated with this StackSidebar.
-//
-// The sidebar widget will automatically update according to the order (packing)
-// and items within the given Stack.
-//
-// The function takes the following parameters:
-//
-//    - stack: Stack.
-//
-func (sidebar *StackSidebar) SetStack(stack *Stack) {
-	var _arg0 *C.GtkStackSidebar // out
-	var _arg1 *C.GtkStack        // out
-
-	_arg0 = (*C.GtkStackSidebar)(unsafe.Pointer(coreglib.InternObject(sidebar).Native()))
-	_arg1 = (*C.GtkStack)(unsafe.Pointer(coreglib.InternObject(stack).Native()))
-
-	C.gtk_stack_sidebar_set_stack(_arg0, _arg1)
-	runtime.KeepAlive(sidebar)
-	runtime.KeepAlive(stack)
 }

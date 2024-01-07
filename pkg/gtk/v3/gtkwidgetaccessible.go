@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeWidgetAccessible = coreglib.Type(C.gtk_widget_accessible_get_type())
+	GTypeWidgetAccessible = coreglib.Type(girepository.MustFind("Gtk", "WidgetAccessible").RegisteredGType())
 )
 
 func init() {
@@ -87,12 +87,7 @@ type WidgetAccessibleClass struct {
 
 // widgetAccessibleClass is the struct that's finalized.
 type widgetAccessibleClass struct {
-	native *C.GtkWidgetAccessibleClass
+	native unsafe.Pointer
 }
 
-func (w *WidgetAccessibleClass) ParentClass() *AccessibleClass {
-	valptr := &w.native.parent_class
-	var _v *AccessibleClass // out
-	_v = (*AccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoWidgetAccessibleClass = girepository.MustFind("Gtk", "WidgetAccessibleClass")

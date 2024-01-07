@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // DBusObjectIface: base object type for D-Bus objects.
@@ -15,5 +23,7 @@ type DBusObjectIface struct {
 
 // dBusObjectIface is the struct that's finalized.
 type dBusObjectIface struct {
-	native *C.GDBusObjectIface
+	native unsafe.Pointer
 }
+
+var GIRInfoDBusObjectIface = girepository.MustFind("Gio", "DBusObjectIface")

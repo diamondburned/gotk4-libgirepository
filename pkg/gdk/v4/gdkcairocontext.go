@@ -3,21 +3,21 @@
 package gdk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/cairo"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeCairoContext = coreglib.Type(C.gdk_cairo_context_get_type())
+	GTypeCairoContext = coreglib.Type(girepository.MustFind("Gdk", "CairoContext").RegisteredGType())
 )
 
 func init() {
@@ -64,46 +64,11 @@ func marshalCairoContext(p uintptr) (interface{}, error) {
 	return wrapCairoContext(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-func (self *CairoContext) baseCairoContext() *CairoContext {
-	return self
+func (v *CairoContext) baseCairoContext() *CairoContext {
+	return v
 }
 
 // BaseCairoContext returns the underlying base object.
 func BaseCairoContext(obj CairoContexter) *CairoContext {
 	return obj.baseCairoContext()
-}
-
-// CairoCreate retrieves a Cairo context to be used to draw on the GdkSurface of
-// context.
-//
-// A call to gdk.DrawContext.BeginFrame() with this context must have been done
-// or this function will return NULL.
-//
-// The returned context is guaranteed to be valid until
-// gdk.DrawContext.EndFrame() is called.
-//
-// The function returns the following values:
-//
-//    - context (optional): cairo context to be used to draw the contents of the
-//      GdkSurface. NULL is returned when context is not drawing.
-//
-func (self *CairoContext) CairoCreate() *cairo.Context {
-	var _arg0 *C.GdkCairoContext // out
-	var _cret *C.cairo_t         // in
-
-	_arg0 = (*C.GdkCairoContext)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gdk_cairo_context_cairo_create(_arg0)
-	runtime.KeepAlive(self)
-
-	var _context *cairo.Context // out
-
-	if _cret != nil {
-		_context = cairo.WrapContext(uintptr(unsafe.Pointer(_cret)))
-		runtime.SetFinalizer(_context, func(v *cairo.Context) {
-			C.cairo_destroy((*C.cairo_t)(unsafe.Pointer(v.Native())))
-		})
-	}
-
-	return _context
 }

@@ -10,12 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_TreeViewColumnDropFunc
-func _gotk4_gtk4_TreeViewColumnDropFunc(arg1 *C.GtkTreeView, arg2 *C.GtkTreeViewColumn, arg3 *C.GtkTreeViewColumn, arg4 *C.GtkTreeViewColumn, arg5 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_TreeViewColumnDropFunc(arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 *C.void, arg5 C.gpointer) (cret C.gboolean) {
 	var fn TreeViewColumnDropFunc
 	{
 		v := gbox.Get(uintptr(arg5))
@@ -47,7 +49,7 @@ func _gotk4_gtk4_TreeViewColumnDropFunc(arg1 *C.GtkTreeView, arg2 *C.GtkTreeView
 }
 
 //export _gotk4_gtk4_TreeViewMappingFunc
-func _gotk4_gtk4_TreeViewMappingFunc(arg1 *C.GtkTreeView, arg2 *C.GtkTreePath, arg3 C.gpointer) {
+func _gotk4_gtk4_TreeViewMappingFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) {
 	var fn TreeViewMappingFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -67,7 +69,7 @@ func _gotk4_gtk4_TreeViewMappingFunc(arg1 *C.GtkTreeView, arg2 *C.GtkTreePath, a
 }
 
 //export _gotk4_gtk4_TreeViewRowSeparatorFunc
-func _gotk4_gtk4_TreeViewRowSeparatorFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreeIter, arg3 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_TreeViewRowSeparatorFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) (cret C.gboolean) {
 	var fn TreeViewRowSeparatorFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -111,7 +113,7 @@ func _gotk4_gtk4_TreeViewRowSeparatorFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreeI
 }
 
 //export _gotk4_gtk4_TreeViewSearchEqualFunc
-func _gotk4_gtk4_TreeViewSearchEqualFunc(arg1 *C.GtkTreeModel, arg2 C.int, arg3 *C.char, arg4 *C.GtkTreeIter, arg5 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_TreeViewSearchEqualFunc(arg1 *C.void, arg2 C.int, arg3 *C.char, arg4 *C.void, arg5 C.gpointer) (cret C.gboolean) {
 	var fn TreeViewSearchEqualFunc
 	{
 		v := gbox.Get(uintptr(arg5))
@@ -190,46 +192,8 @@ func _gotk4_gtk4_TreeView_ConnectCursorChanged(arg0 C.gpointer, arg1 C.guintptr)
 	f()
 }
 
-//export _gotk4_gtk4_TreeView_ConnectMoveCursor
-func _gotk4_gtk4_TreeView_ConnectMoveCursor(arg0 C.gpointer, arg1 C.GtkMovementStep, arg2 C.gint, arg3 C.gboolean, arg4 C.gboolean, arg5 C.guintptr) (cret C.gboolean) {
-	var f func(step MovementStep, direction int, extend, modify bool) (ok bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(step MovementStep, direction int, extend, modify bool) (ok bool))
-	}
-
-	var _step MovementStep // out
-	var _direction int     // out
-	var _extend bool       // out
-	var _modify bool       // out
-
-	_step = MovementStep(arg1)
-	_direction = int(arg2)
-	if arg3 != 0 {
-		_extend = true
-	}
-	if arg4 != 0 {
-		_modify = true
-	}
-
-	ok := f(_step, _direction, _extend, _modify)
-
-	var _ bool
-
-	if ok {
-		cret = C.TRUE
-	}
-
-	return cret
-}
-
 //export _gotk4_gtk4_TreeView_ConnectRowActivated
-func _gotk4_gtk4_TreeView_ConnectRowActivated(arg0 C.gpointer, arg1 *C.GtkTreePath, arg2 *C.GtkTreeViewColumn, arg3 C.guintptr) {
+func _gotk4_gtk4_TreeView_ConnectRowActivated(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(path *TreePath, column *TreeViewColumn)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -251,7 +215,7 @@ func _gotk4_gtk4_TreeView_ConnectRowActivated(arg0 C.gpointer, arg1 *C.GtkTreePa
 }
 
 //export _gotk4_gtk4_TreeView_ConnectRowCollapsed
-func _gotk4_gtk4_TreeView_ConnectRowCollapsed(arg0 C.gpointer, arg1 *C.GtkTreeIter, arg2 *C.GtkTreePath, arg3 C.guintptr) {
+func _gotk4_gtk4_TreeView_ConnectRowCollapsed(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(iter *TreeIter, path *TreePath)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -273,7 +237,7 @@ func _gotk4_gtk4_TreeView_ConnectRowCollapsed(arg0 C.gpointer, arg1 *C.GtkTreeIt
 }
 
 //export _gotk4_gtk4_TreeView_ConnectRowExpanded
-func _gotk4_gtk4_TreeView_ConnectRowExpanded(arg0 C.gpointer, arg1 *C.GtkTreeIter, arg2 *C.GtkTreePath, arg3 C.guintptr) {
+func _gotk4_gtk4_TreeView_ConnectRowExpanded(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(iter *TreeIter, path *TreePath)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -295,7 +259,7 @@ func _gotk4_gtk4_TreeView_ConnectRowExpanded(arg0 C.gpointer, arg1 *C.GtkTreeIte
 }
 
 //export _gotk4_gtk4_TreeView_ConnectTestCollapseRow
-func _gotk4_gtk4_TreeView_ConnectTestCollapseRow(arg0 C.gpointer, arg1 *C.GtkTreeIter, arg2 *C.GtkTreePath, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_TreeView_ConnectTestCollapseRow(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(iter *TreeIter, path *TreePath) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -325,7 +289,7 @@ func _gotk4_gtk4_TreeView_ConnectTestCollapseRow(arg0 C.gpointer, arg1 *C.GtkTre
 }
 
 //export _gotk4_gtk4_TreeView_ConnectTestExpandRow
-func _gotk4_gtk4_TreeView_ConnectTestExpandRow(arg0 C.gpointer, arg1 *C.GtkTreeIter, arg2 *C.GtkTreePath, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_TreeView_ConnectTestExpandRow(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(iter *TreeIter, path *TreePath) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))

@@ -9,12 +9,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_DropTargetAsync_ConnectAccept
-func _gotk4_gtk4_DropTargetAsync_ConnectAccept(arg0 C.gpointer, arg1 *C.GdkDrop, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_DropTargetAsync_ConnectAccept(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(drop gdk.Dropper) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -57,54 +59,8 @@ func _gotk4_gtk4_DropTargetAsync_ConnectAccept(arg0 C.gpointer, arg1 *C.GdkDrop,
 	return cret
 }
 
-//export _gotk4_gtk4_DropTargetAsync_ConnectDragEnter
-func _gotk4_gtk4_DropTargetAsync_ConnectDragEnter(arg0 C.gpointer, arg1 *C.GdkDrop, arg2 C.gdouble, arg3 C.gdouble, arg4 C.guintptr) (cret C.GdkDragAction) {
-	var f func(drop gdk.Dropper, x, y float64) (dragAction gdk.DragAction)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(drop gdk.Dropper, x, y float64) (dragAction gdk.DragAction))
-	}
-
-	var _drop gdk.Dropper // out
-	var _x float64        // out
-	var _y float64        // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type gdk.Dropper is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(gdk.Dropper)
-			return ok
-		})
-		rv, ok := casted.(gdk.Dropper)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Dropper")
-		}
-		_drop = rv
-	}
-	_x = float64(arg2)
-	_y = float64(arg3)
-
-	dragAction := f(_drop, _x, _y)
-
-	var _ gdk.DragAction
-
-	cret = C.GdkDragAction(dragAction)
-
-	return cret
-}
-
 //export _gotk4_gtk4_DropTargetAsync_ConnectDragLeave
-func _gotk4_gtk4_DropTargetAsync_ConnectDragLeave(arg0 C.gpointer, arg1 *C.GdkDrop, arg2 C.guintptr) {
+func _gotk4_gtk4_DropTargetAsync_ConnectDragLeave(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(drop gdk.Dropper)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -139,54 +95,8 @@ func _gotk4_gtk4_DropTargetAsync_ConnectDragLeave(arg0 C.gpointer, arg1 *C.GdkDr
 	f(_drop)
 }
 
-//export _gotk4_gtk4_DropTargetAsync_ConnectDragMotion
-func _gotk4_gtk4_DropTargetAsync_ConnectDragMotion(arg0 C.gpointer, arg1 *C.GdkDrop, arg2 C.gdouble, arg3 C.gdouble, arg4 C.guintptr) (cret C.GdkDragAction) {
-	var f func(drop gdk.Dropper, x, y float64) (dragAction gdk.DragAction)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(drop gdk.Dropper, x, y float64) (dragAction gdk.DragAction))
-	}
-
-	var _drop gdk.Dropper // out
-	var _x float64        // out
-	var _y float64        // out
-
-	{
-		objptr := unsafe.Pointer(arg1)
-		if objptr == nil {
-			panic("object of type gdk.Dropper is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(gdk.Dropper)
-			return ok
-		})
-		rv, ok := casted.(gdk.Dropper)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Dropper")
-		}
-		_drop = rv
-	}
-	_x = float64(arg2)
-	_y = float64(arg3)
-
-	dragAction := f(_drop, _x, _y)
-
-	var _ gdk.DragAction
-
-	cret = C.GdkDragAction(dragAction)
-
-	return cret
-}
-
 //export _gotk4_gtk4_DropTargetAsync_ConnectDrop
-func _gotk4_gtk4_DropTargetAsync_ConnectDrop(arg0 C.gpointer, arg1 *C.GdkDrop, arg2 C.gdouble, arg3 C.gdouble, arg4 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_DropTargetAsync_ConnectDrop(arg0 C.gpointer, arg1 *C.void, arg2 C.gdouble, arg3 C.gdouble, arg4 C.guintptr) (cret C.gboolean) {
 	var f func(drop gdk.Dropper, x, y float64) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))

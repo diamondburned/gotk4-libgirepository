@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeToplevelAccessible = coreglib.Type(C.gtk_toplevel_accessible_get_type())
+	GTypeToplevelAccessible = coreglib.Type(girepository.MustFind("Gtk", "ToplevelAccessible").RegisteredGType())
 )
 
 func init() {
@@ -74,32 +73,6 @@ func marshalToplevelAccessible(p uintptr) (interface{}, error) {
 	return wrapToplevelAccessible(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// The function returns the following values:
-//
-//    - list: list of children.
-//
-func (accessible *ToplevelAccessible) Children() []*Window {
-	var _arg0 *C.GtkToplevelAccessible // out
-	var _cret *C.GList                 // in
-
-	_arg0 = (*C.GtkToplevelAccessible)(unsafe.Pointer(coreglib.InternObject(accessible).Native()))
-
-	_cret = C.gtk_toplevel_accessible_get_children(_arg0)
-	runtime.KeepAlive(accessible)
-
-	var _list []*Window // out
-
-	_list = make([]*Window, 0, gextras.ListSize(unsafe.Pointer(_cret)))
-	gextras.MoveList(unsafe.Pointer(_cret), false, func(v unsafe.Pointer) {
-		src := (*C.GtkWindow)(v)
-		var dst *Window // out
-		dst = wrapWindow(coreglib.Take(unsafe.Pointer(src)))
-		_list = append(_list, dst)
-	})
-
-	return _list
-}
-
 // ToplevelAccessibleClass: instance of this type is always passed by reference.
 type ToplevelAccessibleClass struct {
 	*toplevelAccessibleClass
@@ -107,12 +80,7 @@ type ToplevelAccessibleClass struct {
 
 // toplevelAccessibleClass is the struct that's finalized.
 type toplevelAccessibleClass struct {
-	native *C.GtkToplevelAccessibleClass
+	native unsafe.Pointer
 }
 
-func (t *ToplevelAccessibleClass) ParentClass() *atk.ObjectClass {
-	valptr := &t.native.parent_class
-	var _v *atk.ObjectClass // out
-	_v = (*atk.ObjectClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoToplevelAccessibleClass = girepository.MustFind("Gtk", "ToplevelAccessibleClass")

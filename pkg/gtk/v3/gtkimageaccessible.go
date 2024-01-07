@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeImageAccessible = coreglib.Type(C.gtk_image_accessible_get_type())
+	GTypeImageAccessible = coreglib.Type(girepository.MustFind("Gtk", "ImageAccessible").RegisteredGType())
 )
 
 func init() {
@@ -92,12 +92,7 @@ type ImageAccessibleClass struct {
 
 // imageAccessibleClass is the struct that's finalized.
 type imageAccessibleClass struct {
-	native *C.GtkImageAccessibleClass
+	native unsafe.Pointer
 }
 
-func (i *ImageAccessibleClass) ParentClass() *WidgetAccessibleClass {
-	valptr := &i.native.parent_class
-	var _v *WidgetAccessibleClass // out
-	_v = (*WidgetAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoImageAccessibleClass = girepository.MustFind("Gtk", "ImageAccessibleClass")

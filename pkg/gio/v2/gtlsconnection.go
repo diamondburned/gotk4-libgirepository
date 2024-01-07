@@ -5,11 +5,13 @@ package gio
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // TLSConnectionClass: instance of this type is always passed by reference.
@@ -19,12 +21,7 @@ type TLSConnectionClass struct {
 
 // tlsConnectionClass is the struct that's finalized.
 type tlsConnectionClass struct {
-	native *C.GTlsConnectionClass
+	native unsafe.Pointer
 }
 
-func (t *TLSConnectionClass) ParentClass() *IOStreamClass {
-	valptr := &t.native.parent_class
-	var _v *IOStreamClass // out
-	_v = (*IOStreamClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoTLSConnectionClass = girepository.MustFind("Gio", "TlsConnectionClass")

@@ -6,8 +6,10 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gbox"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gio2_FileMeasureProgressCallback

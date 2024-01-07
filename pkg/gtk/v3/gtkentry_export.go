@@ -5,15 +5,13 @@ package gtk
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_Entry_ConnectActivate
@@ -80,80 +78,6 @@ func _gotk4_gtk3_Entry_ConnectCutClipboard(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gtk3_Entry_ConnectDeleteFromCursor
-func _gotk4_gtk3_Entry_ConnectDeleteFromCursor(arg0 C.gpointer, arg1 C.GtkDeleteType, arg2 C.gint, arg3 C.guintptr) {
-	var f func(typ DeleteType, count int)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(typ DeleteType, count int))
-	}
-
-	var _typ DeleteType // out
-	var _count int      // out
-
-	_typ = DeleteType(arg1)
-	_count = int(arg2)
-
-	f(_typ, _count)
-}
-
-//export _gotk4_gtk3_Entry_ConnectIconPress
-func _gotk4_gtk3_Entry_ConnectIconPress(arg0 C.gpointer, arg1 C.GtkEntryIconPosition, arg2 C.GdkEvent, arg3 C.guintptr) {
-	var f func(iconPos EntryIconPosition, event *gdk.Event)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(iconPos EntryIconPosition, event *gdk.Event))
-	}
-
-	var _iconPos EntryIconPosition // out
-	var _event *gdk.Event          // out
-
-	_iconPos = EntryIconPosition(arg1)
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer((&arg2))))
-		v = gdk.CopyEventer(v)
-		_event = v
-	}
-
-	f(_iconPos, _event)
-}
-
-//export _gotk4_gtk3_Entry_ConnectIconRelease
-func _gotk4_gtk3_Entry_ConnectIconRelease(arg0 C.gpointer, arg1 C.GtkEntryIconPosition, arg2 C.GdkEvent, arg3 C.guintptr) {
-	var f func(iconPos EntryIconPosition, event *gdk.Event)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(iconPos EntryIconPosition, event *gdk.Event))
-	}
-
-	var _iconPos EntryIconPosition // out
-	var _event *gdk.Event          // out
-
-	_iconPos = EntryIconPosition(arg1)
-	{
-		v := (*gdk.Event)(gextras.NewStructNative(unsafe.Pointer((&arg2))))
-		v = gdk.CopyEventer(v)
-		_event = v
-	}
-
-	f(_iconPos, _event)
-}
-
 //export _gotk4_gtk3_Entry_ConnectInsertAtCursor
 func _gotk4_gtk3_Entry_ConnectInsertAtCursor(arg0 C.gpointer, arg1 *C.gchar, arg2 C.guintptr) {
 	var f func(str string)
@@ -190,32 +114,6 @@ func _gotk4_gtk3_Entry_ConnectInsertEmoji(arg0 C.gpointer, arg1 C.guintptr) {
 	f()
 }
 
-//export _gotk4_gtk3_Entry_ConnectMoveCursor
-func _gotk4_gtk3_Entry_ConnectMoveCursor(arg0 C.gpointer, arg1 C.GtkMovementStep, arg2 C.gint, arg3 C.gboolean, arg4 C.guintptr) {
-	var f func(step MovementStep, count int, extendSelection bool)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(step MovementStep, count int, extendSelection bool))
-	}
-
-	var _step MovementStep    // out
-	var _count int            // out
-	var _extendSelection bool // out
-
-	_step = MovementStep(arg1)
-	_count = int(arg2)
-	if arg3 != 0 {
-		_extendSelection = true
-	}
-
-	f(_step, _count, _extendSelection)
-}
-
 //export _gotk4_gtk3_Entry_ConnectPasteClipboard
 func _gotk4_gtk3_Entry_ConnectPasteClipboard(arg0 C.gpointer, arg1 C.guintptr) {
 	var f func()
@@ -233,7 +131,7 @@ func _gotk4_gtk3_Entry_ConnectPasteClipboard(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_Entry_ConnectPopulatePopup
-func _gotk4_gtk3_Entry_ConnectPopulatePopup(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guintptr) {
+func _gotk4_gtk3_Entry_ConnectPopulatePopup(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(widget Widgetter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

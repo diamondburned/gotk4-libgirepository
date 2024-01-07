@@ -3,25 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/pango"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeProgressBar = coreglib.Type(C.gtk_progress_bar_get_type())
+	GTypeProgressBar = coreglib.Type(girepository.MustFind("Gtk", "ProgressBar").RegisteredGType())
 )
 
 func init() {
@@ -129,315 +127,6 @@ func marshalProgressBar(p uintptr) (interface{}, error) {
 	return wrapProgressBar(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewProgressBar creates a new ProgressBar.
-//
-// The function returns the following values:
-//
-//    - progressBar: ProgressBar.
-//
-func NewProgressBar() *ProgressBar {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_progress_bar_new()
-
-	var _progressBar *ProgressBar // out
-
-	_progressBar = wrapProgressBar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _progressBar
-}
-
-// Ellipsize returns the ellipsizing position of the progress bar. See
-// gtk_progress_bar_set_ellipsize().
-//
-// The function returns the following values:
-//
-//    - ellipsizeMode: EllipsizeMode.
-//
-func (pbar *ProgressBar) Ellipsize() pango.EllipsizeMode {
-	var _arg0 *C.GtkProgressBar    // out
-	var _cret C.PangoEllipsizeMode // in
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-
-	_cret = C.gtk_progress_bar_get_ellipsize(_arg0)
-	runtime.KeepAlive(pbar)
-
-	var _ellipsizeMode pango.EllipsizeMode // out
-
-	_ellipsizeMode = pango.EllipsizeMode(_cret)
-
-	return _ellipsizeMode
-}
-
-// Fraction returns the current fraction of the task that’s been completed.
-//
-// The function returns the following values:
-//
-//    - gdouble: fraction from 0.0 to 1.0.
-//
-func (pbar *ProgressBar) Fraction() float64 {
-	var _arg0 *C.GtkProgressBar // out
-	var _cret C.gdouble         // in
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-
-	_cret = C.gtk_progress_bar_get_fraction(_arg0)
-	runtime.KeepAlive(pbar)
-
-	var _gdouble float64 // out
-
-	_gdouble = float64(_cret)
-
-	return _gdouble
-}
-
-// Inverted gets the value set by gtk_progress_bar_set_inverted().
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the progress bar is inverted.
-//
-func (pbar *ProgressBar) Inverted() bool {
-	var _arg0 *C.GtkProgressBar // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-
-	_cret = C.gtk_progress_bar_get_inverted(_arg0)
-	runtime.KeepAlive(pbar)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// PulseStep retrieves the pulse step set with
-// gtk_progress_bar_set_pulse_step().
-//
-// The function returns the following values:
-//
-//    - gdouble: fraction from 0.0 to 1.0.
-//
-func (pbar *ProgressBar) PulseStep() float64 {
-	var _arg0 *C.GtkProgressBar // out
-	var _cret C.gdouble         // in
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-
-	_cret = C.gtk_progress_bar_get_pulse_step(_arg0)
-	runtime.KeepAlive(pbar)
-
-	var _gdouble float64 // out
-
-	_gdouble = float64(_cret)
-
-	return _gdouble
-}
-
-// ShowText gets the value of the ProgressBar:show-text property. See
-// gtk_progress_bar_set_show_text().
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if text is shown in the progress bar.
-//
-func (pbar *ProgressBar) ShowText() bool {
-	var _arg0 *C.GtkProgressBar // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-
-	_cret = C.gtk_progress_bar_get_show_text(_arg0)
-	runtime.KeepAlive(pbar)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Text retrieves the text that is displayed with the progress bar, if any,
-// otherwise NULL. The return value is a reference to the text, not a copy of
-// it, so will become invalid if you change the text in the progress bar.
-//
-// The function returns the following values:
-//
-//    - utf8 (optional): text, or NULL; this string is owned by the widget and
-//      should not be modified or freed.
-//
-func (pbar *ProgressBar) Text() string {
-	var _arg0 *C.GtkProgressBar // out
-	var _cret *C.gchar          // in
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-
-	_cret = C.gtk_progress_bar_get_text(_arg0)
-	runtime.KeepAlive(pbar)
-
-	var _utf8 string // out
-
-	if _cret != nil {
-		_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	}
-
-	return _utf8
-}
-
-// Pulse indicates that some progress has been made, but you don’t know how
-// much. Causes the progress bar to enter “activity mode,” where a block bounces
-// back and forth. Each call to gtk_progress_bar_pulse() causes the block to
-// move by a little bit (the amount of movement per pulse is determined by
-// gtk_progress_bar_set_pulse_step()).
-func (pbar *ProgressBar) Pulse() {
-	var _arg0 *C.GtkProgressBar // out
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-
-	C.gtk_progress_bar_pulse(_arg0)
-	runtime.KeepAlive(pbar)
-}
-
-// SetEllipsize sets the mode used to ellipsize (add an ellipsis: "...") the
-// text if there is not enough space to render the entire string.
-//
-// The function takes the following parameters:
-//
-//    - mode: EllipsizeMode.
-//
-func (pbar *ProgressBar) SetEllipsize(mode pango.EllipsizeMode) {
-	var _arg0 *C.GtkProgressBar    // out
-	var _arg1 C.PangoEllipsizeMode // out
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-	_arg1 = C.PangoEllipsizeMode(mode)
-
-	C.gtk_progress_bar_set_ellipsize(_arg0, _arg1)
-	runtime.KeepAlive(pbar)
-	runtime.KeepAlive(mode)
-}
-
-// SetFraction causes the progress bar to “fill in” the given fraction of the
-// bar. The fraction should be between 0.0 and 1.0, inclusive.
-//
-// The function takes the following parameters:
-//
-//    - fraction of the task that’s been completed.
-//
-func (pbar *ProgressBar) SetFraction(fraction float64) {
-	var _arg0 *C.GtkProgressBar // out
-	var _arg1 C.gdouble         // out
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-	_arg1 = C.gdouble(fraction)
-
-	C.gtk_progress_bar_set_fraction(_arg0, _arg1)
-	runtime.KeepAlive(pbar)
-	runtime.KeepAlive(fraction)
-}
-
-// SetInverted progress bars normally grow from top to bottom or left to right.
-// Inverted progress bars grow in the opposite direction.
-//
-// The function takes the following parameters:
-//
-//    - inverted: TRUE to invert the progress bar.
-//
-func (pbar *ProgressBar) SetInverted(inverted bool) {
-	var _arg0 *C.GtkProgressBar // out
-	var _arg1 C.gboolean        // out
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-	if inverted {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_progress_bar_set_inverted(_arg0, _arg1)
-	runtime.KeepAlive(pbar)
-	runtime.KeepAlive(inverted)
-}
-
-// SetPulseStep sets the fraction of total progress bar length to move the
-// bouncing block for each call to gtk_progress_bar_pulse().
-//
-// The function takes the following parameters:
-//
-//    - fraction between 0.0 and 1.0.
-//
-func (pbar *ProgressBar) SetPulseStep(fraction float64) {
-	var _arg0 *C.GtkProgressBar // out
-	var _arg1 C.gdouble         // out
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-	_arg1 = C.gdouble(fraction)
-
-	C.gtk_progress_bar_set_pulse_step(_arg0, _arg1)
-	runtime.KeepAlive(pbar)
-	runtime.KeepAlive(fraction)
-}
-
-// SetShowText sets whether the progress bar will show text next to the bar. The
-// shown text is either the value of the ProgressBar:text property or, if that
-// is NULL, the ProgressBar:fraction value, as a percentage.
-//
-// To make a progress bar that is styled and sized suitably for containing text
-// (even if the actual text is blank), set ProgressBar:show-text to TRUE and
-// ProgressBar:text to the empty string (not NULL).
-//
-// The function takes the following parameters:
-//
-//    - showText: whether to show text.
-//
-func (pbar *ProgressBar) SetShowText(showText bool) {
-	var _arg0 *C.GtkProgressBar // out
-	var _arg1 C.gboolean        // out
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-	if showText {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_progress_bar_set_show_text(_arg0, _arg1)
-	runtime.KeepAlive(pbar)
-	runtime.KeepAlive(showText)
-}
-
-// SetText causes the given text to appear next to the progress bar.
-//
-// If text is NULL and ProgressBar:show-text is TRUE, the current value of
-// ProgressBar:fraction will be displayed as a percentage.
-//
-// If text is non-NULL and ProgressBar:show-text is TRUE, the text will be
-// displayed. In this case, it will not display the progress percentage. If text
-// is the empty string, the progress bar will still be styled and sized suitably
-// for containing text, as long as ProgressBar:show-text is TRUE.
-//
-// The function takes the following parameters:
-//
-//    - text (optional): UTF-8 string, or NULL.
-//
-func (pbar *ProgressBar) SetText(text string) {
-	var _arg0 *C.GtkProgressBar // out
-	var _arg1 *C.gchar          // out
-
-	_arg0 = (*C.GtkProgressBar)(unsafe.Pointer(coreglib.InternObject(pbar).Native()))
-	if text != "" {
-		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(text)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-
-	C.gtk_progress_bar_set_text(_arg0, _arg1)
-	runtime.KeepAlive(pbar)
-	runtime.KeepAlive(text)
-}
-
 // ProgressBarClass: instance of this type is always passed by reference.
 type ProgressBarClass struct {
 	*progressBarClass
@@ -445,12 +134,7 @@ type ProgressBarClass struct {
 
 // progressBarClass is the struct that's finalized.
 type progressBarClass struct {
-	native *C.GtkProgressBarClass
+	native unsafe.Pointer
 }
 
-func (p *ProgressBarClass) ParentClass() *WidgetClass {
-	valptr := &p.native.parent_class
-	var _v *WidgetClass // out
-	_v = (*WidgetClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoProgressBarClass = girepository.MustFind("Gtk", "ProgressBarClass")

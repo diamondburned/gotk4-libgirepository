@@ -10,12 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gsk/gsk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gsk4_ParseErrorFunc
-func _gotk4_gsk4_ParseErrorFunc(arg1 *C.GskParseLocation, arg2 *C.GskParseLocation, arg3 *C.GError, arg4 C.gpointer) {
+func _gotk4_gsk4_ParseErrorFunc(arg1 *C.void, arg2 *C.void, arg3 *C.GError, arg4 C.gpointer) {
 	var fn ParseErrorFunc
 	{
 		v := gbox.Get(uintptr(arg4))

@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeBooleanCellAccessible = coreglib.Type(C.gtk_boolean_cell_accessible_get_type())
+	GTypeBooleanCellAccessible = coreglib.Type(girepository.MustFind("Gtk", "BooleanCellAccessible").RegisteredGType())
 )
 
 func init() {
@@ -102,12 +102,7 @@ type BooleanCellAccessibleClass struct {
 
 // booleanCellAccessibleClass is the struct that's finalized.
 type booleanCellAccessibleClass struct {
-	native *C.GtkBooleanCellAccessibleClass
+	native unsafe.Pointer
 }
 
-func (b *BooleanCellAccessibleClass) ParentClass() *RendererCellAccessibleClass {
-	valptr := &b.native.parent_class
-	var _v *RendererCellAccessibleClass // out
-	_v = (*RendererCellAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoBooleanCellAccessibleClass = girepository.MustFind("Gtk", "BooleanCellAccessibleClass")

@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ApplicationCommandLineClass private data only.
@@ -15,5 +23,7 @@ type ApplicationCommandLineClass struct {
 
 // applicationCommandLineClass is the struct that's finalized.
 type applicationCommandLineClass struct {
-	native *C.GApplicationCommandLineClass
+	native unsafe.Pointer
 }
+
+var GIRInfoApplicationCommandLineClass = girepository.MustFind("Gio", "ApplicationCommandLineClass")

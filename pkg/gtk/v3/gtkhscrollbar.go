@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeHScrollbar = coreglib.Type(C.gtk_hscrollbar_get_type())
+	GTypeHScrollbar = coreglib.Type(girepository.MustFind("Gtk", "HScrollbar").RegisteredGType())
 )
 
 func init() {
@@ -98,36 +97,6 @@ func marshalHScrollbar(p uintptr) (interface{}, error) {
 	return wrapHScrollbar(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewHScrollbar creates a new horizontal scrollbar.
-//
-// Deprecated: Use gtk_scrollbar_new() with GTK_ORIENTATION_HORIZONTAL instead.
-//
-// The function takes the following parameters:
-//
-//    - adjustment (optional) to use, or NULL to create a new adjustment.
-//
-// The function returns the following values:
-//
-//    - hScrollbar: new HScrollbar.
-//
-func NewHScrollbar(adjustment *Adjustment) *HScrollbar {
-	var _arg1 *C.GtkAdjustment // out
-	var _cret *C.GtkWidget     // in
-
-	if adjustment != nil {
-		_arg1 = (*C.GtkAdjustment)(unsafe.Pointer(coreglib.InternObject(adjustment).Native()))
-	}
-
-	_cret = C.gtk_hscrollbar_new(_arg1)
-	runtime.KeepAlive(adjustment)
-
-	var _hScrollbar *HScrollbar // out
-
-	_hScrollbar = wrapHScrollbar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _hScrollbar
-}
-
 // HScrollbarClass: instance of this type is always passed by reference.
 type HScrollbarClass struct {
 	*hScrollbarClass
@@ -135,12 +104,7 @@ type HScrollbarClass struct {
 
 // hScrollbarClass is the struct that's finalized.
 type hScrollbarClass struct {
-	native *C.GtkHScrollbarClass
+	native unsafe.Pointer
 }
 
-func (h *HScrollbarClass) ParentClass() *ScrollbarClass {
-	valptr := &h.native.parent_class
-	var _v *ScrollbarClass // out
-	_v = (*ScrollbarClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoHScrollbarClass = girepository.MustFind("Gtk", "HScrollbarClass")

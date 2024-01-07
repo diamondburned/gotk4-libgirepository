@@ -9,8 +9,10 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <pango/pango.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_pango1_AttrDataCopyFunc
@@ -34,7 +36,7 @@ func _gotk4_pango1_AttrDataCopyFunc(arg1 C.gconstpointer) (cret C.gpointer) {
 }
 
 //export _gotk4_pango1_AttrFilterFunc
-func _gotk4_pango1_AttrFilterFunc(arg1 *C.PangoAttribute, arg2 C.gpointer) (cret C.gboolean) {
+func _gotk4_pango1_AttrFilterFunc(arg1 *C.void, arg2 C.gpointer) (cret C.gboolean) {
 	var fn AttrFilterFunc
 	{
 		v := gbox.Get(uintptr(arg2))

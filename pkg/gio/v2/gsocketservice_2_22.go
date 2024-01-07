@@ -3,26 +3,23 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern gboolean _gotk4_gio2_SocketService_ConnectIncoming(gpointer, GSocketConnection*, GObject, guintptr);
-// extern gboolean _gotk4_gio2_SocketServiceClass_incoming(GSocketService*, GSocketConnection*, GObject*);
-// gboolean _gotk4_gio2_SocketService_virtual_incoming(void* fnptr, GSocketService* arg0, GSocketConnection* arg1, GObject* arg2) {
-//   return ((gboolean (*)(GSocketService*, GSocketConnection*, GObject*))(fnptr))(arg0, arg1, arg2);
-// };
+// extern gboolean _gotk4_gio2_SocketService_ConnectIncoming(gpointer, void*, GObject, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeSocketService = coreglib.Type(C.g_socket_service_get_type())
+	GTypeSocketService = coreglib.Type(girepository.MustFind("Gio", "SocketService").RegisteredGType())
 )
 
 func init() {
@@ -33,20 +30,10 @@ func init() {
 
 // SocketServiceOverrides contains methods that are overridable.
 type SocketServiceOverrides struct {
-	// The function takes the following parameters:
-	//
-	//    - connection
-	//    - sourceObject
-	//
-	// The function returns the following values:
-	//
-	Incoming func(connection *SocketConnection, sourceObject *coreglib.Object) bool
 }
 
 func defaultSocketServiceOverrides(v *SocketService) SocketServiceOverrides {
-	return SocketServiceOverrides{
-		Incoming: v.incoming,
-	}
+	return SocketServiceOverrides{}
 }
 
 // SocketService is an object that represents a service that is provided to the
@@ -90,12 +77,6 @@ func init() {
 }
 
 func initSocketServiceClass(gclass unsafe.Pointer, overrides SocketServiceOverrides, classInitFunc func(*SocketServiceClass)) {
-	pclass := (*C.GSocketServiceClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeSocketService))))
-
-	if overrides.Incoming != nil {
-		pclass.incoming = (*[0]byte)(C._gotk4_gio2_SocketServiceClass_incoming)
-	}
-
 	if classInitFunc != nil {
 		class := (*SocketServiceClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -120,129 +101,6 @@ func marshalSocketService(p uintptr) (interface{}, error) {
 //
 // connection will be unreffed once the signal handler returns, so you need to
 // ref it yourself if you are planning to use it.
-func (service *SocketService) ConnectIncoming(f func(connection *SocketConnection, sourceObject *coreglib.Object) (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(service, "incoming", false, unsafe.Pointer(C._gotk4_gio2_SocketService_ConnectIncoming), f)
-}
-
-// NewSocketService creates a new Service with no sockets to listen for. New
-// listeners can be added with e.g. g_socket_listener_add_address() or
-// g_socket_listener_add_inet_port().
-//
-// New services are created active, there is no need to call
-// g_socket_service_start(), unless g_socket_service_stop() has been called
-// before.
-//
-// The function returns the following values:
-//
-//    - socketService: new Service.
-//
-func NewSocketService() *SocketService {
-	var _cret *C.GSocketService // in
-
-	_cret = C.g_socket_service_new()
-
-	var _socketService *SocketService // out
-
-	_socketService = wrapSocketService(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _socketService
-}
-
-// IsActive: check whether the service is active or not. An active service will
-// accept new clients that connect, while a non-active service will let
-// connecting clients queue up until the service is started.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the service is active, FALSE otherwise.
-//
-func (service *SocketService) IsActive() bool {
-	var _arg0 *C.GSocketService // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GSocketService)(unsafe.Pointer(coreglib.InternObject(service).Native()))
-
-	_cret = C.g_socket_service_is_active(_arg0)
-	runtime.KeepAlive(service)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Start restarts the service, i.e. start accepting connections from the added
-// sockets when the mainloop runs. This only needs to be called after the
-// service has been stopped from g_socket_service_stop().
-//
-// This call is thread-safe, so it may be called from a thread handling an
-// incoming client request.
-func (service *SocketService) Start() {
-	var _arg0 *C.GSocketService // out
-
-	_arg0 = (*C.GSocketService)(unsafe.Pointer(coreglib.InternObject(service).Native()))
-
-	C.g_socket_service_start(_arg0)
-	runtime.KeepAlive(service)
-}
-
-// Stop stops the service, i.e. stops accepting connections from the added
-// sockets when the mainloop runs.
-//
-// This call is thread-safe, so it may be called from a thread handling an
-// incoming client request.
-//
-// Note that this only stops accepting new connections; it does not close the
-// listening sockets, and you can call g_socket_service_start() again later to
-// begin listening again. To close the listening sockets, call
-// g_socket_listener_close(). (This will happen automatically when the Service
-// is finalized.)
-//
-// This must be called before calling g_socket_listener_close() as the socket
-// service will start accepting connections immediately when a new socket is
-// added.
-func (service *SocketService) Stop() {
-	var _arg0 *C.GSocketService // out
-
-	_arg0 = (*C.GSocketService)(unsafe.Pointer(coreglib.InternObject(service).Native()))
-
-	C.g_socket_service_stop(_arg0)
-	runtime.KeepAlive(service)
-}
-
-// The function takes the following parameters:
-//
-//    - connection
-//    - sourceObject
-//
-// The function returns the following values:
-//
-func (service *SocketService) incoming(connection *SocketConnection, sourceObject *coreglib.Object) bool {
-	gclass := (*C.GSocketServiceClass)(coreglib.PeekParentClass(service))
-	fnarg := gclass.incoming
-
-	var _arg0 *C.GSocketService    // out
-	var _arg1 *C.GSocketConnection // out
-	var _arg2 *C.GObject           // out
-	var _cret C.gboolean           // in
-
-	_arg0 = (*C.GSocketService)(unsafe.Pointer(coreglib.InternObject(service).Native()))
-	_arg1 = (*C.GSocketConnection)(unsafe.Pointer(coreglib.InternObject(connection).Native()))
-	_arg2 = (*C.GObject)(unsafe.Pointer(sourceObject.Native()))
-
-	_cret = C._gotk4_gio2_SocketService_virtual_incoming(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(service)
-	runtime.KeepAlive(connection)
-	runtime.KeepAlive(sourceObject)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
+func (v *SocketService) ConnectIncoming(f func(connection *SocketConnection, sourceObject *coreglib.Object) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "incoming", false, unsafe.Pointer(C._gotk4_gio2_SocketService_ConnectIncoming), f)
 }

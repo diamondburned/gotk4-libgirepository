@@ -7,58 +7,58 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeAlign             = coreglib.Type(C.gtk_align_get_type())
-	GTypeArrowType         = coreglib.Type(C.gtk_arrow_type_get_type())
-	GTypeBorderStyle       = coreglib.Type(C.gtk_border_style_get_type())
-	GTypeDeleteType        = coreglib.Type(C.gtk_delete_type_get_type())
-	GTypeDirectionType     = coreglib.Type(C.gtk_direction_type_get_type())
-	GTypeDragResult        = coreglib.Type(C.gtk_drag_result_get_type())
-	GTypeIMPreeditStyle    = coreglib.Type(C.gtk_im_preedit_style_get_type())
-	GTypeIMStatusStyle     = coreglib.Type(C.gtk_im_status_style_get_type())
-	GTypeIconSize          = coreglib.Type(C.gtk_icon_size_get_type())
-	GTypeJustification     = coreglib.Type(C.gtk_justification_get_type())
-	GTypeMenuDirectionType = coreglib.Type(C.gtk_menu_direction_type_get_type())
-	GTypeMessageType       = coreglib.Type(C.gtk_message_type_get_type())
-	GTypeNumberUpLayout    = coreglib.Type(C.gtk_number_up_layout_get_type())
-	GTypeOrientation       = coreglib.Type(C.gtk_orientation_get_type())
-	GTypePackDirection     = coreglib.Type(C.gtk_pack_direction_get_type())
-	GTypePackType          = coreglib.Type(C.gtk_pack_type_get_type())
-	GTypePageOrientation   = coreglib.Type(C.gtk_page_orientation_get_type())
-	GTypePageSet           = coreglib.Type(C.gtk_page_set_get_type())
-	GTypePositionType      = coreglib.Type(C.gtk_position_type_get_type())
-	GTypePrintDuplex       = coreglib.Type(C.gtk_print_duplex_get_type())
-	GTypePrintPages        = coreglib.Type(C.gtk_print_pages_get_type())
-	GTypePrintQuality      = coreglib.Type(C.gtk_print_quality_get_type())
-	GTypeReliefStyle       = coreglib.Type(C.gtk_relief_style_get_type())
-	GTypeScrollType        = coreglib.Type(C.gtk_scroll_type_get_type())
-	GTypeScrollablePolicy  = coreglib.Type(C.gtk_scrollable_policy_get_type())
-	GTypeSelectionMode     = coreglib.Type(C.gtk_selection_mode_get_type())
-	GTypeSensitivityType   = coreglib.Type(C.gtk_sensitivity_type_get_type())
-	GTypeShadowType        = coreglib.Type(C.gtk_shadow_type_get_type())
-	GTypeSizeGroupMode     = coreglib.Type(C.gtk_size_group_mode_get_type())
-	GTypeSizeRequestMode   = coreglib.Type(C.gtk_size_request_mode_get_type())
-	GTypeSortType          = coreglib.Type(C.gtk_sort_type_get_type())
-	GTypeStateType         = coreglib.Type(C.gtk_state_type_get_type())
-	GTypeTextDirection     = coreglib.Type(C.gtk_text_direction_get_type())
-	GTypeToolbarStyle      = coreglib.Type(C.gtk_toolbar_style_get_type())
-	GTypeTreeViewGridLines = coreglib.Type(C.gtk_tree_view_grid_lines_get_type())
-	GTypeUnit              = coreglib.Type(C.gtk_unit_get_type())
-	GTypeWrapMode          = coreglib.Type(C.gtk_wrap_mode_get_type())
-	GTypeJunctionSides     = coreglib.Type(C.gtk_junction_sides_get_type())
-	GTypeRegionFlags       = coreglib.Type(C.gtk_region_flags_get_type())
-	GTypeStateFlags        = coreglib.Type(C.gtk_state_flags_get_type())
+	GTypeAlign             = coreglib.Type(girepository.MustFind("Gtk", "Align").RegisteredGType())
+	GTypeArrowType         = coreglib.Type(girepository.MustFind("Gtk", "ArrowType").RegisteredGType())
+	GTypeBorderStyle       = coreglib.Type(girepository.MustFind("Gtk", "BorderStyle").RegisteredGType())
+	GTypeDeleteType        = coreglib.Type(girepository.MustFind("Gtk", "DeleteType").RegisteredGType())
+	GTypeDirectionType     = coreglib.Type(girepository.MustFind("Gtk", "DirectionType").RegisteredGType())
+	GTypeDragResult        = coreglib.Type(girepository.MustFind("Gtk", "DragResult").RegisteredGType())
+	GTypeIMPreeditStyle    = coreglib.Type(girepository.MustFind("Gtk", "IMPreeditStyle").RegisteredGType())
+	GTypeIMStatusStyle     = coreglib.Type(girepository.MustFind("Gtk", "IMStatusStyle").RegisteredGType())
+	GTypeIconSize          = coreglib.Type(girepository.MustFind("Gtk", "IconSize").RegisteredGType())
+	GTypeJustification     = coreglib.Type(girepository.MustFind("Gtk", "Justification").RegisteredGType())
+	GTypeMenuDirectionType = coreglib.Type(girepository.MustFind("Gtk", "MenuDirectionType").RegisteredGType())
+	GTypeMessageType       = coreglib.Type(girepository.MustFind("Gtk", "MessageType").RegisteredGType())
+	GTypeNumberUpLayout    = coreglib.Type(girepository.MustFind("Gtk", "NumberUpLayout").RegisteredGType())
+	GTypeOrientation       = coreglib.Type(girepository.MustFind("Gtk", "Orientation").RegisteredGType())
+	GTypePackDirection     = coreglib.Type(girepository.MustFind("Gtk", "PackDirection").RegisteredGType())
+	GTypePackType          = coreglib.Type(girepository.MustFind("Gtk", "PackType").RegisteredGType())
+	GTypePageOrientation   = coreglib.Type(girepository.MustFind("Gtk", "PageOrientation").RegisteredGType())
+	GTypePageSet           = coreglib.Type(girepository.MustFind("Gtk", "PageSet").RegisteredGType())
+	GTypePositionType      = coreglib.Type(girepository.MustFind("Gtk", "PositionType").RegisteredGType())
+	GTypePrintDuplex       = coreglib.Type(girepository.MustFind("Gtk", "PrintDuplex").RegisteredGType())
+	GTypePrintPages        = coreglib.Type(girepository.MustFind("Gtk", "PrintPages").RegisteredGType())
+	GTypePrintQuality      = coreglib.Type(girepository.MustFind("Gtk", "PrintQuality").RegisteredGType())
+	GTypeReliefStyle       = coreglib.Type(girepository.MustFind("Gtk", "ReliefStyle").RegisteredGType())
+	GTypeScrollType        = coreglib.Type(girepository.MustFind("Gtk", "ScrollType").RegisteredGType())
+	GTypeScrollablePolicy  = coreglib.Type(girepository.MustFind("Gtk", "ScrollablePolicy").RegisteredGType())
+	GTypeSelectionMode     = coreglib.Type(girepository.MustFind("Gtk", "SelectionMode").RegisteredGType())
+	GTypeSensitivityType   = coreglib.Type(girepository.MustFind("Gtk", "SensitivityType").RegisteredGType())
+	GTypeShadowType        = coreglib.Type(girepository.MustFind("Gtk", "ShadowType").RegisteredGType())
+	GTypeSizeGroupMode     = coreglib.Type(girepository.MustFind("Gtk", "SizeGroupMode").RegisteredGType())
+	GTypeSizeRequestMode   = coreglib.Type(girepository.MustFind("Gtk", "SizeRequestMode").RegisteredGType())
+	GTypeSortType          = coreglib.Type(girepository.MustFind("Gtk", "SortType").RegisteredGType())
+	GTypeStateType         = coreglib.Type(girepository.MustFind("Gtk", "StateType").RegisteredGType())
+	GTypeTextDirection     = coreglib.Type(girepository.MustFind("Gtk", "TextDirection").RegisteredGType())
+	GTypeToolbarStyle      = coreglib.Type(girepository.MustFind("Gtk", "ToolbarStyle").RegisteredGType())
+	GTypeTreeViewGridLines = coreglib.Type(girepository.MustFind("Gtk", "TreeViewGridLines").RegisteredGType())
+	GTypeUnit              = coreglib.Type(girepository.MustFind("Gtk", "Unit").RegisteredGType())
+	GTypeWrapMode          = coreglib.Type(girepository.MustFind("Gtk", "WrapMode").RegisteredGType())
+	GTypeJunctionSides     = coreglib.Type(girepository.MustFind("Gtk", "JunctionSides").RegisteredGType())
+	GTypeRegionFlags       = coreglib.Type(girepository.MustFind("Gtk", "RegionFlags").RegisteredGType())
+	GTypeStateFlags        = coreglib.Type(girepository.MustFind("Gtk", "StateFlags").RegisteredGType())
 )
 
 func init() {

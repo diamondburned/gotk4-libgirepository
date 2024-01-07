@@ -7,18 +7,20 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTLSCertificateRequestFlags = coreglib.Type(C.g_tls_certificate_request_flags_get_type())
-	GTypeSubprocessFlags            = coreglib.Type(C.g_subprocess_flags_get_type())
+	GTypeTLSCertificateRequestFlags = coreglib.Type(girepository.MustFind("Gio", "TlsCertificateRequestFlags").RegisteredGType())
+	GTypeSubprocessFlags            = coreglib.Type(girepository.MustFind("Gio", "SubprocessFlags").RegisteredGType())
 )
 
 func init() {

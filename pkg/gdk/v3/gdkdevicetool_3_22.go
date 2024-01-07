@@ -6,17 +6,19 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDeviceToolType = coreglib.Type(C.gdk_device_tool_type_get_type())
+	GTypeDeviceToolType = coreglib.Type(girepository.MustFind("Gdk", "DeviceToolType").RegisteredGType())
 )
 
 func init() {

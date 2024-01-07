@@ -3,25 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeMenuBar = coreglib.Type(C.gtk_menu_bar_get_type())
+	GTypeMenuBar = coreglib.Type(girepository.MustFind("Gtk", "MenuBar").RegisteredGType())
 )
 
 func init() {
@@ -95,138 +93,6 @@ func marshalMenuBar(p uintptr) (interface{}, error) {
 	return wrapMenuBar(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewMenuBar creates a new MenuBar.
-//
-// The function returns the following values:
-//
-//    - menuBar: new menu bar, as a Widget.
-//
-func NewMenuBar() *MenuBar {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_menu_bar_new()
-
-	var _menuBar *MenuBar // out
-
-	_menuBar = wrapMenuBar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _menuBar
-}
-
-// NewMenuBarFromModel creates a new MenuBar and populates it with menu items
-// and submenus according to model.
-//
-// The created menu items are connected to actions found in the
-// ApplicationWindow to which the menu bar belongs - typically by means of being
-// contained within the ApplicationWindows widget hierarchy.
-//
-// The function takes the following parameters:
-//
-//    - model: Model.
-//
-// The function returns the following values:
-//
-//    - menuBar: new MenuBar.
-//
-func NewMenuBarFromModel(model gio.MenuModeller) *MenuBar {
-	var _arg1 *C.GMenuModel // out
-	var _cret *C.GtkWidget  // in
-
-	_arg1 = (*C.GMenuModel)(unsafe.Pointer(coreglib.InternObject(model).Native()))
-
-	_cret = C.gtk_menu_bar_new_from_model(_arg1)
-	runtime.KeepAlive(model)
-
-	var _menuBar *MenuBar // out
-
-	_menuBar = wrapMenuBar(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _menuBar
-}
-
-// ChildPackDirection retrieves the current child pack direction of the menubar.
-// See gtk_menu_bar_set_child_pack_direction().
-//
-// The function returns the following values:
-//
-//    - packDirection: child pack direction.
-//
-func (menubar *MenuBar) ChildPackDirection() PackDirection {
-	var _arg0 *C.GtkMenuBar      // out
-	var _cret C.GtkPackDirection // in
-
-	_arg0 = (*C.GtkMenuBar)(unsafe.Pointer(coreglib.InternObject(menubar).Native()))
-
-	_cret = C.gtk_menu_bar_get_child_pack_direction(_arg0)
-	runtime.KeepAlive(menubar)
-
-	var _packDirection PackDirection // out
-
-	_packDirection = PackDirection(_cret)
-
-	return _packDirection
-}
-
-// PackDirection retrieves the current pack direction of the menubar. See
-// gtk_menu_bar_set_pack_direction().
-//
-// The function returns the following values:
-//
-//    - packDirection: pack direction.
-//
-func (menubar *MenuBar) PackDirection() PackDirection {
-	var _arg0 *C.GtkMenuBar      // out
-	var _cret C.GtkPackDirection // in
-
-	_arg0 = (*C.GtkMenuBar)(unsafe.Pointer(coreglib.InternObject(menubar).Native()))
-
-	_cret = C.gtk_menu_bar_get_pack_direction(_arg0)
-	runtime.KeepAlive(menubar)
-
-	var _packDirection PackDirection // out
-
-	_packDirection = PackDirection(_cret)
-
-	return _packDirection
-}
-
-// SetChildPackDirection sets how widgets should be packed inside the children
-// of a menubar.
-//
-// The function takes the following parameters:
-//
-//    - childPackDir: new PackDirection.
-//
-func (menubar *MenuBar) SetChildPackDirection(childPackDir PackDirection) {
-	var _arg0 *C.GtkMenuBar      // out
-	var _arg1 C.GtkPackDirection // out
-
-	_arg0 = (*C.GtkMenuBar)(unsafe.Pointer(coreglib.InternObject(menubar).Native()))
-	_arg1 = C.GtkPackDirection(childPackDir)
-
-	C.gtk_menu_bar_set_child_pack_direction(_arg0, _arg1)
-	runtime.KeepAlive(menubar)
-	runtime.KeepAlive(childPackDir)
-}
-
-// SetPackDirection sets how items should be packed inside a menubar.
-//
-// The function takes the following parameters:
-//
-//    - packDir: new PackDirection.
-//
-func (menubar *MenuBar) SetPackDirection(packDir PackDirection) {
-	var _arg0 *C.GtkMenuBar      // out
-	var _arg1 C.GtkPackDirection // out
-
-	_arg0 = (*C.GtkMenuBar)(unsafe.Pointer(coreglib.InternObject(menubar).Native()))
-	_arg1 = C.GtkPackDirection(packDir)
-
-	C.gtk_menu_bar_set_pack_direction(_arg0, _arg1)
-	runtime.KeepAlive(menubar)
-	runtime.KeepAlive(packDir)
-}
-
 // MenuBarClass: instance of this type is always passed by reference.
 type MenuBarClass struct {
 	*menuBarClass
@@ -234,12 +100,7 @@ type MenuBarClass struct {
 
 // menuBarClass is the struct that's finalized.
 type menuBarClass struct {
-	native *C.GtkMenuBarClass
+	native unsafe.Pointer
 }
 
-func (m *MenuBarClass) ParentClass() *MenuShellClass {
-	valptr := &m.native.parent_class
-	var _v *MenuShellClass // out
-	_v = (*MenuShellClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoMenuBarClass = girepository.MustFind("Gtk", "MenuBarClass")

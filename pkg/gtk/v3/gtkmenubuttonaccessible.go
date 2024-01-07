@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeMenuButtonAccessible = coreglib.Type(C.gtk_menu_button_accessible_get_type())
+	GTypeMenuButtonAccessible = coreglib.Type(girepository.MustFind("Gtk", "MenuButtonAccessible").RegisteredGType())
 )
 
 func init() {
@@ -101,12 +101,7 @@ type MenuButtonAccessibleClass struct {
 
 // menuButtonAccessibleClass is the struct that's finalized.
 type menuButtonAccessibleClass struct {
-	native *C.GtkMenuButtonAccessibleClass
+	native unsafe.Pointer
 }
 
-func (m *MenuButtonAccessibleClass) ParentClass() *ToggleButtonAccessibleClass {
-	valptr := &m.native.parent_class
-	var _v *ToggleButtonAccessibleClass // out
-	_v = (*ToggleButtonAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoMenuButtonAccessibleClass = girepository.MustFind("Gtk", "MenuButtonAccessibleClass")

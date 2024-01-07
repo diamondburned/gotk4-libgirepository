@@ -4,8 +4,10 @@ package gio
 
 import ()
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // VFSFileLookupFunc: this function type is used by g_vfs_register_uri_scheme()

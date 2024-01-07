@@ -3,21 +3,22 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTCPConnection = coreglib.Type(C.g_tcp_connection_get_type())
+	GTypeTCPConnection = coreglib.Type(girepository.MustFind("Gio", "TcpConnection").RegisteredGType())
 )
 
 func init() {
@@ -73,58 +74,4 @@ func wrapTCPConnection(obj *coreglib.Object) *TCPConnection {
 
 func marshalTCPConnection(p uintptr) (interface{}, error) {
 	return wrapTCPConnection(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// GracefulDisconnect checks if graceful disconnects are used. See
-// g_tcp_connection_set_graceful_disconnect().
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if graceful disconnect is used on close, FALSE otherwise.
-//
-func (connection *TCPConnection) GracefulDisconnect() bool {
-	var _arg0 *C.GTcpConnection // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GTcpConnection)(unsafe.Pointer(coreglib.InternObject(connection).Native()))
-
-	_cret = C.g_tcp_connection_get_graceful_disconnect(_arg0)
-	runtime.KeepAlive(connection)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetGracefulDisconnect: this enables graceful disconnects on close. A graceful
-// disconnect means that we signal the receiving end that the connection is
-// terminated and wait for it to close the connection before closing the
-// connection.
-//
-// A graceful disconnect means that we can be sure that we successfully sent all
-// the outstanding data to the other end, or get an error reported. However, it
-// also means we have to wait for all the data to reach the other side and for
-// it to acknowledge this by closing the socket, which may take a while. For
-// this reason it is disabled by default.
-//
-// The function takes the following parameters:
-//
-//    - gracefulDisconnect: whether to do graceful disconnects or not.
-//
-func (connection *TCPConnection) SetGracefulDisconnect(gracefulDisconnect bool) {
-	var _arg0 *C.GTcpConnection // out
-	var _arg1 C.gboolean        // out
-
-	_arg0 = (*C.GTcpConnection)(unsafe.Pointer(coreglib.InternObject(connection).Native()))
-	if gracefulDisconnect {
-		_arg1 = C.TRUE
-	}
-
-	C.g_tcp_connection_set_graceful_disconnect(_arg0, _arg1)
-	runtime.KeepAlive(connection)
-	runtime.KeepAlive(gracefulDisconnect)
 }

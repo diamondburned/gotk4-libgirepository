@@ -3,34 +3,26 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
+// extern void* _gotk4_gtk4_GLArea_ConnectCreateContext(gpointer, guintptr);
 // extern void _gotk4_gtk4_GLArea_ConnectResize(gpointer, gint, gint, guintptr);
-// extern void _gotk4_gtk4_GLAreaClass_resize(GtkGLArea*, int, int);
-// extern gboolean _gotk4_gtk4_GLArea_ConnectRender(gpointer, GdkGLContext*, guintptr);
-// extern gboolean _gotk4_gtk4_GLAreaClass_render(GtkGLArea*, GdkGLContext*);
-// extern GdkGLContext* _gotk4_gtk4_GLArea_ConnectCreateContext(gpointer, guintptr);
-// gboolean _gotk4_gtk4_GLArea_virtual_render(void* fnptr, GtkGLArea* arg0, GdkGLContext* arg1) {
-//   return ((gboolean (*)(GtkGLArea*, GdkGLContext*))(fnptr))(arg0, arg1);
-// };
-// void _gotk4_gtk4_GLArea_virtual_resize(void* fnptr, GtkGLArea* arg0, int arg1, int arg2) {
-//   ((void (*)(GtkGLArea*, int, int))(fnptr))(arg0, arg1, arg2);
-// };
+// extern gboolean _gotk4_gtk4_GLArea_ConnectRender(gpointer, void*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeGLArea = coreglib.Type(C.gtk_gl_area_get_type())
+	GTypeGLArea = coreglib.Type(girepository.MustFind("Gtk", "GLArea").RegisteredGType())
 )
 
 func init() {
@@ -41,24 +33,10 @@ func init() {
 
 // GLAreaOverrides contains methods that are overridable.
 type GLAreaOverrides struct {
-	// The function takes the following parameters:
-	//
-	// The function returns the following values:
-	//
-	Render func(context gdk.GLContexter) bool
-	// The function takes the following parameters:
-	//
-	//    - width
-	//    - height
-	//
-	Resize func(width, height int)
 }
 
 func defaultGLAreaOverrides(v *GLArea) GLAreaOverrides {
-	return GLAreaOverrides{
-		Render: v.render,
-		Resize: v.resize,
-	}
+	return GLAreaOverrides{}
 }
 
 // GLArea: GtkGLArea is a widget that allows drawing with OpenGL.
@@ -180,16 +158,6 @@ func init() {
 }
 
 func initGLAreaClass(gclass unsafe.Pointer, overrides GLAreaOverrides, classInitFunc func(*GLAreaClass)) {
-	pclass := (*C.GtkGLAreaClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeGLArea))))
-
-	if overrides.Render != nil {
-		pclass.render = (*[0]byte)(C._gotk4_gtk4_GLAreaClass_render)
-	}
-
-	if overrides.Resize != nil {
-		pclass.resize = (*[0]byte)(C._gotk4_gtk4_GLAreaClass_resize)
-	}
-
 	if classInitFunc != nil {
 		class := (*GLAreaClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -229,8 +197,8 @@ func marshalGLArea(p uintptr) (interface{}, error) {
 // If context creation fails then the signal handler can use
 // gtk.GLArea.SetError() to register a more detailed error of how the
 // construction failed.
-func (area *GLArea) ConnectCreateContext(f func() (glContext gdk.GLContexter)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(area, "create-context", false, unsafe.Pointer(C._gotk4_gtk4_GLArea_ConnectCreateContext), f)
+func (v *GLArea) ConnectCreateContext(f func() (glContext gdk.GLContexter)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "create-context", false, unsafe.Pointer(C._gotk4_gtk4_GLArea_ConnectCreateContext), f)
 }
 
 // ConnectRender is emitted every time the contents of the GtkGLArea should be
@@ -238,8 +206,8 @@ func (area *GLArea) ConnectCreateContext(f func() (glContext gdk.GLContexter)) c
 //
 // The context is bound to the area prior to emitting this function, and the
 // buffers are painted to the window once the emission terminates.
-func (area *GLArea) ConnectRender(f func(context gdk.GLContexter) (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(area, "render", false, unsafe.Pointer(C._gotk4_gtk4_GLArea_ConnectRender), f)
+func (v *GLArea) ConnectRender(f func(context gdk.GLContexter) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "render", false, unsafe.Pointer(C._gotk4_gtk4_GLArea_ConnectRender), f)
 }
 
 // ConnectResize is emitted once when the widget is realized, and then each time
@@ -253,463 +221,8 @@ func (area *GLArea) ConnectRender(f func(context gdk.GLContexter) (ok bool)) cor
 // emitted.
 //
 // The default handler sets up the GL viewport.
-func (area *GLArea) ConnectResize(f func(width, height int)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(area, "resize", false, unsafe.Pointer(C._gotk4_gtk4_GLArea_ConnectResize), f)
-}
-
-// NewGLArea creates a new GtkGLArea widget.
-//
-// The function returns the following values:
-//
-//    - glArea: new GtkGLArea.
-//
-func NewGLArea() *GLArea {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_gl_area_new()
-
-	var _glArea *GLArea // out
-
-	_glArea = wrapGLArea(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _glArea
-}
-
-// AttachBuffers binds buffers to the framebuffer.
-//
-// Ensures that the area framebuffer object is made the current draw and read
-// target, and that all the required buffers for the area are created and bound
-// to the framebuffer.
-//
-// This function is automatically called before emitting the gtk.GLArea::render
-// signal, and doesn't normally need to be called by application code.
-func (area *GLArea) AttachBuffers() {
-	var _arg0 *C.GtkGLArea // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	C.gtk_gl_area_attach_buffers(_arg0)
-	runtime.KeepAlive(area)
-}
-
-// AutoRender returns whether the area is in auto render mode or not.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the area is auto rendering, FALSE otherwise.
-//
-func (area *GLArea) AutoRender() bool {
-	var _arg0 *C.GtkGLArea // out
-	var _cret C.gboolean   // in
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	_cret = C.gtk_gl_area_get_auto_render(_arg0)
-	runtime.KeepAlive(area)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Context retrieves the GdkGLContext used by area.
-//
-// The function returns the following values:
-//
-//    - glContext: GdkGLContext.
-//
-func (area *GLArea) Context() gdk.GLContexter {
-	var _arg0 *C.GtkGLArea    // out
-	var _cret *C.GdkGLContext // in
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	_cret = C.gtk_gl_area_get_context(_arg0)
-	runtime.KeepAlive(area)
-
-	var _glContext gdk.GLContexter // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gdk.GLContexter is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(gdk.GLContexter)
-			return ok
-		})
-		rv, ok := casted.(gdk.GLContexter)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.GLContexter")
-		}
-		_glContext = rv
-	}
-
-	return _glContext
-}
-
-// Error gets the current error set on the area.
-//
-// The function returns the following values:
-//
-//    - err (optional) or NULL.
-//
-func (area *GLArea) Error() error {
-	var _arg0 *C.GtkGLArea // out
-	var _cret *C.GError    // in
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	_cret = C.gtk_gl_area_get_error(_arg0)
-	runtime.KeepAlive(area)
-
-	var _err error // out
-
-	if _cret != nil {
-		_err = gerror.Take(unsafe.Pointer(_cret))
-	}
-
-	return _err
-}
-
-// HasDepthBuffer returns whether the area has a depth buffer.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the area has a depth buffer, FALSE otherwise.
-//
-func (area *GLArea) HasDepthBuffer() bool {
-	var _arg0 *C.GtkGLArea // out
-	var _cret C.gboolean   // in
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	_cret = C.gtk_gl_area_get_has_depth_buffer(_arg0)
-	runtime.KeepAlive(area)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// HasStencilBuffer returns whether the area has a stencil buffer.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the area has a stencil buffer, FALSE otherwise.
-//
-func (area *GLArea) HasStencilBuffer() bool {
-	var _arg0 *C.GtkGLArea // out
-	var _cret C.gboolean   // in
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	_cret = C.gtk_gl_area_get_has_stencil_buffer(_arg0)
-	runtime.KeepAlive(area)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// RequiredVersion retrieves the required version of OpenGL.
-//
-// See gtk.GLArea.SetRequiredVersion().
-//
-// The function returns the following values:
-//
-//    - major: return location for the required major version.
-//    - minor: return location for the required minor version.
-//
-func (area *GLArea) RequiredVersion() (major, minor int) {
-	var _arg0 *C.GtkGLArea // out
-	var _arg1 C.int        // in
-	var _arg2 C.int        // in
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	C.gtk_gl_area_get_required_version(_arg0, &_arg1, &_arg2)
-	runtime.KeepAlive(area)
-
-	var _major int // out
-	var _minor int // out
-
-	_major = int(_arg1)
-	_minor = int(_arg2)
-
-	return _major, _minor
-}
-
-// UseES returns whether the GtkGLArea should use OpenGL ES.
-//
-// See gtk.GLArea.SetUseES().
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the GtkGLArea should create an OpenGL ES context and FALSE
-//      otherwise.
-//
-func (area *GLArea) UseES() bool {
-	var _arg0 *C.GtkGLArea // out
-	var _cret C.gboolean   // in
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	_cret = C.gtk_gl_area_get_use_es(_arg0)
-	runtime.KeepAlive(area)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// MakeCurrent ensures that the GdkGLContext used by area is associated with the
-// GtkGLArea.
-//
-// This function is automatically called before emitting the gtk.GLArea::render
-// signal, and doesn't normally need to be called by application code.
-func (area *GLArea) MakeCurrent() {
-	var _arg0 *C.GtkGLArea // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	C.gtk_gl_area_make_current(_arg0)
-	runtime.KeepAlive(area)
-}
-
-// QueueRender marks the currently rendered data (if any) as invalid, and queues
-// a redraw of the widget.
-//
-// This ensures that the gtk.GLArea::render signal is emitted during the draw.
-//
-// This is only needed when gtk.GLArea.SetAutoRender() has been called with a
-// FALSE value. The default behaviour is to emit gtk.GLArea::render on each
-// draw.
-func (area *GLArea) QueueRender() {
-	var _arg0 *C.GtkGLArea // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-
-	C.gtk_gl_area_queue_render(_arg0)
-	runtime.KeepAlive(area)
-}
-
-// SetAutoRender sets whether the GtkGLArea is in auto render mode.
-//
-// If auto_render is TRUE the gtk.GLArea::render signal will be emitted every
-// time the widget draws. This is the default and is useful if drawing the
-// widget is faster.
-//
-// If auto_render is FALSE the data from previous rendering is kept around and
-// will be used for drawing the widget the next time, unless the window is
-// resized. In order to force a rendering gtk.GLArea.QueueRender() must be
-// called. This mode is useful when the scene changes seldom, but takes a long
-// time to redraw.
-//
-// The function takes the following parameters:
-//
-//    - autoRender: boolean.
-//
-func (area *GLArea) SetAutoRender(autoRender bool) {
-	var _arg0 *C.GtkGLArea // out
-	var _arg1 C.gboolean   // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-	if autoRender {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_gl_area_set_auto_render(_arg0, _arg1)
-	runtime.KeepAlive(area)
-	runtime.KeepAlive(autoRender)
-}
-
-// SetError sets an error on the area which will be shown instead of the GL
-// rendering.
-//
-// This is useful in the gtk.GLArea::create-context signal if GL context
-// creation fails.
-//
-// The function takes the following parameters:
-//
-//    - err (optional): new GError, or NULL to unset the error.
-//
-func (area *GLArea) SetError(err error) {
-	var _arg0 *C.GtkGLArea // out
-	var _arg1 *C.GError    // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-	if err != nil {
-		_arg1 = (*C.GError)(gerror.New(err))
-	}
-
-	C.gtk_gl_area_set_error(_arg0, _arg1)
-	runtime.KeepAlive(area)
-	runtime.KeepAlive(err)
-}
-
-// SetHasDepthBuffer sets whether the GtkGLArea should use a depth buffer.
-//
-// If has_depth_buffer is TRUE the widget will allocate and enable a depth
-// buffer for the target framebuffer. Otherwise there will be none.
-//
-// The function takes the following parameters:
-//
-//    - hasDepthBuffer: TRUE to add a depth buffer.
-//
-func (area *GLArea) SetHasDepthBuffer(hasDepthBuffer bool) {
-	var _arg0 *C.GtkGLArea // out
-	var _arg1 C.gboolean   // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-	if hasDepthBuffer {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_gl_area_set_has_depth_buffer(_arg0, _arg1)
-	runtime.KeepAlive(area)
-	runtime.KeepAlive(hasDepthBuffer)
-}
-
-// SetHasStencilBuffer sets whether the GtkGLArea should use a stencil buffer.
-//
-// If has_stencil_buffer is TRUE the widget will allocate and enable a stencil
-// buffer for the target framebuffer. Otherwise there will be none.
-//
-// The function takes the following parameters:
-//
-//    - hasStencilBuffer: TRUE to add a stencil buffer.
-//
-func (area *GLArea) SetHasStencilBuffer(hasStencilBuffer bool) {
-	var _arg0 *C.GtkGLArea // out
-	var _arg1 C.gboolean   // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-	if hasStencilBuffer {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_gl_area_set_has_stencil_buffer(_arg0, _arg1)
-	runtime.KeepAlive(area)
-	runtime.KeepAlive(hasStencilBuffer)
-}
-
-// SetRequiredVersion sets the required version of OpenGL to be used when
-// creating the context for the widget.
-//
-// This function must be called before the area has been realized.
-//
-// The function takes the following parameters:
-//
-//    - major version.
-//    - minor version.
-//
-func (area *GLArea) SetRequiredVersion(major, minor int) {
-	var _arg0 *C.GtkGLArea // out
-	var _arg1 C.int        // out
-	var _arg2 C.int        // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-	_arg1 = C.int(major)
-	_arg2 = C.int(minor)
-
-	C.gtk_gl_area_set_required_version(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(area)
-	runtime.KeepAlive(major)
-	runtime.KeepAlive(minor)
-}
-
-// SetUseES sets whether the area should create an OpenGL or an OpenGL ES
-// context.
-//
-// You should check the capabilities of the GLContext before drawing with either
-// API.
-//
-// The function takes the following parameters:
-//
-//    - useEs: whether to use OpenGL or OpenGL ES.
-//
-func (area *GLArea) SetUseES(useEs bool) {
-	var _arg0 *C.GtkGLArea // out
-	var _arg1 C.gboolean   // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-	if useEs {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_gl_area_set_use_es(_arg0, _arg1)
-	runtime.KeepAlive(area)
-	runtime.KeepAlive(useEs)
-}
-
-// The function takes the following parameters:
-//
-// The function returns the following values:
-//
-func (area *GLArea) render(context gdk.GLContexter) bool {
-	gclass := (*C.GtkGLAreaClass)(coreglib.PeekParentClass(area))
-	fnarg := gclass.render
-
-	var _arg0 *C.GtkGLArea    // out
-	var _arg1 *C.GdkGLContext // out
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-	_arg1 = (*C.GdkGLContext)(unsafe.Pointer(coreglib.InternObject(context).Native()))
-
-	_cret = C._gotk4_gtk4_GLArea_virtual_render(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(area)
-	runtime.KeepAlive(context)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// The function takes the following parameters:
-//
-//    - width
-//    - height
-//
-func (area *GLArea) resize(width, height int) {
-	gclass := (*C.GtkGLAreaClass)(coreglib.PeekParentClass(area))
-	fnarg := gclass.resize
-
-	var _arg0 *C.GtkGLArea // out
-	var _arg1 C.int        // out
-	var _arg2 C.int        // out
-
-	_arg0 = (*C.GtkGLArea)(unsafe.Pointer(coreglib.InternObject(area).Native()))
-	_arg1 = C.int(width)
-	_arg2 = C.int(height)
-
-	C._gotk4_gtk4_GLArea_virtual_resize(unsafe.Pointer(fnarg), _arg0, _arg1, _arg2)
-	runtime.KeepAlive(area)
-	runtime.KeepAlive(width)
-	runtime.KeepAlive(height)
+func (v *GLArea) ConnectResize(f func(width, height int)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "resize", false, unsafe.Pointer(C._gotk4_gtk4_GLArea_ConnectResize), f)
 }
 
 // GLAreaClass: GtkGLAreaClass structure contains only private data.
@@ -721,5 +234,7 @@ type GLAreaClass struct {
 
 // glAreaClass is the struct that's finalized.
 type glAreaClass struct {
-	native *C.GtkGLAreaClass
+	native unsafe.Pointer
 }
+
+var GIRInfoGLAreaClass = girepository.MustFind("Gtk", "GLAreaClass")

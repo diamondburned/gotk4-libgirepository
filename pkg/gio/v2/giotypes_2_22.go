@@ -5,11 +5,14 @@ package gio
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // SocketSourceFunc: this is the function type of the callback used for the
@@ -27,12 +30,15 @@ type InputVector struct {
 
 // inputVector is the struct that's finalized.
 type inputVector struct {
-	native *C.GInputVector
+	native unsafe.Pointer
 }
+
+var GIRInfoInputVector = girepository.MustFind("Gio", "InputVector")
 
 // Buffer: pointer to a buffer where data will be written.
 func (i *InputVector) Buffer() unsafe.Pointer {
-	valptr := &i.native.buffer
+	offset := GIRInfoInputVector.StructFieldOffset("buffer")
+	valptr := (*unsafe.Pointer)(unsafe.Add(i.native, offset))
 	var _v unsafe.Pointer // out
 	_v = (unsafe.Pointer)(unsafe.Pointer(*valptr))
 	return _v
@@ -40,7 +46,8 @@ func (i *InputVector) Buffer() unsafe.Pointer {
 
 // Size: available size in buffer.
 func (i *InputVector) Size() uint {
-	valptr := &i.native.size
+	offset := GIRInfoInputVector.StructFieldOffset("size")
+	valptr := (*uint)(unsafe.Add(i.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -48,7 +55,8 @@ func (i *InputVector) Size() uint {
 
 // Size: available size in buffer.
 func (i *InputVector) SetSize(size uint) {
-	valptr := &i.native.size
+	offset := GIRInfoInputVector.StructFieldOffset("size")
+	valptr := (*C.gsize)(unsafe.Add(i.native, offset))
 	*valptr = C.gsize(size)
 }
 
@@ -63,12 +71,15 @@ type OutputVector struct {
 
 // outputVector is the struct that's finalized.
 type outputVector struct {
-	native *C.GOutputVector
+	native unsafe.Pointer
 }
+
+var GIRInfoOutputVector = girepository.MustFind("Gio", "OutputVector")
 
 // Buffer: pointer to a buffer of data to read.
 func (o *OutputVector) Buffer() unsafe.Pointer {
-	valptr := &o.native.buffer
+	offset := GIRInfoOutputVector.StructFieldOffset("buffer")
+	valptr := (*unsafe.Pointer)(unsafe.Add(o.native, offset))
 	var _v unsafe.Pointer // out
 	_v = (unsafe.Pointer)(unsafe.Pointer(*valptr))
 	return _v
@@ -76,7 +87,8 @@ func (o *OutputVector) Buffer() unsafe.Pointer {
 
 // Size: size of buffer.
 func (o *OutputVector) Size() uint {
-	valptr := &o.native.size
+	offset := GIRInfoOutputVector.StructFieldOffset("size")
+	valptr := (*uint)(unsafe.Add(o.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -84,6 +96,7 @@ func (o *OutputVector) Size() uint {
 
 // Size: size of buffer.
 func (o *OutputVector) SetSize(size uint) {
-	valptr := &o.native.size
+	offset := GIRInfoOutputVector.StructFieldOffset("size")
+	valptr := (*C.gsize)(unsafe.Add(o.native, offset))
 	*valptr = C.gsize(size)
 }

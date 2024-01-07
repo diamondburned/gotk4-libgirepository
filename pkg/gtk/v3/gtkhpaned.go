@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeHPaned = coreglib.Type(C.gtk_hpaned_get_type())
+	GTypeHPaned = coreglib.Type(girepository.MustFind("Gtk", "HPaned").RegisteredGType())
 )
 
 func init() {
@@ -96,26 +96,6 @@ func marshalHPaned(p uintptr) (interface{}, error) {
 	return wrapHPaned(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewHPaned: create a new HPaned
-//
-// Deprecated: Use gtk_paned_new() with GTK_ORIENTATION_HORIZONTAL instead.
-//
-// The function returns the following values:
-//
-//    - hPaned: new HPaned.
-//
-func NewHPaned() *HPaned {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_hpaned_new()
-
-	var _hPaned *HPaned // out
-
-	_hPaned = wrapHPaned(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _hPaned
-}
-
 // HPanedClass: instance of this type is always passed by reference.
 type HPanedClass struct {
 	*hPanedClass
@@ -123,12 +103,7 @@ type HPanedClass struct {
 
 // hPanedClass is the struct that's finalized.
 type hPanedClass struct {
-	native *C.GtkHPanedClass
+	native unsafe.Pointer
 }
 
-func (h *HPanedClass) ParentClass() *PanedClass {
-	valptr := &h.native.parent_class
-	var _v *PanedClass // out
-	_v = (*PanedClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoHPanedClass = girepository.MustFind("Gtk", "HPanedClass")

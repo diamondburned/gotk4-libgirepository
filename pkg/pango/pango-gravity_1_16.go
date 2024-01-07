@@ -4,22 +4,22 @@ package pango
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <pango/pango.h>
 import "C"
 
 // GType values.
 var (
-	GTypeGravity     = coreglib.Type(C.pango_gravity_get_type())
-	GTypeGravityHint = coreglib.Type(C.pango_gravity_hint_get_type())
+	GTypeGravity     = coreglib.Type(girepository.MustFind("Pango", "Gravity").RegisteredGType())
+	GTypeGravityHint = coreglib.Type(girepository.MustFind("Pango", "GravityHint").RegisteredGType())
 )
 
 func init() {
@@ -77,107 +77,6 @@ func (g Gravity) String() string {
 	default:
 		return fmt.Sprintf("Gravity(%d)", g)
 	}
-}
-
-// GravityGetForMatrix finds the gravity that best matches the rotation
-// component in a PangoMatrix.
-//
-// The function takes the following parameters:
-//
-//    - matrix (optional): PangoMatrix.
-//
-// The function returns the following values:
-//
-//    - gravity of matrix, which will never be PANGO_GRAVITY_AUTO, or
-//      PANGO_GRAVITY_SOUTH if matrix is NULL.
-//
-func GravityGetForMatrix(matrix *Matrix) Gravity {
-	var _arg1 *C.PangoMatrix // out
-	var _cret C.PangoGravity // in
-
-	if matrix != nil {
-		_arg1 = (*C.PangoMatrix)(gextras.StructNative(unsafe.Pointer(matrix)))
-	}
-
-	_cret = C.pango_gravity_get_for_matrix(_arg1)
-	runtime.KeepAlive(matrix)
-
-	var _gravity Gravity // out
-
-	_gravity = Gravity(_cret)
-
-	return _gravity
-}
-
-// GravityGetForScript returns the gravity to use in laying out a PangoItem.
-//
-// The gravity is determined based on the script, base gravity, and hint.
-//
-// If base_gravity is PANGO_GRAVITY_AUTO, it is first replaced with the
-// preferred gravity of script. To get the preferred gravity of a script, pass
-// PANGO_GRAVITY_AUTO and PANGO_GRAVITY_HINT_STRONG in.
-//
-// The function takes the following parameters:
-//
-//    - script to query.
-//    - baseGravity: base gravity of the paragraph.
-//    - hint: orientation hint.
-//
-// The function returns the following values:
-//
-//    - gravity: resolved gravity suitable to use for a run of text with script.
-//
-func GravityGetForScript(script Script, baseGravity Gravity, hint GravityHint) Gravity {
-	var _arg1 C.PangoScript      // out
-	var _arg2 C.PangoGravity     // out
-	var _arg3 C.PangoGravityHint // out
-	var _cret C.PangoGravity     // in
-
-	_arg1 = C.PangoScript(script)
-	_arg2 = C.PangoGravity(baseGravity)
-	_arg3 = C.PangoGravityHint(hint)
-
-	_cret = C.pango_gravity_get_for_script(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(script)
-	runtime.KeepAlive(baseGravity)
-	runtime.KeepAlive(hint)
-
-	var _gravity Gravity // out
-
-	_gravity = Gravity(_cret)
-
-	return _gravity
-}
-
-// GravityToRotation converts a Gravity value to its natural rotation in
-// radians.
-//
-// Note that pango.Matrix.Rotate() takes angle in degrees, not radians. So, to
-// call pango.Matrix,rotate with the output of this function you should multiply
-// it by (180. / G_PI).
-//
-// The function takes the following parameters:
-//
-//    - gravity to query, should not be PANGO_GRAVITY_AUTO.
-//
-// The function returns the following values:
-//
-//    - gdouble: rotation value corresponding to gravity.
-//
-func GravityToRotation(gravity Gravity) float64 {
-	var _arg1 C.PangoGravity // out
-	var _cret C.double       // in
-
-	_arg1 = C.PangoGravity(gravity)
-
-	_cret = C.pango_gravity_to_rotation(_arg1)
-	runtime.KeepAlive(gravity)
-
-	var _gdouble float64 // out
-
-	_gdouble = float64(_cret)
-
-	return _gdouble
 }
 
 // GravityHint: PangoGravityHint defines how horizontal scripts should behave in

@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ActionInterface: virtual function table for #GAction.
@@ -15,5 +23,7 @@ type ActionInterface struct {
 
 // actionInterface is the struct that's finalized.
 type actionInterface struct {
-	native *C.GActionInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoActionInterface = girepository.MustFind("Gio", "ActionInterface")

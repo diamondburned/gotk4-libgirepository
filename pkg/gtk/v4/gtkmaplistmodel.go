@@ -3,25 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// extern void callbackDelete(gpointer);
-// extern gpointer _gotk4_gtk4_MapListModelMapFunc(gpointer, gpointer);
 import "C"
 
 // GType values.
 var (
-	GTypeMapListModel = coreglib.Type(C.gtk_map_list_model_get_type())
+	GTypeMapListModel = coreglib.Type(girepository.MustFind("Gtk", "MapListModel").RegisteredGType())
 )
 
 func init() {
@@ -114,156 +112,6 @@ func marshalMapListModel(p uintptr) (interface{}, error) {
 	return wrapMapListModel(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewMapListModel creates a new GtkMapListModel for the given arguments.
-//
-// The function takes the following parameters:
-//
-//    - model (optional) to map or NULL for none.
-//    - mapFunc (optional): map function or NULL to not map items.
-//
-// The function returns the following values:
-//
-//    - mapListModel: new GtkMapListModel.
-//
-func NewMapListModel(model gio.ListModeller, mapFunc MapListModelMapFunc) *MapListModel {
-	var _arg1 *C.GListModel            // out
-	var _arg2 C.GtkMapListModelMapFunc // out
-	var _arg3 C.gpointer
-	var _arg4 C.GDestroyNotify
-	var _cret *C.GtkMapListModel // in
-
-	if model != nil {
-		_arg1 = (*C.GListModel)(unsafe.Pointer(coreglib.InternObject(model).Native()))
-		C.g_object_ref(C.gpointer(coreglib.InternObject(model).Native()))
-	}
-	if mapFunc != nil {
-		_arg2 = (*[0]byte)(C._gotk4_gtk4_MapListModelMapFunc)
-		_arg3 = C.gpointer(gbox.Assign(mapFunc))
-		_arg4 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-	}
-
-	_cret = C.gtk_map_list_model_new(_arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(model)
-	runtime.KeepAlive(mapFunc)
-
-	var _mapListModel *MapListModel // out
-
-	_mapListModel = wrapMapListModel(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _mapListModel
-}
-
-// Model gets the model that is currently being mapped or NULL if none.
-//
-// The function returns the following values:
-//
-//    - listModel (optional): model that gets mapped.
-//
-func (self *MapListModel) Model() *gio.ListModel {
-	var _arg0 *C.GtkMapListModel // out
-	var _cret *C.GListModel      // in
-
-	_arg0 = (*C.GtkMapListModel)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_map_list_model_get_model(_arg0)
-	runtime.KeepAlive(self)
-
-	var _listModel *gio.ListModel // out
-
-	if _cret != nil {
-		{
-			obj := coreglib.Take(unsafe.Pointer(_cret))
-			_listModel = &gio.ListModel{
-				Object: obj,
-			}
-		}
-	}
-
-	return _listModel
-}
-
-// HasMap checks if a map function is currently set on self.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if a map function is set.
-//
-func (self *MapListModel) HasMap() bool {
-	var _arg0 *C.GtkMapListModel // out
-	var _cret C.gboolean         // in
-
-	_arg0 = (*C.GtkMapListModel)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_map_list_model_has_map(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetMapFunc sets the function used to map items.
-//
-// The function will be called whenever an item needs to be mapped and must
-// return the item to use for the given input item.
-//
-// Note that GtkMapListModel may call this function multiple times on the same
-// item, because it may delete items it doesn't need anymore.
-//
-// GTK makes no effort to ensure that map_func conforms to the item type of
-// self. It assumes that the caller knows what they are doing and the map
-// function returns items of the appropriate type.
-//
-// The function takes the following parameters:
-//
-//    - mapFunc (optional): map function or NULL to not map items.
-//
-func (self *MapListModel) SetMapFunc(mapFunc MapListModelMapFunc) {
-	var _arg0 *C.GtkMapListModel       // out
-	var _arg1 C.GtkMapListModelMapFunc // out
-	var _arg2 C.gpointer
-	var _arg3 C.GDestroyNotify
-
-	_arg0 = (*C.GtkMapListModel)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if mapFunc != nil {
-		_arg1 = (*[0]byte)(C._gotk4_gtk4_MapListModelMapFunc)
-		_arg2 = C.gpointer(gbox.Assign(mapFunc))
-		_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-	}
-
-	C.gtk_map_list_model_set_map_func(_arg0, _arg1, _arg2, _arg3)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(mapFunc)
-}
-
-// SetModel sets the model to be mapped.
-//
-// GTK makes no effort to ensure that model conforms to the item type expected
-// by the map function. It assumes that the caller knows what they are doing and
-// have set up an appropriate map function.
-//
-// The function takes the following parameters:
-//
-//    - model (optional) to be mapped.
-//
-func (self *MapListModel) SetModel(model gio.ListModeller) {
-	var _arg0 *C.GtkMapListModel // out
-	var _arg1 *C.GListModel      // out
-
-	_arg0 = (*C.GtkMapListModel)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if model != nil {
-		_arg1 = (*C.GListModel)(unsafe.Pointer(coreglib.InternObject(model).Native()))
-	}
-
-	C.gtk_map_list_model_set_model(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(model)
-}
-
 // MapListModelClass: instance of this type is always passed by reference.
 type MapListModelClass struct {
 	*mapListModelClass
@@ -271,5 +119,7 @@ type MapListModelClass struct {
 
 // mapListModelClass is the struct that's finalized.
 type mapListModelClass struct {
-	native *C.GtkMapListModelClass
+	native unsafe.Pointer
 }
+
+var GIRInfoMapListModelClass = girepository.MustFind("Gtk", "MapListModelClass")

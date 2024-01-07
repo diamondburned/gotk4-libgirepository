@@ -3,21 +3,21 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTLSServerConnection = coreglib.Type(C.g_tls_server_connection_get_type())
+	GTypeTLSServerConnection = coreglib.Type(girepository.MustFind("Gio", "TlsServerConnection").RegisteredGType())
 )
 
 func init() {
@@ -77,46 +77,4 @@ func (v *TLSServerConnection) baseTLSServerConnection() *TLSServerConnection {
 // BaseTLSServerConnection returns the underlying base object.
 func BaseTLSServerConnection(obj TLSServerConnectioner) *TLSServerConnection {
 	return obj.baseTLSServerConnection()
-}
-
-// NewTLSServerConnection creates a new ServerConnection wrapping base_io_stream
-// (which must have pollable input and output streams).
-//
-// See the documentation for Connection:base-io-stream for restrictions on when
-// application code can run operations on the base_io_stream after this function
-// has returned.
-//
-// The function takes the following parameters:
-//
-//    - baseIoStream to wrap.
-//    - certificate (optional): default server certificate, or NULL.
-//
-// The function returns the following values:
-//
-//    - tlsServerConnection: new ServerConnection, or NULL on error.
-//
-func NewTLSServerConnection(baseIoStream IOStreamer, certificate TLSCertificater) (*TLSServerConnection, error) {
-	var _arg1 *C.GIOStream       // out
-	var _arg2 *C.GTlsCertificate // out
-	var _cret *C.GIOStream       // in
-	var _cerr *C.GError          // in
-
-	_arg1 = (*C.GIOStream)(unsafe.Pointer(coreglib.InternObject(baseIoStream).Native()))
-	if certificate != nil {
-		_arg2 = (*C.GTlsCertificate)(unsafe.Pointer(coreglib.InternObject(certificate).Native()))
-	}
-
-	_cret = C.g_tls_server_connection_new(_arg1, _arg2, &_cerr)
-	runtime.KeepAlive(baseIoStream)
-	runtime.KeepAlive(certificate)
-
-	var _tlsServerConnection *TLSServerConnection // out
-	var _goerr error                              // out
-
-	_tlsServerConnection = wrapTLSServerConnection(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _tlsServerConnection, _goerr
 }

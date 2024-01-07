@@ -9,12 +9,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_GLArea_ConnectCreateContext
-func _gotk4_gtk4_GLArea_ConnectCreateContext(arg0 C.gpointer, arg1 C.guintptr) (cret *C.GdkGLContext) {
+func _gotk4_gtk4_GLArea_ConnectCreateContext(arg0 C.gpointer, arg1 C.guintptr) (cret *C.void) {
 	var f func() (glContext gdk.GLContexter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg1))
@@ -30,14 +32,14 @@ func _gotk4_gtk4_GLArea_ConnectCreateContext(arg0 C.gpointer, arg1 C.guintptr) (
 
 	var _ gdk.GLContexter
 
-	cret = (*C.GdkGLContext)(unsafe.Pointer(coreglib.InternObject(glContext).Native()))
+	cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(glContext).Native()))
 	C.g_object_ref(C.gpointer(coreglib.InternObject(glContext).Native()))
 
 	return cret
 }
 
 //export _gotk4_gtk4_GLArea_ConnectRender
-func _gotk4_gtk4_GLArea_ConnectRender(arg0 C.gpointer, arg1 *C.GdkGLContext, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_GLArea_ConnectRender(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(context gdk.GLContexter) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

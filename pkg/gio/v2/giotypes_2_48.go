@@ -3,11 +3,16 @@
 package gio
 
 import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // DatagramBasedSourceFunc: this is the function type of the callback used for
@@ -41,5 +46,7 @@ type InputMessage struct {
 
 // inputMessage is the struct that's finalized.
 type inputMessage struct {
-	native *C.GInputMessage
+	native unsafe.Pointer
 }
+
+var GIRInfoInputMessage = girepository.MustFind("Gio", "InputMessage")

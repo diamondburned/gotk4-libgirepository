@@ -8,10 +8,10 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_ComboBox_ConnectChanged
@@ -54,26 +54,6 @@ func _gotk4_gtk3_ComboBox_ConnectFormatEntryText(arg0 C.gpointer, arg1 *C.gchar,
 	cret = (*C.gchar)(unsafe.Pointer(C.CString(utf8)))
 
 	return cret
-}
-
-//export _gotk4_gtk3_ComboBox_ConnectMoveActive
-func _gotk4_gtk3_ComboBox_ConnectMoveActive(arg0 C.gpointer, arg1 C.GtkScrollType, arg2 C.guintptr) {
-	var f func(scrollType ScrollType)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(scrollType ScrollType))
-	}
-
-	var _scrollType ScrollType // out
-
-	_scrollType = ScrollType(arg1)
-
-	f(_scrollType)
 }
 
 //export _gotk4_gtk3_ComboBox_ConnectPopdown

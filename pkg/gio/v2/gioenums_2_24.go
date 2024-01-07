@@ -7,19 +7,21 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeConverterResult      = coreglib.Type(C.g_converter_result_get_type())
-	GTypeZlibCompressorFormat = coreglib.Type(C.g_zlib_compressor_format_get_type())
-	GTypeConverterFlags       = coreglib.Type(C.g_converter_flags_get_type())
+	GTypeConverterResult      = coreglib.Type(girepository.MustFind("Gio", "ConverterResult").RegisteredGType())
+	GTypeZlibCompressorFormat = coreglib.Type(girepository.MustFind("Gio", "ZlibCompressorFormat").RegisteredGType())
+	GTypeConverterFlags       = coreglib.Type(girepository.MustFind("Gio", "ConverterFlags").RegisteredGType())
 )
 
 func init() {

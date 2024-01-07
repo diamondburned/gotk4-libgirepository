@@ -7,17 +7,19 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFrameClockPhase = coreglib.Type(C.gdk_frame_clock_phase_get_type())
+	GTypeFrameClockPhase = coreglib.Type(girepository.MustFind("Gdk", "FrameClockPhase").RegisteredGType())
 )
 
 func init() {

@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // OutputMessage: structure used for scatter/gather data output when sending
@@ -21,5 +29,7 @@ type OutputMessage struct {
 
 // outputMessage is the struct that's finalized.
 type outputMessage struct {
-	native *C.GOutputMessage
+	native unsafe.Pointer
 }
+
+var GIRInfoOutputMessage = girepository.MustFind("Gio", "OutputMessage")

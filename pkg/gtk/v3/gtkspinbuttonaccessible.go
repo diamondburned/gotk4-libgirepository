@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeSpinButtonAccessible = coreglib.Type(C.gtk_spin_button_accessible_get_type())
+	GTypeSpinButtonAccessible = coreglib.Type(girepository.MustFind("Gtk", "SpinButtonAccessible").RegisteredGType())
 )
 
 func init() {
@@ -107,12 +107,7 @@ type SpinButtonAccessibleClass struct {
 
 // spinButtonAccessibleClass is the struct that's finalized.
 type spinButtonAccessibleClass struct {
-	native *C.GtkSpinButtonAccessibleClass
+	native unsafe.Pointer
 }
 
-func (s *SpinButtonAccessibleClass) ParentClass() *EntryAccessibleClass {
-	valptr := &s.native.parent_class
-	var _v *EntryAccessibleClass // out
-	_v = (*EntryAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoSpinButtonAccessibleClass = girepository.MustFind("Gtk", "SpinButtonAccessibleClass")

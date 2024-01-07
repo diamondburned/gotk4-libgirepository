@@ -3,21 +3,22 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDBusObjectProxy = coreglib.Type(C.g_dbus_object_proxy_get_type())
+	GTypeDBusObjectProxy = coreglib.Type(girepository.MustFind("Gio", "DBusObjectProxy").RegisteredGType())
 )
 
 func init() {
@@ -77,60 +78,6 @@ func marshalDBusObjectProxy(p uintptr) (interface{}, error) {
 	return wrapDBusObjectProxy(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewDBusObjectProxy creates a new BusObjectProxy for the given connection and
-// object path.
-//
-// The function takes the following parameters:
-//
-//    - connection: BusConnection.
-//    - objectPath: object path.
-//
-// The function returns the following values:
-//
-//    - dBusObjectProxy: new BusObjectProxy.
-//
-func NewDBusObjectProxy(connection *DBusConnection, objectPath string) *DBusObjectProxy {
-	var _arg1 *C.GDBusConnection  // out
-	var _arg2 *C.gchar            // out
-	var _cret *C.GDBusObjectProxy // in
-
-	_arg1 = (*C.GDBusConnection)(unsafe.Pointer(coreglib.InternObject(connection).Native()))
-	_arg2 = (*C.gchar)(unsafe.Pointer(C.CString(objectPath)))
-	defer C.free(unsafe.Pointer(_arg2))
-
-	_cret = C.g_dbus_object_proxy_new(_arg1, _arg2)
-	runtime.KeepAlive(connection)
-	runtime.KeepAlive(objectPath)
-
-	var _dBusObjectProxy *DBusObjectProxy // out
-
-	_dBusObjectProxy = wrapDBusObjectProxy(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _dBusObjectProxy
-}
-
-// Connection gets the connection that proxy is for.
-//
-// The function returns the following values:
-//
-//    - dBusConnection Do not free, the object is owned by proxy.
-//
-func (proxy *DBusObjectProxy) Connection() *DBusConnection {
-	var _arg0 *C.GDBusObjectProxy // out
-	var _cret *C.GDBusConnection  // in
-
-	_arg0 = (*C.GDBusObjectProxy)(unsafe.Pointer(coreglib.InternObject(proxy).Native()))
-
-	_cret = C.g_dbus_object_proxy_get_connection(_arg0)
-	runtime.KeepAlive(proxy)
-
-	var _dBusConnection *DBusConnection // out
-
-	_dBusConnection = wrapDBusConnection(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _dBusConnection
-}
-
 // DBusObjectProxyClass class structure for BusObjectProxy.
 //
 // An instance of this type is always passed by reference.
@@ -140,5 +87,7 @@ type DBusObjectProxyClass struct {
 
 // dBusObjectProxyClass is the struct that's finalized.
 type dBusObjectProxyClass struct {
-	native *C.GDBusObjectProxyClass
+	native unsafe.Pointer
 }
+
+var GIRInfoDBusObjectProxyClass = girepository.MustFind("Gio", "DBusObjectProxyClass")

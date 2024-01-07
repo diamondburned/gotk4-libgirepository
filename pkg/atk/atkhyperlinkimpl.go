@@ -3,29 +3,31 @@
 package atk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// AtkHyperlink* _gotk4_atk1_HyperlinkImpl_virtual_get_hyperlink(void* fnptr, AtkHyperlinkImpl* arg0) {
-//   return ((AtkHyperlink* (*)(AtkHyperlinkImpl*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeHyperlinkImpl = coreglib.Type(C.atk_hyperlink_impl_get_type())
+	GTypeHyperlinkImpl = coreglib.Type(girepository.MustFind("Atk", "HyperlinkImpl").RegisteredGType())
 )
 
 func init() {
 	coreglib.RegisterGValueMarshalers([]coreglib.TypeMarshaler{
 		coreglib.TypeMarshaler{T: GTypeHyperlinkImpl, F: marshalHyperlinkImpl},
 	})
+}
+
+// HyperlinkImplOverrider contains methods that are overridable.
+type HyperlinkImplOverrider interface {
 }
 
 // HyperlinkImpl allows AtkObjects to refer to their associated AtkHyperlink
@@ -68,11 +70,13 @@ var (
 type HyperlinkImpler interface {
 	coreglib.Objector
 
-	// Hyperlink gets the hyperlink associated with this object.
-	Hyperlink() *Hyperlink
+	baseHyperlinkImpl() *HyperlinkImpl
 }
 
 var _ HyperlinkImpler = (*HyperlinkImpl)(nil)
+
+func ifaceInitHyperlinkImpler(gifacePtr, data C.gpointer) {
+}
 
 func wrapHyperlinkImpl(obj *coreglib.Object) *HyperlinkImpl {
 	return &HyperlinkImpl{
@@ -84,53 +88,13 @@ func marshalHyperlinkImpl(p uintptr) (interface{}, error) {
 	return wrapHyperlinkImpl(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Hyperlink gets the hyperlink associated with this object.
-//
-// The function returns the following values:
-//
-//    - hyperlink: atkHyperlink object which points to this implementing
-//      AtkObject.
-//
-func (impl *HyperlinkImpl) Hyperlink() *Hyperlink {
-	var _arg0 *C.AtkHyperlinkImpl // out
-	var _cret *C.AtkHyperlink     // in
-
-	_arg0 = (*C.AtkHyperlinkImpl)(unsafe.Pointer(coreglib.InternObject(impl).Native()))
-
-	_cret = C.atk_hyperlink_impl_get_hyperlink(_arg0)
-	runtime.KeepAlive(impl)
-
-	var _hyperlink *Hyperlink // out
-
-	_hyperlink = wrapHyperlink(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _hyperlink
+func (v *HyperlinkImpl) baseHyperlinkImpl() *HyperlinkImpl {
+	return v
 }
 
-// Hyperlink gets the hyperlink associated with this object.
-//
-// The function returns the following values:
-//
-//    - hyperlink: atkHyperlink object which points to this implementing
-//      AtkObject.
-//
-func (impl *HyperlinkImpl) hyperlink() *Hyperlink {
-	gclass := (*C.AtkHyperlinkImplIface)(coreglib.PeekParentClass(impl))
-	fnarg := gclass.get_hyperlink
-
-	var _arg0 *C.AtkHyperlinkImpl // out
-	var _cret *C.AtkHyperlink     // in
-
-	_arg0 = (*C.AtkHyperlinkImpl)(unsafe.Pointer(coreglib.InternObject(impl).Native()))
-
-	_cret = C._gotk4_atk1_HyperlinkImpl_virtual_get_hyperlink(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(impl)
-
-	var _hyperlink *Hyperlink // out
-
-	_hyperlink = wrapHyperlink(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _hyperlink
+// BaseHyperlinkImpl returns the underlying base object.
+func BaseHyperlinkImpl(obj HyperlinkImpler) *HyperlinkImpl {
+	return obj.baseHyperlinkImpl()
 }
 
 // HyperlinkImplIface: instance of this type is always passed by reference.
@@ -140,5 +104,7 @@ type HyperlinkImplIface struct {
 
 // hyperlinkImplIface is the struct that's finalized.
 type hyperlinkImplIface struct {
-	native *C.AtkHyperlinkImplIface
+	native unsafe.Pointer
 }
+
+var GIRInfoHyperlinkImplIface = girepository.MustFind("Atk", "HyperlinkImplIface")

@@ -8,12 +8,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gdk3_DeviceManager_ConnectDeviceAdded
-func _gotk4_gdk3_DeviceManager_ConnectDeviceAdded(arg0 C.gpointer, arg1 *C.GdkDevice, arg2 C.guintptr) {
+func _gotk4_gdk3_DeviceManager_ConnectDeviceAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(device Devicer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -49,7 +51,7 @@ func _gotk4_gdk3_DeviceManager_ConnectDeviceAdded(arg0 C.gpointer, arg1 *C.GdkDe
 }
 
 //export _gotk4_gdk3_DeviceManager_ConnectDeviceChanged
-func _gotk4_gdk3_DeviceManager_ConnectDeviceChanged(arg0 C.gpointer, arg1 *C.GdkDevice, arg2 C.guintptr) {
+func _gotk4_gdk3_DeviceManager_ConnectDeviceChanged(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(device Devicer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -85,7 +87,7 @@ func _gotk4_gdk3_DeviceManager_ConnectDeviceChanged(arg0 C.gpointer, arg1 *C.Gdk
 }
 
 //export _gotk4_gdk3_DeviceManager_ConnectDeviceRemoved
-func _gotk4_gdk3_DeviceManager_ConnectDeviceRemoved(arg0 C.gpointer, arg1 *C.GdkDevice, arg2 C.guintptr) {
+func _gotk4_gdk3_DeviceManager_ConnectDeviceRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(device Devicer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

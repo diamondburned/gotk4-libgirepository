@@ -8,12 +8,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gdk3_Seat_ConnectDeviceAdded
-func _gotk4_gdk3_Seat_ConnectDeviceAdded(arg0 C.gpointer, arg1 *C.GdkDevice, arg2 C.guintptr) {
+func _gotk4_gdk3_Seat_ConnectDeviceAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(device Devicer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -49,7 +51,7 @@ func _gotk4_gdk3_Seat_ConnectDeviceAdded(arg0 C.gpointer, arg1 *C.GdkDevice, arg
 }
 
 //export _gotk4_gdk3_Seat_ConnectDeviceRemoved
-func _gotk4_gdk3_Seat_ConnectDeviceRemoved(arg0 C.gpointer, arg1 *C.GdkDevice, arg2 C.guintptr) {
+func _gotk4_gdk3_Seat_ConnectDeviceRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(device Devicer)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -85,7 +87,7 @@ func _gotk4_gdk3_Seat_ConnectDeviceRemoved(arg0 C.gpointer, arg1 *C.GdkDevice, a
 }
 
 //export _gotk4_gdk3_Seat_ConnectToolAdded
-func _gotk4_gdk3_Seat_ConnectToolAdded(arg0 C.gpointer, arg1 *C.GdkDeviceTool, arg2 C.guintptr) {
+func _gotk4_gdk3_Seat_ConnectToolAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(tool *DeviceTool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -105,7 +107,7 @@ func _gotk4_gdk3_Seat_ConnectToolAdded(arg0 C.gpointer, arg1 *C.GdkDeviceTool, a
 }
 
 //export _gotk4_gdk3_Seat_ConnectToolRemoved
-func _gotk4_gdk3_Seat_ConnectToolRemoved(arg0 C.gpointer, arg1 *C.GdkDeviceTool, arg2 C.guintptr) {
+func _gotk4_gdk3_Seat_ConnectToolRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(tool *DeviceTool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

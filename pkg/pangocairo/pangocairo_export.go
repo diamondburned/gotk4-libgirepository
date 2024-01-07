@@ -12,12 +12,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/pango"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <pango/pangocairo.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_pangocairo1_ShapeRendererFunc
-func _gotk4_pangocairo1_ShapeRendererFunc(arg1 *C.cairo_t, arg2 *C.PangoAttrShape, arg3 C.gboolean, arg4 C.gpointer) {
+func _gotk4_pangocairo1_ShapeRendererFunc(arg1 *C.void, arg2 *C.void, arg3 C.gboolean, arg4 C.gpointer) {
 	var fn ShapeRendererFunc
 	{
 		v := gbox.Get(uintptr(arg4))
@@ -34,7 +36,7 @@ func _gotk4_pangocairo1_ShapeRendererFunc(arg1 *C.cairo_t, arg2 *C.PangoAttrShap
 	_cr = cairo.WrapContext(uintptr(unsafe.Pointer(arg1)))
 	C.cairo_reference(arg1)
 	runtime.SetFinalizer(_cr, func(v *cairo.Context) {
-		C.cairo_destroy((*C.cairo_t)(unsafe.Pointer(v.Native())))
+		C.cairo_destroy((*C.void)(unsafe.Pointer(v.Native())))
 	})
 	_attr = (*pango.AttrShape)(gextras.NewStructNative(unsafe.Pointer(arg2)))
 	if arg3 != 0 {

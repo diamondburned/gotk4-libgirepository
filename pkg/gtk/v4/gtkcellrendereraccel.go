@@ -6,21 +6,21 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// extern void _gotk4_gtk4_CellRendererAccel_ConnectAccelEdited(gpointer, gchar*, guint, GdkModifierType, guint, guintptr);
 // extern void _gotk4_gtk4_CellRendererAccel_ConnectAccelCleared(gpointer, gchar*, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeCellRendererAccelMode = coreglib.Type(C.gtk_cell_renderer_accel_mode_get_type())
-	GTypeCellRendererAccel     = coreglib.Type(C.gtk_cell_renderer_accel_get_type())
+	GTypeCellRendererAccelMode = coreglib.Type(girepository.MustFind("Gtk", "CellRendererAccelMode").RegisteredGType())
+	GTypeCellRendererAccel     = coreglib.Type(girepository.MustFind("Gtk", "CellRendererAccel").RegisteredGType())
 )
 
 func init() {
@@ -92,27 +92,4 @@ func marshalCellRendererAccel(p uintptr) (interface{}, error) {
 // ConnectAccelCleared gets emitted when the user has removed the accelerator.
 func (v *CellRendererAccel) ConnectAccelCleared(f func(pathString string)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "accel-cleared", false, unsafe.Pointer(C._gotk4_gtk4_CellRendererAccel_ConnectAccelCleared), f)
-}
-
-// ConnectAccelEdited gets emitted when the user has selected a new accelerator.
-func (v *CellRendererAccel) ConnectAccelEdited(f func(pathString string, accelKey uint, accelMods gdk.ModifierType, hardwareKeycode uint)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(v, "accel-edited", false, unsafe.Pointer(C._gotk4_gtk4_CellRendererAccel_ConnectAccelEdited), f)
-}
-
-// NewCellRendererAccel creates a new CellRendererAccel.
-//
-// The function returns the following values:
-//
-//    - cellRendererAccel: new cell renderer.
-//
-func NewCellRendererAccel() *CellRendererAccel {
-	var _cret *C.GtkCellRenderer // in
-
-	_cret = C.gtk_cell_renderer_accel_new()
-
-	var _cellRendererAccel *CellRendererAccel // out
-
-	_cellRendererAccel = wrapCellRendererAccel(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _cellRendererAccel
 }

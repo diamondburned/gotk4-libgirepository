@@ -5,14 +5,16 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
-// extern void _gotk4_gtk4_GestureClick_ConnectUnpairedRelease(gpointer, gdouble, gdouble, guint, GdkEventSequence*, guintptr);
+// extern void _gotk4_gtk4_GestureClick_ConnectUnpairedRelease(gpointer, gdouble, gdouble, guint, void*, guintptr);
 // extern void _gotk4_gtk4_GestureClick_ConnectStopped(gpointer, guintptr);
 // extern void _gotk4_gtk4_GestureClick_ConnectReleased(gpointer, gint, gdouble, gdouble, guintptr);
 // extern void _gotk4_gtk4_GestureClick_ConnectPressed(gpointer, gint, gdouble, gdouble, guintptr);
@@ -20,7 +22,7 @@ import "C"
 
 // GType values.
 var (
-	GTypeGestureClick = coreglib.Type(C.gtk_gesture_click_get_type())
+	GTypeGestureClick = coreglib.Type(girepository.MustFind("Gtk", "GestureClick").RegisteredGType())
 )
 
 func init() {
@@ -88,23 +90,4 @@ func (v *GestureClick) ConnectStopped(f func()) coreglib.SignalHandle {
 // its implicit grab.
 func (v *GestureClick) ConnectUnpairedRelease(f func(x, y float64, button uint, sequence *gdk.EventSequence)) coreglib.SignalHandle {
 	return coreglib.ConnectGeneratedClosure(v, "unpaired-release", false, unsafe.Pointer(C._gotk4_gtk4_GestureClick_ConnectUnpairedRelease), f)
-}
-
-// NewGestureClick returns a newly created GtkGesture that recognizes single and
-// multiple presses.
-//
-// The function returns the following values:
-//
-//    - gestureClick: newly created GtkGestureClick.
-//
-func NewGestureClick() *GestureClick {
-	var _cret *C.GtkGesture // in
-
-	_cret = C.gtk_gesture_click_new()
-
-	var _gestureClick *GestureClick // out
-
-	_gestureClick = wrapGestureClick(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _gestureClick
 }

@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gio2_VFSFileLookupFunc
-func _gotk4_gio2_VFSFileLookupFunc(arg1 *C.GVfs, arg2 *C.char, arg3 C.gpointer) (cret *C.GFile) {
+func _gotk4_gio2_VFSFileLookupFunc(arg1 *C.void, arg2 *C.char, arg3 C.gpointer) (cret *C.void) {
 	var fn VFSFileLookupFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -34,7 +36,7 @@ func _gotk4_gio2_VFSFileLookupFunc(arg1 *C.GVfs, arg2 *C.char, arg3 C.gpointer) 
 
 	var _ *File
 
-	cret = (*C.GFile)(unsafe.Pointer(coreglib.InternObject(file).Native()))
+	cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(file).Native()))
 	C.g_object_ref(C.gpointer(coreglib.InternObject(file).Native()))
 
 	return cret

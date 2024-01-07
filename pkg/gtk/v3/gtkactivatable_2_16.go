@@ -2,10 +2,16 @@
 
 package gtk
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ActivatableIface: > This method can be called with a NULL action at times.
@@ -19,5 +25,7 @@ type ActivatableIface struct {
 
 // activatableIface is the struct that's finalized.
 type activatableIface struct {
-	native *C.GtkActivatableIface
+	native unsafe.Pointer
 }
+
+var GIRInfoActivatableIface = girepository.MustFind("Gtk", "ActivatableIface")

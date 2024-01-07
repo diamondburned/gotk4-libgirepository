@@ -5,17 +5,19 @@ package gdkx11
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/x11/gdkx.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeX11DeviceManagerXI2 = coreglib.Type(C.gdk_x11_device_manager_xi2_get_type())
+	GTypeX11DeviceManagerXI2 = coreglib.Type(girepository.MustFind("GdkX11", "X11DeviceManagerXI2").RegisteredGType())
 )
 
 func init() {

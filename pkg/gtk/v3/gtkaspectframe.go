@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeAspectFrame = coreglib.Type(C.gtk_aspect_frame_get_type())
+	GTypeAspectFrame = coreglib.Type(girepository.MustFind("Gtk", "AspectFrame").RegisteredGType())
 )
 
 func init() {
@@ -99,91 +98,6 @@ func marshalAspectFrame(p uintptr) (interface{}, error) {
 	return wrapAspectFrame(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewAspectFrame: create a new AspectFrame.
-//
-// The function takes the following parameters:
-//
-//    - label (optional): label text.
-//    - xalign: horizontal alignment of the child within the allocation of the
-//      AspectFrame. This ranges from 0.0 (left aligned) to 1.0 (right aligned).
-//    - yalign: vertical alignment of the child within the allocation of the
-//      AspectFrame. This ranges from 0.0 (top aligned) to 1.0 (bottom aligned).
-//    - ratio: desired aspect ratio.
-//    - obeyChild: if TRUE, ratio is ignored, and the aspect ratio is taken from
-//      the requistion of the child.
-//
-// The function returns the following values:
-//
-//    - aspectFrame: new AspectFrame.
-//
-func NewAspectFrame(label string, xalign, yalign, ratio float32, obeyChild bool) *AspectFrame {
-	var _arg1 *C.gchar     // out
-	var _arg2 C.gfloat     // out
-	var _arg3 C.gfloat     // out
-	var _arg4 C.gfloat     // out
-	var _arg5 C.gboolean   // out
-	var _cret *C.GtkWidget // in
-
-	if label != "" {
-		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(label)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-	_arg2 = C.gfloat(xalign)
-	_arg3 = C.gfloat(yalign)
-	_arg4 = C.gfloat(ratio)
-	if obeyChild {
-		_arg5 = C.TRUE
-	}
-
-	_cret = C.gtk_aspect_frame_new(_arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(label)
-	runtime.KeepAlive(xalign)
-	runtime.KeepAlive(yalign)
-	runtime.KeepAlive(ratio)
-	runtime.KeepAlive(obeyChild)
-
-	var _aspectFrame *AspectFrame // out
-
-	_aspectFrame = wrapAspectFrame(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _aspectFrame
-}
-
-// Set parameters for an existing AspectFrame.
-//
-// The function takes the following parameters:
-//
-//    - xalign: horizontal alignment of the child within the allocation of the
-//      AspectFrame. This ranges from 0.0 (left aligned) to 1.0 (right aligned).
-//    - yalign: vertical alignment of the child within the allocation of the
-//      AspectFrame. This ranges from 0.0 (top aligned) to 1.0 (bottom aligned).
-//    - ratio: desired aspect ratio.
-//    - obeyChild: if TRUE, ratio is ignored, and the aspect ratio is taken from
-//      the requistion of the child.
-//
-func (aspectFrame *AspectFrame) Set(xalign, yalign, ratio float32, obeyChild bool) {
-	var _arg0 *C.GtkAspectFrame // out
-	var _arg1 C.gfloat          // out
-	var _arg2 C.gfloat          // out
-	var _arg3 C.gfloat          // out
-	var _arg4 C.gboolean        // out
-
-	_arg0 = (*C.GtkAspectFrame)(unsafe.Pointer(coreglib.InternObject(aspectFrame).Native()))
-	_arg1 = C.gfloat(xalign)
-	_arg2 = C.gfloat(yalign)
-	_arg3 = C.gfloat(ratio)
-	if obeyChild {
-		_arg4 = C.TRUE
-	}
-
-	C.gtk_aspect_frame_set(_arg0, _arg1, _arg2, _arg3, _arg4)
-	runtime.KeepAlive(aspectFrame)
-	runtime.KeepAlive(xalign)
-	runtime.KeepAlive(yalign)
-	runtime.KeepAlive(ratio)
-	runtime.KeepAlive(obeyChild)
-}
-
 // AspectFrameClass: instance of this type is always passed by reference.
 type AspectFrameClass struct {
 	*aspectFrameClass
@@ -191,13 +105,7 @@ type AspectFrameClass struct {
 
 // aspectFrameClass is the struct that's finalized.
 type aspectFrameClass struct {
-	native *C.GtkAspectFrameClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (a *AspectFrameClass) ParentClass() *FrameClass {
-	valptr := &a.native.parent_class
-	var _v *FrameClass // out
-	_v = (*FrameClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoAspectFrameClass = girepository.MustFind("Gtk", "AspectFrameClass")

@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // MenuAttributeIterClass: instance of this type is always passed by reference.
@@ -13,8 +21,10 @@ type MenuAttributeIterClass struct {
 
 // menuAttributeIterClass is the struct that's finalized.
 type menuAttributeIterClass struct {
-	native *C.GMenuAttributeIterClass
+	native unsafe.Pointer
 }
+
+var GIRInfoMenuAttributeIterClass = girepository.MustFind("Gio", "MenuAttributeIterClass")
 
 // MenuLinkIterClass: instance of this type is always passed by reference.
 type MenuLinkIterClass struct {
@@ -23,8 +33,10 @@ type MenuLinkIterClass struct {
 
 // menuLinkIterClass is the struct that's finalized.
 type menuLinkIterClass struct {
-	native *C.GMenuLinkIterClass
+	native unsafe.Pointer
 }
+
+var GIRInfoMenuLinkIterClass = girepository.MustFind("Gio", "MenuLinkIterClass")
 
 // MenuModelClass: instance of this type is always passed by reference.
 type MenuModelClass struct {
@@ -33,5 +45,7 @@ type MenuModelClass struct {
 
 // menuModelClass is the struct that's finalized.
 type menuModelClass struct {
-	native *C.GMenuModelClass
+	native unsafe.Pointer
 }
+
+var GIRInfoMenuModelClass = girepository.MustFind("Gio", "MenuModelClass")

@@ -6,11 +6,12 @@ import (
 	"unsafe"
 
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_CellRendererAccel_ConnectAccelCleared
@@ -31,30 +32,4 @@ func _gotk4_gtk4_CellRendererAccel_ConnectAccelCleared(arg0 C.gpointer, arg1 *C.
 	_pathString = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
 
 	f(_pathString)
-}
-
-//export _gotk4_gtk4_CellRendererAccel_ConnectAccelEdited
-func _gotk4_gtk4_CellRendererAccel_ConnectAccelEdited(arg0 C.gpointer, arg1 *C.gchar, arg2 C.guint, arg3 C.GdkModifierType, arg4 C.guint, arg5 C.guintptr) {
-	var f func(pathString string, accelKey uint, accelMods gdk.ModifierType, hardwareKeycode uint)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(pathString string, accelKey uint, accelMods gdk.ModifierType, hardwareKeycode uint))
-	}
-
-	var _pathString string          // out
-	var _accelKey uint              // out
-	var _accelMods gdk.ModifierType // out
-	var _hardwareKeycode uint       // out
-
-	_pathString = C.GoString((*C.gchar)(unsafe.Pointer(arg1)))
-	_accelKey = uint(arg2)
-	_accelMods = gdk.ModifierType(arg3)
-	_hardwareKeycode = uint(arg4)
-
-	f(_pathString, _accelKey, _accelMods, _hardwareKeycode)
 }

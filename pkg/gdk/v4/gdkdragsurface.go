@@ -3,20 +3,21 @@
 package gdk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDragSurface = coreglib.Type(C.gdk_drag_surface_get_type())
+	GTypeDragSurface = coreglib.Type(girepository.MustFind("Gdk", "DragSurface").RegisteredGType())
 )
 
 func init() {
@@ -42,8 +43,7 @@ var (
 type DragSurfacer interface {
 	coreglib.Objector
 
-	// Present drag_surface.
-	Present(width, height int) bool
+	baseDragSurface() *DragSurface
 }
 
 var _ DragSurfacer = (*DragSurface)(nil)
@@ -60,37 +60,11 @@ func marshalDragSurface(p uintptr) (interface{}, error) {
 	return wrapDragSurface(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Present drag_surface.
-//
-// The function takes the following parameters:
-//
-//    - width: unconstrained drag_surface width to layout.
-//    - height: unconstrained drag_surface height to layout.
-//
-// The function returns the following values:
-//
-//    - ok: FALSE if it failed to be presented, otherwise TRUE.
-//
-func (dragSurface *DragSurface) Present(width, height int) bool {
-	var _arg0 *C.GdkDragSurface // out
-	var _arg1 C.int             // out
-	var _arg2 C.int             // out
-	var _cret C.gboolean        // in
+func (v *DragSurface) baseDragSurface() *DragSurface {
+	return v
+}
 
-	_arg0 = (*C.GdkDragSurface)(unsafe.Pointer(coreglib.InternObject(dragSurface).Native()))
-	_arg1 = C.int(width)
-	_arg2 = C.int(height)
-
-	_cret = C.gdk_drag_surface_present(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(dragSurface)
-	runtime.KeepAlive(width)
-	runtime.KeepAlive(height)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
+// BaseDragSurface returns the underlying base object.
+func BaseDragSurface(obj DragSurfacer) *DragSurface {
+	return obj.baseDragSurface()
 }

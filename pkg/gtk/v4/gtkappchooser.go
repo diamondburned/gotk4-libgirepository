@@ -3,21 +3,21 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeAppChooser = coreglib.Type(C.gtk_app_chooser_get_type())
+	GTypeAppChooser = coreglib.Type(girepository.MustFind("Gtk", "AppChooser").RegisteredGType())
 )
 
 func init() {
@@ -59,13 +59,7 @@ var (
 type AppChooserer interface {
 	coreglib.Objector
 
-	// AppInfo returns the currently selected application.
-	AppInfo() *gio.AppInfo
-	// ContentType returns the content type for which the GtkAppChooser shows
-	// applications.
-	ContentType() string
-	// Refresh reloads the list of applications.
-	Refresh()
+	baseAppChooser() *AppChooser
 }
 
 var _ AppChooserer = (*AppChooser)(nil)
@@ -94,66 +88,11 @@ func marshalAppChooser(p uintptr) (interface{}, error) {
 	return wrapAppChooser(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// AppInfo returns the currently selected application.
-//
-// The function returns the following values:
-//
-//    - appInfo (optional): GAppInfo for the currently selected application, or
-//      NULL if none is selected. Free with g_object_unref().
-//
-func (self *AppChooser) AppInfo() *gio.AppInfo {
-	var _arg0 *C.GtkAppChooser // out
-	var _cret *C.GAppInfo      // in
-
-	_arg0 = (*C.GtkAppChooser)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_app_chooser_get_app_info(_arg0)
-	runtime.KeepAlive(self)
-
-	var _appInfo *gio.AppInfo // out
-
-	if _cret != nil {
-		{
-			obj := coreglib.AssumeOwnership(unsafe.Pointer(_cret))
-			_appInfo = &gio.AppInfo{
-				Object: obj,
-			}
-		}
-	}
-
-	return _appInfo
+func (v *AppChooser) baseAppChooser() *AppChooser {
+	return v
 }
 
-// ContentType returns the content type for which the GtkAppChooser shows
-// applications.
-//
-// The function returns the following values:
-//
-//    - utf8: content type of self. Free with g_free().
-//
-func (self *AppChooser) ContentType() string {
-	var _arg0 *C.GtkAppChooser // out
-	var _cret *C.char          // in
-
-	_arg0 = (*C.GtkAppChooser)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_app_chooser_get_content_type(_arg0)
-	runtime.KeepAlive(self)
-
-	var _utf8 string // out
-
-	_utf8 = C.GoString((*C.gchar)(unsafe.Pointer(_cret)))
-	defer C.free(unsafe.Pointer(_cret))
-
-	return _utf8
-}
-
-// Refresh reloads the list of applications.
-func (self *AppChooser) Refresh() {
-	var _arg0 *C.GtkAppChooser // out
-
-	_arg0 = (*C.GtkAppChooser)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	C.gtk_app_chooser_refresh(_arg0)
-	runtime.KeepAlive(self)
+// BaseAppChooser returns the underlying base object.
+func BaseAppChooser(obj AppChooserer) *AppChooser {
+	return obj.baseAppChooser()
 }

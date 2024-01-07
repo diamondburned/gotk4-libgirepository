@@ -9,13 +9,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 //export _gotk4_gtk4_DropTarget_ConnectAccept
-func _gotk4_gtk4_DropTarget_ConnectAccept(arg0 C.gpointer, arg1 *C.GdkDrop, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_DropTarget_ConnectAccept(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(drop gdk.Dropper) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -90,34 +91,6 @@ func _gotk4_gtk4_DropTarget_ConnectDrop(arg0 C.gpointer, arg1 C.GValue, arg2 C.g
 	return cret
 }
 
-//export _gotk4_gtk4_DropTarget_ConnectEnter
-func _gotk4_gtk4_DropTarget_ConnectEnter(arg0 C.gpointer, arg1 C.gdouble, arg2 C.gdouble, arg3 C.guintptr) (cret C.GdkDragAction) {
-	var f func(x, y float64) (dragAction gdk.DragAction)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(x, y float64) (dragAction gdk.DragAction))
-	}
-
-	var _x float64 // out
-	var _y float64 // out
-
-	_x = float64(arg1)
-	_y = float64(arg2)
-
-	dragAction := f(_x, _y)
-
-	var _ gdk.DragAction
-
-	cret = C.GdkDragAction(dragAction)
-
-	return cret
-}
-
 //export _gotk4_gtk4_DropTarget_ConnectLeave
 func _gotk4_gtk4_DropTarget_ConnectLeave(arg0 C.gpointer, arg1 C.guintptr) {
 	var f func()
@@ -132,32 +105,4 @@ func _gotk4_gtk4_DropTarget_ConnectLeave(arg0 C.gpointer, arg1 C.guintptr) {
 	}
 
 	f()
-}
-
-//export _gotk4_gtk4_DropTarget_ConnectMotion
-func _gotk4_gtk4_DropTarget_ConnectMotion(arg0 C.gpointer, arg1 C.gdouble, arg2 C.gdouble, arg3 C.guintptr) (cret C.GdkDragAction) {
-	var f func(x, y float64) (dragAction gdk.DragAction)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(x, y float64) (dragAction gdk.DragAction))
-	}
-
-	var _x float64 // out
-	var _y float64 // out
-
-	_x = float64(arg1)
-	_y = float64(arg2)
-
-	dragAction := f(_x, _y)
-
-	var _ gdk.DragAction
-
-	cret = C.GdkDragAction(dragAction)
-
-	return cret
 }

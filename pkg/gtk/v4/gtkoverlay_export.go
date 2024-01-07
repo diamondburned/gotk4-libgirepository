@@ -10,12 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_Overlay_ConnectGetChildPosition
-func _gotk4_gtk4_Overlay_ConnectGetChildPosition(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 *C.GdkRectangle, arg3 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk4_Overlay_ConnectGetChildPosition(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) (cret C.gboolean) {
 	var f func(widget Widgetter) (allocation *gdk.Rectangle, ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -52,7 +54,7 @@ func _gotk4_gtk4_Overlay_ConnectGetChildPosition(arg0 C.gpointer, arg1 *C.GtkWid
 	var _ *gdk.Rectangle
 	var _ bool
 
-	*arg2 = *(*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(allocation)))
+	*arg2 = (*C.void)(gextras.StructNative(unsafe.Pointer(allocation)))
 	if ok {
 		cret = C.TRUE
 	}

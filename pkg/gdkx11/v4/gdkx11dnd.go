@@ -5,18 +5,20 @@ package gdkx11
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/x11/gdkx.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeX11Drag = coreglib.Type(C.gdk_x11_drag_get_type())
+	GTypeX11Drag = coreglib.Type(girepository.MustFind("GdkX11", "X11Drag").RegisteredGType())
 )
 
 func init() {

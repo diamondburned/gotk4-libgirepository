@@ -3,17 +3,17 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern gboolean _gotk4_gtk4_Paned_ConnectToggleHandleFocus(gpointer, guintptr);
-// extern gboolean _gotk4_gtk4_Paned_ConnectMoveHandle(gpointer, GtkScrollType, guintptr);
 // extern gboolean _gotk4_gtk4_Paned_ConnectCycleHandleFocus(gpointer, gboolean, guintptr);
 // extern gboolean _gotk4_gtk4_Paned_ConnectCycleChildFocus(gpointer, gboolean, guintptr);
 // extern gboolean _gotk4_gtk4_Paned_ConnectCancelPosition(gpointer, guintptr);
@@ -22,7 +22,7 @@ import "C"
 
 // GType values.
 var (
-	GTypePaned = coreglib.Type(C.gtk_paned_get_type())
+	GTypePaned = coreglib.Type(girepository.MustFind("Gtk", "Paned").RegisteredGType())
 )
 
 func init() {
@@ -140,8 +140,8 @@ func marshalPaned(p uintptr) (interface{}, error) {
 // This is a keybinding signal (class.SignalAction.html).
 //
 // The default binding for this signal is Return or Space.
-func (paned *Paned) ConnectAcceptPosition(f func() (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(paned, "accept-position", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectAcceptPosition), f)
+func (v *Paned) ConnectAcceptPosition(f func() (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "accept-position", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectAcceptPosition), f)
 }
 
 // ConnectCancelPosition is emitted to cancel moving the position of the handle
@@ -152,8 +152,8 @@ func (paned *Paned) ConnectAcceptPosition(f func() (ok bool)) coreglib.SignalHan
 // This is a keybinding signal (class.SignalAction.html).
 //
 // The default binding for this signal is Escape.
-func (paned *Paned) ConnectCancelPosition(f func() (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(paned, "cancel-position", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectCancelPosition), f)
+func (v *Paned) ConnectCancelPosition(f func() (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "cancel-position", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectCancelPosition), f)
 }
 
 // ConnectCycleChildFocus is emitted to cycle the focus between the children of
@@ -162,8 +162,8 @@ func (paned *Paned) ConnectCancelPosition(f func() (ok bool)) coreglib.SignalHan
 // This is a keybinding signal (class.SignalAction.html).
 //
 // The default binding is F6.
-func (paned *Paned) ConnectCycleChildFocus(f func(reversed bool) (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(paned, "cycle-child-focus", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectCycleChildFocus), f)
+func (v *Paned) ConnectCycleChildFocus(f func(reversed bool) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "cycle-child-focus", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectCycleChildFocus), f)
 }
 
 // ConnectCycleHandleFocus is emitted to cycle whether the paned should grab
@@ -173,15 +173,8 @@ func (paned *Paned) ConnectCycleChildFocus(f func(reversed bool) (ok bool)) core
 // This is a keybinding signal (class.SignalAction.html).
 //
 // The default binding for this signal is F8.
-func (paned *Paned) ConnectCycleHandleFocus(f func(reversed bool) (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(paned, "cycle-handle-focus", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectCycleHandleFocus), f)
-}
-
-// ConnectMoveHandle is emitted to move the handle with key bindings.
-//
-// This is a keybinding signal (class.SignalAction.html).
-func (paned *Paned) ConnectMoveHandle(f func(scrollType ScrollType) (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(paned, "move-handle", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectMoveHandle), f)
+func (v *Paned) ConnectCycleHandleFocus(f func(reversed bool) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "cycle-handle-focus", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectCycleHandleFocus), f)
 }
 
 // ConnectToggleHandleFocus is emitted to accept the current position of the
@@ -190,407 +183,6 @@ func (paned *Paned) ConnectMoveHandle(f func(scrollType ScrollType) (ok bool)) c
 // This is a keybinding signal (class.SignalAction.html).
 //
 // The default binding is Tab.
-func (paned *Paned) ConnectToggleHandleFocus(f func() (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(paned, "toggle-handle-focus", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectToggleHandleFocus), f)
-}
-
-// NewPaned creates a new GtkPaned widget.
-//
-// The function takes the following parameters:
-//
-//    - orientation paned’s orientation.
-//
-// The function returns the following values:
-//
-//    - paned: new GtkPaned.
-//
-func NewPaned(orientation Orientation) *Paned {
-	var _arg1 C.GtkOrientation // out
-	var _cret *C.GtkWidget     // in
-
-	_arg1 = C.GtkOrientation(orientation)
-
-	_cret = C.gtk_paned_new(_arg1)
-	runtime.KeepAlive(orientation)
-
-	var _paned *Paned // out
-
-	_paned = wrapPaned(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _paned
-}
-
-// EndChild retrieves the end child of the given GtkPaned.
-//
-// See also: GtkPaned:end-child.
-//
-// The function returns the following values:
-//
-//    - widget (optional): end child widget.
-//
-func (paned *Paned) EndChild() Widgetter {
-	var _arg0 *C.GtkPaned  // out
-	var _cret *C.GtkWidget // in
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-
-	_cret = C.gtk_paned_get_end_child(_arg0)
-	runtime.KeepAlive(paned)
-
-	var _widget Widgetter // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Widgetter)
-				return ok
-			})
-			rv, ok := casted.(Widgetter)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-			}
-			_widget = rv
-		}
-	}
-
-	return _widget
-}
-
-// Position obtains the position of the divider between the two panes.
-//
-// The function returns the following values:
-//
-//    - gint: position of the divider.
-//
-func (paned *Paned) Position() int {
-	var _arg0 *C.GtkPaned // out
-	var _cret C.int       // in
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-
-	_cret = C.gtk_paned_get_position(_arg0)
-	runtime.KeepAlive(paned)
-
-	var _gint int // out
-
-	_gint = int(_cret)
-
-	return _gint
-}
-
-// ResizeEndChild returns whether the end child can be resized.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the end child is resizable.
-//
-func (paned *Paned) ResizeEndChild() bool {
-	var _arg0 *C.GtkPaned // out
-	var _cret C.gboolean  // in
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-
-	_cret = C.gtk_paned_get_resize_end_child(_arg0)
-	runtime.KeepAlive(paned)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// ResizeStartChild returns whether the start child can be resized.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the start child is resizable.
-//
-func (paned *Paned) ResizeStartChild() bool {
-	var _arg0 *C.GtkPaned // out
-	var _cret C.gboolean  // in
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-
-	_cret = C.gtk_paned_get_resize_start_child(_arg0)
-	runtime.KeepAlive(paned)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// ShrinkEndChild returns whether the end child can be shrunk.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the end child is shrinkable.
-//
-func (paned *Paned) ShrinkEndChild() bool {
-	var _arg0 *C.GtkPaned // out
-	var _cret C.gboolean  // in
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-
-	_cret = C.gtk_paned_get_shrink_end_child(_arg0)
-	runtime.KeepAlive(paned)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// ShrinkStartChild returns whether the start child can be shrunk.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the start child is shrinkable.
-//
-func (paned *Paned) ShrinkStartChild() bool {
-	var _arg0 *C.GtkPaned // out
-	var _cret C.gboolean  // in
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-
-	_cret = C.gtk_paned_get_shrink_start_child(_arg0)
-	runtime.KeepAlive(paned)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// StartChild retrieves the start child of the given GtkPaned.
-//
-// See also: GtkPaned:start-child.
-//
-// The function returns the following values:
-//
-//    - widget (optional): start child widget.
-//
-func (paned *Paned) StartChild() Widgetter {
-	var _arg0 *C.GtkPaned  // out
-	var _cret *C.GtkWidget // in
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-
-	_cret = C.gtk_paned_get_start_child(_arg0)
-	runtime.KeepAlive(paned)
-
-	var _widget Widgetter // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.Take(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(Widgetter)
-				return ok
-			})
-			rv, ok := casted.(Widgetter)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-			}
-			_widget = rv
-		}
-	}
-
-	return _widget
-}
-
-// WideHandle gets whether the separator should be wide.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the paned should have a wide handle.
-//
-func (paned *Paned) WideHandle() bool {
-	var _arg0 *C.GtkPaned // out
-	var _cret C.gboolean  // in
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-
-	_cret = C.gtk_paned_get_wide_handle(_arg0)
-	runtime.KeepAlive(paned)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetEndChild sets the end child of paned to child.
-//
-// The function takes the following parameters:
-//
-//    - child: widget to add.
-//
-func (paned *Paned) SetEndChild(child Widgetter) {
-	var _arg0 *C.GtkPaned  // out
-	var _arg1 *C.GtkWidget // out
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	C.gtk_paned_set_end_child(_arg0, _arg1)
-	runtime.KeepAlive(paned)
-	runtime.KeepAlive(child)
-}
-
-// SetPosition sets the position of the divider between the two panes.
-//
-// The function takes the following parameters:
-//
-//    - position: pixel position of divider, a negative value means that the
-//      position is unset.
-//
-func (paned *Paned) SetPosition(position int) {
-	var _arg0 *C.GtkPaned // out
-	var _arg1 C.int       // out
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-	_arg1 = C.int(position)
-
-	C.gtk_paned_set_position(_arg0, _arg1)
-	runtime.KeepAlive(paned)
-	runtime.KeepAlive(position)
-}
-
-// SetResizeEndChild sets the GtkPaned:resize-end-child property.
-//
-// The function takes the following parameters:
-//
-//    - resize: TRUE to let the end child be resized.
-//
-func (paned *Paned) SetResizeEndChild(resize bool) {
-	var _arg0 *C.GtkPaned // out
-	var _arg1 C.gboolean  // out
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-	if resize {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_paned_set_resize_end_child(_arg0, _arg1)
-	runtime.KeepAlive(paned)
-	runtime.KeepAlive(resize)
-}
-
-// SetResizeStartChild sets the GtkPaned:resize-start-child property.
-//
-// The function takes the following parameters:
-//
-//    - resize: TRUE to let the start child be resized.
-//
-func (paned *Paned) SetResizeStartChild(resize bool) {
-	var _arg0 *C.GtkPaned // out
-	var _arg1 C.gboolean  // out
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-	if resize {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_paned_set_resize_start_child(_arg0, _arg1)
-	runtime.KeepAlive(paned)
-	runtime.KeepAlive(resize)
-}
-
-// SetShrinkEndChild sets the GtkPaned:shrink-end-child property.
-//
-// The function takes the following parameters:
-//
-//    - resize: TRUE to let the end child be shrunk.
-//
-func (paned *Paned) SetShrinkEndChild(resize bool) {
-	var _arg0 *C.GtkPaned // out
-	var _arg1 C.gboolean  // out
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-	if resize {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_paned_set_shrink_end_child(_arg0, _arg1)
-	runtime.KeepAlive(paned)
-	runtime.KeepAlive(resize)
-}
-
-// SetShrinkStartChild sets the GtkPaned:shrink-start-child property.
-//
-// The function takes the following parameters:
-//
-//    - resize: TRUE to let the start child be shrunk.
-//
-func (paned *Paned) SetShrinkStartChild(resize bool) {
-	var _arg0 *C.GtkPaned // out
-	var _arg1 C.gboolean  // out
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-	if resize {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_paned_set_shrink_start_child(_arg0, _arg1)
-	runtime.KeepAlive(paned)
-	runtime.KeepAlive(resize)
-}
-
-// SetStartChild sets the start child of paned to child.
-//
-// The function takes the following parameters:
-//
-//    - child: widget to add.
-//
-func (paned *Paned) SetStartChild(child Widgetter) {
-	var _arg0 *C.GtkPaned  // out
-	var _arg1 *C.GtkWidget // out
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	C.gtk_paned_set_start_child(_arg0, _arg1)
-	runtime.KeepAlive(paned)
-	runtime.KeepAlive(child)
-}
-
-// SetWideHandle sets whether the separator should be wide.
-//
-// The function takes the following parameters:
-//
-//    - wide: new value for the gtk.Paned:wide-handle property.
-//
-func (paned *Paned) SetWideHandle(wide bool) {
-	var _arg0 *C.GtkPaned // out
-	var _arg1 C.gboolean  // out
-
-	_arg0 = (*C.GtkPaned)(unsafe.Pointer(coreglib.InternObject(paned).Native()))
-	if wide {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_paned_set_wide_handle(_arg0, _arg1)
-	runtime.KeepAlive(paned)
-	runtime.KeepAlive(wide)
+func (v *Paned) ConnectToggleHandleFocus(f func() (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "toggle-handle-focus", false, unsafe.Pointer(C._gotk4_gtk4_Paned_ConnectToggleHandleFocus), f)
 }

@@ -4,25 +4,24 @@ package gtk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeButtonBoxStyle = coreglib.Type(C.gtk_button_box_style_get_type())
-	GTypeButtonBox      = coreglib.Type(C.gtk_button_box_get_type())
+	GTypeButtonBoxStyle = coreglib.Type(girepository.MustFind("Gtk", "ButtonBoxStyle").RegisteredGType())
+	GTypeButtonBox      = coreglib.Type(girepository.MustFind("Gtk", "ButtonBox").RegisteredGType())
 )
 
 func init() {
@@ -143,197 +142,6 @@ func marshalButtonBox(p uintptr) (interface{}, error) {
 	return wrapButtonBox(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewButtonBox creates a new ButtonBox.
-//
-// The function takes the following parameters:
-//
-//    - orientation box's orientation.
-//
-// The function returns the following values:
-//
-//    - buttonBox: new ButtonBox.
-//
-func NewButtonBox(orientation Orientation) *ButtonBox {
-	var _arg1 C.GtkOrientation // out
-	var _cret *C.GtkWidget     // in
-
-	_arg1 = C.GtkOrientation(orientation)
-
-	_cret = C.gtk_button_box_new(_arg1)
-	runtime.KeepAlive(orientation)
-
-	var _buttonBox *ButtonBox // out
-
-	_buttonBox = wrapButtonBox(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _buttonBox
-}
-
-// ChildNonHomogeneous returns whether the child is exempted from homogenous
-// sizing.
-//
-// The function takes the following parameters:
-//
-//    - child of widget.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the child is not subject to homogenous sizing.
-//
-func (widget *ButtonBox) ChildNonHomogeneous(child Widgetter) bool {
-	var _arg0 *C.GtkButtonBox // out
-	var _arg1 *C.GtkWidget    // out
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GtkButtonBox)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	_cret = C.gtk_button_box_get_child_non_homogeneous(_arg0, _arg1)
-	runtime.KeepAlive(widget)
-	runtime.KeepAlive(child)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// ChildSecondary returns whether child should appear in a secondary group of
-// children.
-//
-// The function takes the following parameters:
-//
-//    - child of widget.
-//
-// The function returns the following values:
-//
-//    - ok: whether child should appear in a secondary group of children.
-//
-func (widget *ButtonBox) ChildSecondary(child Widgetter) bool {
-	var _arg0 *C.GtkButtonBox // out
-	var _arg1 *C.GtkWidget    // out
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GtkButtonBox)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	_cret = C.gtk_button_box_get_child_secondary(_arg0, _arg1)
-	runtime.KeepAlive(widget)
-	runtime.KeepAlive(child)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Layout retrieves the method being used to arrange the buttons in a button
-// box.
-//
-// The function returns the following values:
-//
-//    - buttonBoxStyle: method used to lay out buttons in widget.
-//
-func (widget *ButtonBox) Layout() ButtonBoxStyle {
-	var _arg0 *C.GtkButtonBox     // out
-	var _cret C.GtkButtonBoxStyle // in
-
-	_arg0 = (*C.GtkButtonBox)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-
-	_cret = C.gtk_button_box_get_layout(_arg0)
-	runtime.KeepAlive(widget)
-
-	var _buttonBoxStyle ButtonBoxStyle // out
-
-	_buttonBoxStyle = ButtonBoxStyle(_cret)
-
-	return _buttonBoxStyle
-}
-
-// SetChildNonHomogeneous sets whether the child is exempted from homogeous
-// sizing.
-//
-// The function takes the following parameters:
-//
-//    - child of widget.
-//    - nonHomogeneous: new value.
-//
-func (widget *ButtonBox) SetChildNonHomogeneous(child Widgetter, nonHomogeneous bool) {
-	var _arg0 *C.GtkButtonBox // out
-	var _arg1 *C.GtkWidget    // out
-	var _arg2 C.gboolean      // out
-
-	_arg0 = (*C.GtkButtonBox)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-	if nonHomogeneous {
-		_arg2 = C.TRUE
-	}
-
-	C.gtk_button_box_set_child_non_homogeneous(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(widget)
-	runtime.KeepAlive(child)
-	runtime.KeepAlive(nonHomogeneous)
-}
-
-// SetChildSecondary sets whether child should appear in a secondary group of
-// children. A typical use of a secondary child is the help button in a dialog.
-//
-// This group appears after the other children if the style is
-// GTK_BUTTONBOX_START, GTK_BUTTONBOX_SPREAD or GTK_BUTTONBOX_EDGE, and before
-// the other children if the style is GTK_BUTTONBOX_END. For horizontal button
-// boxes, the definition of before/after depends on direction of the widget (see
-// gtk_widget_set_direction()). If the style is GTK_BUTTONBOX_START or
-// GTK_BUTTONBOX_END, then the secondary children are aligned at the other end
-// of the button box from the main children. For the other styles, they appear
-// immediately next to the main children.
-//
-// The function takes the following parameters:
-//
-//    - child of widget.
-//    - isSecondary: if TRUE, the child appears in a secondary group of the
-//      button box.
-//
-func (widget *ButtonBox) SetChildSecondary(child Widgetter, isSecondary bool) {
-	var _arg0 *C.GtkButtonBox // out
-	var _arg1 *C.GtkWidget    // out
-	var _arg2 C.gboolean      // out
-
-	_arg0 = (*C.GtkButtonBox)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-	if isSecondary {
-		_arg2 = C.TRUE
-	}
-
-	C.gtk_button_box_set_child_secondary(_arg0, _arg1, _arg2)
-	runtime.KeepAlive(widget)
-	runtime.KeepAlive(child)
-	runtime.KeepAlive(isSecondary)
-}
-
-// SetLayout changes the way buttons are arranged in their container.
-//
-// The function takes the following parameters:
-//
-//    - layoutStyle: new layout style.
-//
-func (widget *ButtonBox) SetLayout(layoutStyle ButtonBoxStyle) {
-	var _arg0 *C.GtkButtonBox     // out
-	var _arg1 C.GtkButtonBoxStyle // out
-
-	_arg0 = (*C.GtkButtonBox)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-	_arg1 = C.GtkButtonBoxStyle(layoutStyle)
-
-	C.gtk_button_box_set_layout(_arg0, _arg1)
-	runtime.KeepAlive(widget)
-	runtime.KeepAlive(layoutStyle)
-}
-
 // ButtonBoxClass: instance of this type is always passed by reference.
 type ButtonBoxClass struct {
 	*buttonBoxClass
@@ -341,13 +149,7 @@ type ButtonBoxClass struct {
 
 // buttonBoxClass is the struct that's finalized.
 type buttonBoxClass struct {
-	native *C.GtkButtonBoxClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (b *ButtonBoxClass) ParentClass() *BoxClass {
-	valptr := &b.native.parent_class
-	var _v *BoxClass // out
-	_v = (*BoxClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoButtonBoxClass = girepository.MustFind("Gtk", "ButtonBoxClass")

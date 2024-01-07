@@ -10,10 +10,10 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_StatusIcon_ConnectActivate
@@ -33,7 +33,7 @@ func _gotk4_gtk3_StatusIcon_ConnectActivate(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk3_StatusIcon_ConnectButtonPressEvent
-func _gotk4_gtk3_StatusIcon_ConnectButtonPressEvent(arg0 C.gpointer, arg1 *C.GdkEventButton, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_StatusIcon_ConnectButtonPressEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventButton) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -61,7 +61,7 @@ func _gotk4_gtk3_StatusIcon_ConnectButtonPressEvent(arg0 C.gpointer, arg1 *C.Gdk
 }
 
 //export _gotk4_gtk3_StatusIcon_ConnectButtonReleaseEvent
-func _gotk4_gtk3_StatusIcon_ConnectButtonReleaseEvent(arg0 C.gpointer, arg1 *C.GdkEventButton, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_StatusIcon_ConnectButtonReleaseEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventButton) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -111,7 +111,7 @@ func _gotk4_gtk3_StatusIcon_ConnectPopupMenu(arg0 C.gpointer, arg1 C.guint, arg2
 }
 
 //export _gotk4_gtk3_StatusIcon_ConnectQueryTooltip
-func _gotk4_gtk3_StatusIcon_ConnectQueryTooltip(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.gboolean, arg4 *C.GtkTooltip, arg5 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_StatusIcon_ConnectQueryTooltip(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.gboolean, arg4 *C.void, arg5 C.guintptr) (cret C.gboolean) {
 	var f func(x, y int, keyboardMode bool, tooltip *Tooltip) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))
@@ -147,7 +147,7 @@ func _gotk4_gtk3_StatusIcon_ConnectQueryTooltip(arg0 C.gpointer, arg1 C.gint, ar
 }
 
 //export _gotk4_gtk3_StatusIcon_ConnectScrollEvent
-func _gotk4_gtk3_StatusIcon_ConnectScrollEvent(arg0 C.gpointer, arg1 *C.GdkEventScroll, arg2 C.guintptr) (cret C.gboolean) {
+func _gotk4_gtk3_StatusIcon_ConnectScrollEvent(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) (cret C.gboolean) {
 	var f func(event *gdk.EventScroll) (ok bool)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

@@ -9,12 +9,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_atk1_KeySnoopFunc
-func _gotk4_atk1_KeySnoopFunc(arg1 *C.AtkKeyEventStruct, arg2 C.gpointer) (cret C.gint) {
+func _gotk4_atk1_KeySnoopFunc(arg1 *C.void, arg2 C.gpointer) (cret C.gint) {
 	var fn KeySnoopFunc
 	{
 		v := gbox.Get(uintptr(arg2))

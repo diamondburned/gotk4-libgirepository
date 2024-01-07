@@ -6,17 +6,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeProxyAddressEnumerator = coreglib.Type(C.g_proxy_address_enumerator_get_type())
+	GTypeProxyAddressEnumerator = coreglib.Type(girepository.MustFind("Gio", "ProxyAddressEnumerator").RegisteredGType())
 )
 
 func init() {
@@ -87,5 +89,7 @@ type ProxyAddressEnumeratorClass struct {
 
 // proxyAddressEnumeratorClass is the struct that's finalized.
 type proxyAddressEnumeratorClass struct {
-	native *C.GProxyAddressEnumeratorClass
+	native unsafe.Pointer
 }
+
+var GIRInfoProxyAddressEnumeratorClass = girepository.MustFind("Gio", "ProxyAddressEnumeratorClass")

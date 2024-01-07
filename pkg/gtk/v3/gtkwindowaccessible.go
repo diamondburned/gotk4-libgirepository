@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeWindowAccessible = coreglib.Type(C.gtk_window_accessible_get_type())
+	GTypeWindowAccessible = coreglib.Type(girepository.MustFind("Gtk", "WindowAccessible").RegisteredGType())
 )
 
 func init() {
@@ -96,12 +96,7 @@ type WindowAccessibleClass struct {
 
 // windowAccessibleClass is the struct that's finalized.
 type windowAccessibleClass struct {
-	native *C.GtkWindowAccessibleClass
+	native unsafe.Pointer
 }
 
-func (w *WindowAccessibleClass) ParentClass() *ContainerAccessibleClass {
-	valptr := &w.native.parent_class
-	var _v *ContainerAccessibleClass // out
-	_v = (*ContainerAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoWindowAccessibleClass = girepository.MustFind("Gtk", "WindowAccessibleClass")

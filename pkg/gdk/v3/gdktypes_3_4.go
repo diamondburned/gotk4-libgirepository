@@ -6,17 +6,19 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeModifierIntent = coreglib.Type(C.gdk_modifier_intent_get_type())
+	GTypeModifierIntent = coreglib.Type(girepository.MustFind("Gdk", "ModifierIntent").RegisteredGType())
 )
 
 func init() {

@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeRendererCellAccessible = coreglib.Type(C.gtk_renderer_cell_accessible_get_type())
+	GTypeRendererCellAccessible = coreglib.Type(girepository.MustFind("Gtk", "RendererCellAccessible").RegisteredGType())
 )
 
 func init() {
@@ -93,26 +92,6 @@ func marshalRendererCellAccessible(p uintptr) (interface{}, error) {
 	return wrapRendererCellAccessible(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// The function takes the following parameters:
-//
-// The function returns the following values:
-//
-func NewRendererCellAccessible(renderer CellRendererer) *RendererCellAccessible {
-	var _arg1 *C.GtkCellRenderer // out
-	var _cret *C.AtkObject       // in
-
-	_arg1 = (*C.GtkCellRenderer)(unsafe.Pointer(coreglib.InternObject(renderer).Native()))
-
-	_cret = C.gtk_renderer_cell_accessible_new(_arg1)
-	runtime.KeepAlive(renderer)
-
-	var _rendererCellAccessible *RendererCellAccessible // out
-
-	_rendererCellAccessible = wrapRendererCellAccessible(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _rendererCellAccessible
-}
-
 // RendererCellAccessibleClass: instance of this type is always passed by
 // reference.
 type RendererCellAccessibleClass struct {
@@ -121,12 +100,7 @@ type RendererCellAccessibleClass struct {
 
 // rendererCellAccessibleClass is the struct that's finalized.
 type rendererCellAccessibleClass struct {
-	native *C.GtkRendererCellAccessibleClass
+	native unsafe.Pointer
 }
 
-func (r *RendererCellAccessibleClass) ParentClass() *CellAccessibleClass {
-	valptr := &r.native.parent_class
-	var _v *CellAccessibleClass // out
-	_v = (*CellAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoRendererCellAccessibleClass = girepository.MustFind("Gtk", "RendererCellAccessibleClass")

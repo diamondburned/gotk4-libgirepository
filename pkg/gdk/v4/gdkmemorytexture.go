@@ -4,23 +4,22 @@ package gdk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeMemoryFormat  = coreglib.Type(C.gdk_memory_format_get_type())
-	GTypeMemoryTexture = coreglib.Type(C.gdk_memory_texture_get_type())
+	GTypeMemoryFormat  = coreglib.Type(girepository.MustFind("Gdk", "MemoryFormat").RegisteredGType())
+	GTypeMemoryTexture = coreglib.Type(girepository.MustFind("Gdk", "MemoryTexture").RegisteredGType())
 )
 
 func init() {
@@ -126,48 +125,4 @@ func wrapMemoryTexture(obj *coreglib.Object) *MemoryTexture {
 
 func marshalMemoryTexture(p uintptr) (interface{}, error) {
 	return wrapMemoryTexture(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewMemoryTexture creates a new texture for a blob of image data.
-//
-// The GBytes must contain stride x height pixels in the given format.
-//
-// The function takes the following parameters:
-//
-//    - width of the texture.
-//    - height of the texture.
-//    - format of the data.
-//    - bytes: GBytes containing the pixel data.
-//    - stride for the data.
-//
-// The function returns the following values:
-//
-//    - memoryTexture: newly-created GdkTexture.
-//
-func NewMemoryTexture(width, height int, format MemoryFormat, bytes *glib.Bytes, stride uint) *MemoryTexture {
-	var _arg1 C.int             // out
-	var _arg2 C.int             // out
-	var _arg3 C.GdkMemoryFormat // out
-	var _arg4 *C.GBytes         // out
-	var _arg5 C.gsize           // out
-	var _cret *C.GdkTexture     // in
-
-	_arg1 = C.int(width)
-	_arg2 = C.int(height)
-	_arg3 = C.GdkMemoryFormat(format)
-	_arg4 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(bytes)))
-	_arg5 = C.gsize(stride)
-
-	_cret = C.gdk_memory_texture_new(_arg1, _arg2, _arg3, _arg4, _arg5)
-	runtime.KeepAlive(width)
-	runtime.KeepAlive(height)
-	runtime.KeepAlive(format)
-	runtime.KeepAlive(bytes)
-	runtime.KeepAlive(stride)
-
-	var _memoryTexture *MemoryTexture // out
-
-	_memoryTexture = wrapMemoryTexture(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _memoryTexture
 }

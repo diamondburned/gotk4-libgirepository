@@ -4,21 +4,21 @@ package pango
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <pango/pango.h>
 import "C"
 
 // GType values.
 var (
-	GTypeOverline = coreglib.Type(C.pango_overline_get_type())
+	GTypeOverline = coreglib.Type(girepository.MustFind("Pango", "Overline").RegisteredGType())
 )
 
 func init() {
@@ -53,81 +53,4 @@ func (o Overline) String() string {
 	default:
 		return fmt.Sprintf("Overline(%d)", o)
 	}
-}
-
-// NewAttrOverlineColor: create a new overline color attribute.
-//
-// This attribute modifies the color of overlines. If not set, overlines will
-// use the foreground color.
-//
-// The function takes the following parameters:
-//
-//    - red value (ranging from 0 to 65535).
-//    - green value.
-//    - blue value.
-//
-// The function returns the following values:
-//
-//    - attribute: newly allocated PangoAttribute, which should be freed with
-//      pango.Attribute.Destroy().
-//
-func NewAttrOverlineColor(red, green, blue uint16) *Attribute {
-	var _arg1 C.guint16         // out
-	var _arg2 C.guint16         // out
-	var _arg3 C.guint16         // out
-	var _cret *C.PangoAttribute // in
-
-	_arg1 = C.guint16(red)
-	_arg2 = C.guint16(green)
-	_arg3 = C.guint16(blue)
-
-	_cret = C.pango_attr_overline_color_new(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(red)
-	runtime.KeepAlive(green)
-	runtime.KeepAlive(blue)
-
-	var _attribute *Attribute // out
-
-	_attribute = (*Attribute)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_attribute)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.pango_attribute_destroy((*C.PangoAttribute)(intern.C))
-		},
-	)
-
-	return _attribute
-}
-
-// NewAttrOverline: create a new overline-style attribute.
-//
-// The function takes the following parameters:
-//
-//    - overline style.
-//
-// The function returns the following values:
-//
-//    - attribute: newly allocated PangoAttribute, which should be freed with
-//      pango.Attribute.Destroy().
-//
-func NewAttrOverline(overline Overline) *Attribute {
-	var _arg1 C.PangoOverline   // out
-	var _cret *C.PangoAttribute // in
-
-	_arg1 = C.PangoOverline(overline)
-
-	_cret = C.pango_attr_overline_new(_arg1)
-	runtime.KeepAlive(overline)
-
-	var _attribute *Attribute // out
-
-	_attribute = (*Attribute)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_attribute)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.pango_attribute_destroy((*C.PangoAttribute)(intern.C))
-		},
-	)
-
-	return _attribute
 }

@@ -5,19 +5,21 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_ShortcutsWindow_ConnectSearch(gpointer, guintptr);
 // extern void _gotk4_gtk4_ShortcutsWindow_ConnectClose(gpointer, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeShortcutsWindow = coreglib.Type(C.gtk_shortcuts_window_get_type())
+	GTypeShortcutsWindow = coreglib.Type(girepository.MustFind("Gtk", "ShortcutsWindow").RegisteredGType())
 )
 
 func init() {

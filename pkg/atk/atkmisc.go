@@ -3,29 +3,22 @@
 package atk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <atk/atk.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern void _gotk4_atk1_MiscClass_threads_leave(AtkMisc*);
-// extern void _gotk4_atk1_MiscClass_threads_enter(AtkMisc*);
-// void _gotk4_atk1_Misc_virtual_threads_enter(void* fnptr, AtkMisc* arg0) {
-//   ((void (*)(AtkMisc*))(fnptr))(arg0);
-// };
-// void _gotk4_atk1_Misc_virtual_threads_leave(void* fnptr, AtkMisc* arg0) {
-//   ((void (*)(AtkMisc*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeMisc = coreglib.Type(C.atk_misc_get_type())
+	GTypeMisc = coreglib.Type(girepository.MustFind("Atk", "Misc").RegisteredGType())
 )
 
 func init() {
@@ -36,31 +29,10 @@ func init() {
 
 // MiscOverrides contains methods that are overridable.
 type MiscOverrides struct {
-	// ThreadsEnter: take the thread mutex for the GUI toolkit, if one exists.
-	// (This method is implemented by the toolkit ATK implementation layer; for
-	// instance, for GTK+, GAIL implements this via GDK_THREADS_ENTER).
-	//
-	// Deprecated: Since 2.12.
-	ThreadsEnter func()
-	// ThreadsLeave: release the thread mutex for the GUI toolkit, if one
-	// exists. This method, and atk_misc_threads_enter, are needed in some
-	// situations by threaded application code which services ATK requests,
-	// since fulfilling ATK requests often requires calling into the GUI
-	// toolkit. If a long-running or potentially blocking call takes place
-	// inside such a block, it should be bracketed by
-	// atk_misc_threads_leave/atk_misc_threads_enter calls. (This method is
-	// implemented by the toolkit ATK implementation layer; for instance, for
-	// GTK+, GAIL implements this via GDK_THREADS_LEAVE).
-	//
-	// Deprecated: Since 2.12.
-	ThreadsLeave func()
 }
 
 func defaultMiscOverrides(v *Misc) MiscOverrides {
-	return MiscOverrides{
-		ThreadsEnter: v.threadsEnter,
-		ThreadsLeave: v.threadsLeave,
-	}
+	return MiscOverrides{}
 }
 
 // Misc: set of utility functions for thread locking. This interface and all his
@@ -84,16 +56,6 @@ func init() {
 }
 
 func initMiscClass(gclass unsafe.Pointer, overrides MiscOverrides, classInitFunc func(*MiscClass)) {
-	pclass := (*C.AtkMiscClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeMisc))))
-
-	if overrides.ThreadsEnter != nil {
-		pclass.threads_enter = (*[0]byte)(C._gotk4_atk1_MiscClass_threads_enter)
-	}
-
-	if overrides.ThreadsLeave != nil {
-		pclass.threads_leave = (*[0]byte)(C._gotk4_atk1_MiscClass_threads_leave)
-	}
-
 	if classInitFunc != nil {
 		class := (*MiscClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -110,78 +72,6 @@ func marshalMisc(p uintptr) (interface{}, error) {
 	return wrapMisc(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// ThreadsEnter: take the thread mutex for the GUI toolkit, if one exists. (This
-// method is implemented by the toolkit ATK implementation layer; for instance,
-// for GTK+, GAIL implements this via GDK_THREADS_ENTER).
-//
-// Deprecated: Since 2.12.
-func (misc *Misc) ThreadsEnter() {
-	var _arg0 *C.AtkMisc // out
-
-	_arg0 = (*C.AtkMisc)(unsafe.Pointer(coreglib.InternObject(misc).Native()))
-
-	C.atk_misc_threads_enter(_arg0)
-	runtime.KeepAlive(misc)
-}
-
-// ThreadsLeave: release the thread mutex for the GUI toolkit, if one exists.
-// This method, and atk_misc_threads_enter, are needed in some situations by
-// threaded application code which services ATK requests, since fulfilling ATK
-// requests often requires calling into the GUI toolkit. If a long-running or
-// potentially blocking call takes place inside such a block, it should be
-// bracketed by atk_misc_threads_leave/atk_misc_threads_enter calls. (This
-// method is implemented by the toolkit ATK implementation layer; for instance,
-// for GTK+, GAIL implements this via GDK_THREADS_LEAVE).
-//
-// Deprecated: Since 2.12.
-func (misc *Misc) ThreadsLeave() {
-	var _arg0 *C.AtkMisc // out
-
-	_arg0 = (*C.AtkMisc)(unsafe.Pointer(coreglib.InternObject(misc).Native()))
-
-	C.atk_misc_threads_leave(_arg0)
-	runtime.KeepAlive(misc)
-}
-
-// threadsEnter: take the thread mutex for the GUI toolkit, if one exists. (This
-// method is implemented by the toolkit ATK implementation layer; for instance,
-// for GTK+, GAIL implements this via GDK_THREADS_ENTER).
-//
-// Deprecated: Since 2.12.
-func (misc *Misc) threadsEnter() {
-	gclass := (*C.AtkMiscClass)(coreglib.PeekParentClass(misc))
-	fnarg := gclass.threads_enter
-
-	var _arg0 *C.AtkMisc // out
-
-	_arg0 = (*C.AtkMisc)(unsafe.Pointer(coreglib.InternObject(misc).Native()))
-
-	C._gotk4_atk1_Misc_virtual_threads_enter(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(misc)
-}
-
-// threadsLeave: release the thread mutex for the GUI toolkit, if one exists.
-// This method, and atk_misc_threads_enter, are needed in some situations by
-// threaded application code which services ATK requests, since fulfilling ATK
-// requests often requires calling into the GUI toolkit. If a long-running or
-// potentially blocking call takes place inside such a block, it should be
-// bracketed by atk_misc_threads_leave/atk_misc_threads_enter calls. (This
-// method is implemented by the toolkit ATK implementation layer; for instance,
-// for GTK+, GAIL implements this via GDK_THREADS_LEAVE).
-//
-// Deprecated: Since 2.12.
-func (misc *Misc) threadsLeave() {
-	gclass := (*C.AtkMiscClass)(coreglib.PeekParentClass(misc))
-	fnarg := gclass.threads_leave
-
-	var _arg0 *C.AtkMisc // out
-
-	_arg0 = (*C.AtkMisc)(unsafe.Pointer(coreglib.InternObject(misc).Native()))
-
-	C._gotk4_atk1_Misc_virtual_threads_leave(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(misc)
-}
-
 // MiscClass: usage of AtkMisc is deprecated since 2.12 and heavily discouraged.
 //
 // An instance of this type is always passed by reference.
@@ -191,11 +81,14 @@ type MiscClass struct {
 
 // miscClass is the struct that's finalized.
 type miscClass struct {
-	native *C.AtkMiscClass
+	native unsafe.Pointer
 }
 
+var GIRInfoMiscClass = girepository.MustFind("Atk", "MiscClass")
+
 func (m *MiscClass) Vfuncs() [32]unsafe.Pointer {
-	valptr := &m.native.vfuncs
+	offset := GIRInfoMiscClass.StructFieldOffset("vfuncs")
+	valptr := (*[32]unsafe.Pointer)(unsafe.Add(m.native, offset))
 	var _v [32]unsafe.Pointer // out
 	{
 		src := &*valptr

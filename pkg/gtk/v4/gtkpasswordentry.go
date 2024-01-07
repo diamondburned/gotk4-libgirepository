@@ -3,22 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_PasswordEntry_ConnectActivate(gpointer, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypePasswordEntry = coreglib.Type(C.gtk_password_entry_get_type())
+	GTypePasswordEntry = coreglib.Type(girepository.MustFind("Gtk", "PasswordEntry").RegisteredGType())
 )
 
 func init() {
@@ -118,131 +118,6 @@ func marshalPasswordEntry(p uintptr) (interface{}, error) {
 // ConnectActivate is emitted when the entry is activated.
 //
 // The keybindings for this signal are all forms of the Enter key.
-func (entry *PasswordEntry) ConnectActivate(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "activate", false, unsafe.Pointer(C._gotk4_gtk4_PasswordEntry_ConnectActivate), f)
-}
-
-// NewPasswordEntry creates a GtkPasswordEntry.
-//
-// The function returns the following values:
-//
-//    - passwordEntry: new GtkPasswordEntry.
-//
-func NewPasswordEntry() *PasswordEntry {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_password_entry_new()
-
-	var _passwordEntry *PasswordEntry // out
-
-	_passwordEntry = wrapPasswordEntry(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _passwordEntry
-}
-
-// ExtraMenu gets the menu model set with gtk_password_entry_set_extra_menu().
-//
-// The function returns the following values:
-//
-//    - menuModel: (nullable): the menu model.
-//
-func (entry *PasswordEntry) ExtraMenu() gio.MenuModeller {
-	var _arg0 *C.GtkPasswordEntry // out
-	var _cret *C.GMenuModel       // in
-
-	_arg0 = (*C.GtkPasswordEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-
-	_cret = C.gtk_password_entry_get_extra_menu(_arg0)
-	runtime.KeepAlive(entry)
-
-	var _menuModel gio.MenuModeller // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gio.MenuModeller is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(gio.MenuModeller)
-			return ok
-		})
-		rv, ok := casted.(gio.MenuModeller)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gio.MenuModeller")
-		}
-		_menuModel = rv
-	}
-
-	return _menuModel
-}
-
-// ShowPeekIcon returns whether the entry is showing an icon to reveal the
-// contents.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if an icon is shown.
-//
-func (entry *PasswordEntry) ShowPeekIcon() bool {
-	var _arg0 *C.GtkPasswordEntry // out
-	var _cret C.gboolean          // in
-
-	_arg0 = (*C.GtkPasswordEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-
-	_cret = C.gtk_password_entry_get_show_peek_icon(_arg0)
-	runtime.KeepAlive(entry)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetExtraMenu sets a menu model to add when constructing the context menu for
-// entry.
-//
-// The function takes the following parameters:
-//
-//    - model (optional): GMenuModel.
-//
-func (entry *PasswordEntry) SetExtraMenu(model gio.MenuModeller) {
-	var _arg0 *C.GtkPasswordEntry // out
-	var _arg1 *C.GMenuModel       // out
-
-	_arg0 = (*C.GtkPasswordEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-	if model != nil {
-		_arg1 = (*C.GMenuModel)(unsafe.Pointer(coreglib.InternObject(model).Native()))
-	}
-
-	C.gtk_password_entry_set_extra_menu(_arg0, _arg1)
-	runtime.KeepAlive(entry)
-	runtime.KeepAlive(model)
-}
-
-// SetShowPeekIcon sets whether the entry should have a clickable icon to reveal
-// the contents.
-//
-// Setting this to FALSE also hides the text again.
-//
-// The function takes the following parameters:
-//
-//    - showPeekIcon: whether to show the peek icon.
-//
-func (entry *PasswordEntry) SetShowPeekIcon(showPeekIcon bool) {
-	var _arg0 *C.GtkPasswordEntry // out
-	var _arg1 C.gboolean          // out
-
-	_arg0 = (*C.GtkPasswordEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-	if showPeekIcon {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_password_entry_set_show_peek_icon(_arg0, _arg1)
-	runtime.KeepAlive(entry)
-	runtime.KeepAlive(showPeekIcon)
+func (v *PasswordEntry) ConnectActivate(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "activate", false, unsafe.Pointer(C._gotk4_gtk4_PasswordEntry_ConnectActivate), f)
 }

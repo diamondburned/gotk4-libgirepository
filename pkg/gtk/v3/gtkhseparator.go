@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeHSeparator = coreglib.Type(C.gtk_hseparator_get_type())
+	GTypeHSeparator = coreglib.Type(girepository.MustFind("Gtk", "HSeparator").RegisteredGType())
 )
 
 func init() {
@@ -99,26 +99,6 @@ func marshalHSeparator(p uintptr) (interface{}, error) {
 	return wrapHSeparator(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewHSeparator creates a new HSeparator.
-//
-// Deprecated: Use gtk_separator_new() with GTK_ORIENTATION_HORIZONTAL instead.
-//
-// The function returns the following values:
-//
-//    - hSeparator: new HSeparator.
-//
-func NewHSeparator() *HSeparator {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_hseparator_new()
-
-	var _hSeparator *HSeparator // out
-
-	_hSeparator = wrapHSeparator(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _hSeparator
-}
-
 // HSeparatorClass: instance of this type is always passed by reference.
 type HSeparatorClass struct {
 	*hSeparatorClass
@@ -126,12 +106,7 @@ type HSeparatorClass struct {
 
 // hSeparatorClass is the struct that's finalized.
 type hSeparatorClass struct {
-	native *C.GtkHSeparatorClass
+	native unsafe.Pointer
 }
 
-func (h *HSeparatorClass) ParentClass() *SeparatorClass {
-	valptr := &h.native.parent_class
-	var _v *SeparatorClass // out
-	_v = (*SeparatorClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoHSeparatorClass = girepository.MustFind("Gtk", "HSeparatorClass")

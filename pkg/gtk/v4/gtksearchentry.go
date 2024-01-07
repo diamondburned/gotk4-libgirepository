@@ -3,15 +3,16 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_SearchEntry_ConnectStopSearch(gpointer, guintptr);
 // extern void _gotk4_gtk4_SearchEntry_ConnectSearchStarted(gpointer, guintptr);
 // extern void _gotk4_gtk4_SearchEntry_ConnectSearchChanged(gpointer, guintptr);
@@ -22,7 +23,7 @@ import "C"
 
 // GType values.
 var (
-	GTypeSearchEntry = coreglib.Type(C.gtk_search_entry_get_type())
+	GTypeSearchEntry = coreglib.Type(girepository.MustFind("Gtk", "SearchEntry").RegisteredGType())
 )
 
 func init() {
@@ -131,8 +132,8 @@ func marshalSearchEntry(p uintptr) (interface{}, error) {
 // ConnectActivate is emitted when the entry is activated.
 //
 // The keybindings for this signal are all forms of the Enter key.
-func (entry *SearchEntry) ConnectActivate(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "activate", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectActivate), f)
+func (v *SearchEntry) ConnectActivate(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "activate", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectActivate), f)
 }
 
 // ConnectNextMatch is emitted when the user initiates a move to the next match
@@ -143,8 +144,8 @@ func (entry *SearchEntry) ConnectActivate(f func()) coreglib.SignalHandle {
 // Applications should connect to it, to implement moving between matches.
 //
 // The default bindings for this signal is Ctrl-g.
-func (entry *SearchEntry) ConnectNextMatch(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "next-match", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectNextMatch), f)
+func (v *SearchEntry) ConnectNextMatch(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "next-match", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectNextMatch), f)
 }
 
 // ConnectPreviousMatch is emitted when the user initiates a move to the
@@ -155,20 +156,20 @@ func (entry *SearchEntry) ConnectNextMatch(f func()) coreglib.SignalHandle {
 // Applications should connect to it, to implement moving between matches.
 //
 // The default bindings for this signal is Ctrl-Shift-g.
-func (entry *SearchEntry) ConnectPreviousMatch(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "previous-match", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectPreviousMatch), f)
+func (v *SearchEntry) ConnectPreviousMatch(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "previous-match", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectPreviousMatch), f)
 }
 
 // ConnectSearchChanged is emitted with a short delay of 150 milliseconds after
 // the last change to the entry text.
-func (entry *SearchEntry) ConnectSearchChanged(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "search-changed", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectSearchChanged), f)
+func (v *SearchEntry) ConnectSearchChanged(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "search-changed", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectSearchChanged), f)
 }
 
 // ConnectSearchStarted is emitted when the user initiated a search on the
 // entry.
-func (entry *SearchEntry) ConnectSearchStarted(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "search-started", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectSearchStarted), f)
+func (v *SearchEntry) ConnectSearchStarted(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "search-started", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectSearchStarted), f)
 }
 
 // ConnectStopSearch is emitted when the user stops a search via keyboard input.
@@ -179,95 +180,6 @@ func (entry *SearchEntry) ConnectSearchStarted(f func()) coreglib.SignalHandle {
 // this case.
 //
 // The default bindings for this signal is Escape.
-func (entry *SearchEntry) ConnectStopSearch(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "stop-search", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectStopSearch), f)
-}
-
-// NewSearchEntry creates a GtkSearchEntry.
-//
-// The function returns the following values:
-//
-//    - searchEntry: new GtkSearchEntry.
-//
-func NewSearchEntry() *SearchEntry {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_search_entry_new()
-
-	var _searchEntry *SearchEntry // out
-
-	_searchEntry = wrapSearchEntry(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _searchEntry
-}
-
-// KeyCaptureWidget gets the widget that entry is capturing key events from.
-//
-// The function returns the following values:
-//
-//    - widget: key capture widget.
-//
-func (entry *SearchEntry) KeyCaptureWidget() Widgetter {
-	var _arg0 *C.GtkSearchEntry // out
-	var _cret *C.GtkWidget      // in
-
-	_arg0 = (*C.GtkSearchEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-
-	_cret = C.gtk_search_entry_get_key_capture_widget(_arg0)
-	runtime.KeepAlive(entry)
-
-	var _widget Widgetter // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gtk.Widgetter is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Widgetter)
-			return ok
-		})
-		rv, ok := casted.(Widgetter)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-		}
-		_widget = rv
-	}
-
-	return _widget
-}
-
-// SetKeyCaptureWidget sets widget as the widget that entry will capture key
-// events from.
-//
-// Key events are consumed by the search entry to start or continue a search.
-//
-// If the entry is part of a GtkSearchBar, it is preferable to call
-// gtk.SearchBar.SetKeyCaptureWidget() instead, which will reveal the entry in
-// addition to triggering the search entry.
-//
-// Note that despite the name of this function, the events are only 'captured'
-// in the bubble phase, which means that editable child widgets of widget will
-// receive text input before it gets captured. If that is not desired, you can
-// capture and forward the events yourself with
-// gtk.EventControllerKey.Forward().
-//
-// The function takes the following parameters:
-//
-//    - widget (optional): Widget.
-//
-func (entry *SearchEntry) SetKeyCaptureWidget(widget Widgetter) {
-	var _arg0 *C.GtkSearchEntry // out
-	var _arg1 *C.GtkWidget      // out
-
-	_arg0 = (*C.GtkSearchEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-	if widget != nil {
-		_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
-	}
-
-	C.gtk_search_entry_set_key_capture_widget(_arg0, _arg1)
-	runtime.KeepAlive(entry)
-	runtime.KeepAlive(widget)
+func (v *SearchEntry) ConnectStopSearch(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "stop-search", false, unsafe.Pointer(C._gotk4_gtk4_SearchEntry_ConnectStopSearch), f)
 }

@@ -3,45 +3,27 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 // extern void _gotk4_gtk3_SearchEntry_ConnectStopSearch(gpointer, guintptr);
 // extern void _gotk4_gtk3_SearchEntry_ConnectSearchChanged(gpointer, guintptr);
 // extern void _gotk4_gtk3_SearchEntry_ConnectPreviousMatch(gpointer, guintptr);
 // extern void _gotk4_gtk3_SearchEntry_ConnectNextMatch(gpointer, guintptr);
-// extern void _gotk4_gtk3_SearchEntryClass_stop_search(GtkSearchEntry*);
-// extern void _gotk4_gtk3_SearchEntryClass_search_changed(GtkSearchEntry*);
-// extern void _gotk4_gtk3_SearchEntryClass_previous_match(GtkSearchEntry*);
-// extern void _gotk4_gtk3_SearchEntryClass_next_match(GtkSearchEntry*);
-// void _gotk4_gtk3_SearchEntry_virtual_next_match(void* fnptr, GtkSearchEntry* arg0) {
-//   ((void (*)(GtkSearchEntry*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_SearchEntry_virtual_previous_match(void* fnptr, GtkSearchEntry* arg0) {
-//   ((void (*)(GtkSearchEntry*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_SearchEntry_virtual_search_changed(void* fnptr, GtkSearchEntry* arg0) {
-//   ((void (*)(GtkSearchEntry*))(fnptr))(arg0);
-// };
-// void _gotk4_gtk3_SearchEntry_virtual_stop_search(void* fnptr, GtkSearchEntry* arg0) {
-//   ((void (*)(GtkSearchEntry*))(fnptr))(arg0);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeSearchEntry = coreglib.Type(C.gtk_search_entry_get_type())
+	GTypeSearchEntry = coreglib.Type(girepository.MustFind("Gtk", "SearchEntry").RegisteredGType())
 )
 
 func init() {
@@ -52,19 +34,10 @@ func init() {
 
 // SearchEntryOverrides contains methods that are overridable.
 type SearchEntryOverrides struct {
-	NextMatch     func()
-	PreviousMatch func()
-	SearchChanged func()
-	StopSearch    func()
 }
 
 func defaultSearchEntryOverrides(v *SearchEntry) SearchEntryOverrides {
-	return SearchEntryOverrides{
-		NextMatch:     v.nextMatch,
-		PreviousMatch: v.previousMatch,
-		SearchChanged: v.searchChanged,
-		StopSearch:    v.stopSearch,
-	}
+	return SearchEntryOverrides{}
 }
 
 // SearchEntry is a subclass of Entry that has been tailored for use as a search
@@ -110,24 +83,6 @@ func init() {
 }
 
 func initSearchEntryClass(gclass unsafe.Pointer, overrides SearchEntryOverrides, classInitFunc func(*SearchEntryClass)) {
-	pclass := (*C.GtkSearchEntryClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeSearchEntry))))
-
-	if overrides.NextMatch != nil {
-		pclass.next_match = (*[0]byte)(C._gotk4_gtk3_SearchEntryClass_next_match)
-	}
-
-	if overrides.PreviousMatch != nil {
-		pclass.previous_match = (*[0]byte)(C._gotk4_gtk3_SearchEntryClass_previous_match)
-	}
-
-	if overrides.SearchChanged != nil {
-		pclass.search_changed = (*[0]byte)(C._gotk4_gtk3_SearchEntryClass_search_changed)
-	}
-
-	if overrides.StopSearch != nil {
-		pclass.stop_search = (*[0]byte)(C._gotk4_gtk3_SearchEntryClass_stop_search)
-	}
-
 	if classInitFunc != nil {
 		class := (*SearchEntryClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -182,8 +137,8 @@ func marshalSearchEntry(p uintptr) (interface{}, error) {
 // Applications should connect to it, to implement moving between matches.
 //
 // The default bindings for this signal is Ctrl-g.
-func (entry *SearchEntry) ConnectNextMatch(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "next-match", false, unsafe.Pointer(C._gotk4_gtk3_SearchEntry_ConnectNextMatch), f)
+func (v *SearchEntry) ConnectNextMatch(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "next-match", false, unsafe.Pointer(C._gotk4_gtk3_SearchEntry_ConnectNextMatch), f)
 }
 
 // ConnectPreviousMatch signal is a [keybinding signal][GtkBindingSignal] which
@@ -193,14 +148,14 @@ func (entry *SearchEntry) ConnectNextMatch(f func()) coreglib.SignalHandle {
 // Applications should connect to it, to implement moving between matches.
 //
 // The default bindings for this signal is Ctrl-Shift-g.
-func (entry *SearchEntry) ConnectPreviousMatch(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "previous-match", false, unsafe.Pointer(C._gotk4_gtk3_SearchEntry_ConnectPreviousMatch), f)
+func (v *SearchEntry) ConnectPreviousMatch(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "previous-match", false, unsafe.Pointer(C._gotk4_gtk3_SearchEntry_ConnectPreviousMatch), f)
 }
 
 // ConnectSearchChanged signal is emitted with a short delay of 150 milliseconds
 // after the last change to the entry text.
-func (entry *SearchEntry) ConnectSearchChanged(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "search-changed", false, unsafe.Pointer(C._gotk4_gtk3_SearchEntry_ConnectSearchChanged), f)
+func (v *SearchEntry) ConnectSearchChanged(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "search-changed", false, unsafe.Pointer(C._gotk4_gtk3_SearchEntry_ConnectSearchChanged), f)
 }
 
 // ConnectStopSearch signal is a [keybinding signal][GtkBindingSignal] which
@@ -210,113 +165,6 @@ func (entry *SearchEntry) ConnectSearchChanged(f func()) coreglib.SignalHandle {
 // this case.
 //
 // The default bindings for this signal is Escape.
-func (entry *SearchEntry) ConnectStopSearch(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(entry, "stop-search", false, unsafe.Pointer(C._gotk4_gtk3_SearchEntry_ConnectStopSearch), f)
-}
-
-// NewSearchEntry creates a SearchEntry, with a find icon when the search field
-// is empty, and a clear icon when it isn't.
-//
-// The function returns the following values:
-//
-//    - searchEntry: new SearchEntry.
-//
-func NewSearchEntry() *SearchEntry {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_search_entry_new()
-
-	var _searchEntry *SearchEntry // out
-
-	_searchEntry = wrapSearchEntry(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _searchEntry
-}
-
-// HandleEvent: this function should be called when the top-level window which
-// contains the search entry received a key event. If the entry is part of a
-// SearchBar, it is preferable to call gtk_search_bar_handle_event() instead,
-// which will reveal the entry in addition to passing the event to this
-// function.
-//
-// If the key event is handled by the search entry and starts or continues a
-// search, GDK_EVENT_STOP will be returned. The caller should ensure that the
-// entry is shown in this case, and not propagate the event further.
-//
-// The function takes the following parameters:
-//
-//    - event: key event.
-//
-// The function returns the following values:
-//
-//    - ok: GDK_EVENT_STOP if the key press event resulted in a search beginning
-//      or continuing, GDK_EVENT_PROPAGATE otherwise.
-//
-func (entry *SearchEntry) HandleEvent(event *gdk.Event) bool {
-	var _arg0 *C.GtkSearchEntry // out
-	var _arg1 *C.GdkEvent       // out
-	var _cret C.gboolean        // in
-
-	_arg0 = (*C.GtkSearchEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-	_arg1 = (*C.GdkEvent)(gextras.StructNative(unsafe.Pointer(event)))
-
-	_cret = C.gtk_search_entry_handle_event(_arg0, _arg1)
-	runtime.KeepAlive(entry)
-	runtime.KeepAlive(event)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-func (entry *SearchEntry) nextMatch() {
-	gclass := (*C.GtkSearchEntryClass)(coreglib.PeekParentClass(entry))
-	fnarg := gclass.next_match
-
-	var _arg0 *C.GtkSearchEntry // out
-
-	_arg0 = (*C.GtkSearchEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-
-	C._gotk4_gtk3_SearchEntry_virtual_next_match(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(entry)
-}
-
-func (entry *SearchEntry) previousMatch() {
-	gclass := (*C.GtkSearchEntryClass)(coreglib.PeekParentClass(entry))
-	fnarg := gclass.previous_match
-
-	var _arg0 *C.GtkSearchEntry // out
-
-	_arg0 = (*C.GtkSearchEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-
-	C._gotk4_gtk3_SearchEntry_virtual_previous_match(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(entry)
-}
-
-func (entry *SearchEntry) searchChanged() {
-	gclass := (*C.GtkSearchEntryClass)(coreglib.PeekParentClass(entry))
-	fnarg := gclass.search_changed
-
-	var _arg0 *C.GtkSearchEntry // out
-
-	_arg0 = (*C.GtkSearchEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-
-	C._gotk4_gtk3_SearchEntry_virtual_search_changed(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(entry)
-}
-
-func (entry *SearchEntry) stopSearch() {
-	gclass := (*C.GtkSearchEntryClass)(coreglib.PeekParentClass(entry))
-	fnarg := gclass.stop_search
-
-	var _arg0 *C.GtkSearchEntry // out
-
-	_arg0 = (*C.GtkSearchEntry)(unsafe.Pointer(coreglib.InternObject(entry).Native()))
-
-	C._gotk4_gtk3_SearchEntry_virtual_stop_search(unsafe.Pointer(fnarg), _arg0)
-	runtime.KeepAlive(entry)
+func (v *SearchEntry) ConnectStopSearch(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "stop-search", false, unsafe.Pointer(C._gotk4_gtk3_SearchEntry_ConnectStopSearch), f)
 }

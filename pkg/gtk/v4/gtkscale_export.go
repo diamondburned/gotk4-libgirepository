@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_ScaleFormatValueFunc
-func _gotk4_gtk4_ScaleFormatValueFunc(arg1 *C.GtkScale, arg2 C.double, arg3 C.gpointer) (cret *C.char) {
+func _gotk4_gtk4_ScaleFormatValueFunc(arg1 *C.void, arg2 C.double, arg3 C.gpointer) (cret *C.char) {
 	var fn ScaleFormatValueFunc
 	{
 		v := gbox.Get(uintptr(arg3))

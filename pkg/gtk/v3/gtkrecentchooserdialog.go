@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeRecentChooserDialog = coreglib.Type(C.gtk_recent_chooser_dialog_get_type())
+	GTypeRecentChooserDialog = coreglib.Type(girepository.MustFind("Gtk", "RecentChooserDialog").RegisteredGType())
 )
 
 func init() {
@@ -146,12 +146,7 @@ type RecentChooserDialogClass struct {
 
 // recentChooserDialogClass is the struct that's finalized.
 type recentChooserDialogClass struct {
-	native *C.GtkRecentChooserDialogClass
+	native unsafe.Pointer
 }
 
-func (r *RecentChooserDialogClass) ParentClass() *DialogClass {
-	valptr := &r.native.parent_class
-	var _v *DialogClass // out
-	_v = (*DialogClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoRecentChooserDialogClass = girepository.MustFind("Gtk", "RecentChooserDialogClass")

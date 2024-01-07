@@ -5,18 +5,20 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern gboolean _gotk4_gtk4_ShortcutsSection_ConnectChangeCurrentPage(gpointer, gint, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeShortcutsSection = coreglib.Type(C.gtk_shortcuts_section_get_type())
+	GTypeShortcutsSection = coreglib.Type(girepository.MustFind("Gtk", "ShortcutsSection").RegisteredGType())
 )
 
 func init() {

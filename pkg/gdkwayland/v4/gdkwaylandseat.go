@@ -5,18 +5,20 @@ package gdkwayland
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/wayland/gdkwayland.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeWaylandSeat = coreglib.Type(C.gdk_wayland_seat_get_type())
+	GTypeWaylandSeat = coreglib.Type(girepository.MustFind("GdkWayland", "WaylandSeat").RegisteredGType())
 )
 
 func init() {

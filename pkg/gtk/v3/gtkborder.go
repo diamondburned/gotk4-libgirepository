@@ -3,23 +3,21 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeBorder = coreglib.Type(C.gtk_border_get_type())
+	GTypeBorder = coreglib.Type(girepository.MustFind("Gtk", "Border").RegisteredGType())
 )
 
 func init() {
@@ -38,36 +36,20 @@ type Border struct {
 
 // border is the struct that's finalized.
 type border struct {
-	native *C.GtkBorder
+	native unsafe.Pointer
 }
+
+var GIRInfoBorder = girepository.MustFind("Gtk", "Border")
 
 func marshalBorder(p uintptr) (interface{}, error) {
 	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
-	return &Border{&border{(*C.GtkBorder)(b)}}, nil
-}
-
-// NewBorder constructs a struct Border.
-func NewBorder() *Border {
-	var _cret *C.GtkBorder // in
-
-	_cret = C.gtk_border_new()
-
-	var _border *Border // out
-
-	_border = (*Border)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_border)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gtk_border_free((*C.GtkBorder)(intern.C))
-		},
-	)
-
-	return _border
+	return &Border{&border{(unsafe.Pointer)(b)}}, nil
 }
 
 // Left: width of the left border.
 func (b *Border) Left() int16 {
-	valptr := &b.native.left
+	offset := GIRInfoBorder.StructFieldOffset("left")
+	valptr := (*int16)(unsafe.Add(b.native, offset))
 	var _v int16 // out
 	_v = int16(*valptr)
 	return _v
@@ -75,7 +57,8 @@ func (b *Border) Left() int16 {
 
 // Right: width of the right border.
 func (b *Border) Right() int16 {
-	valptr := &b.native.right
+	offset := GIRInfoBorder.StructFieldOffset("right")
+	valptr := (*int16)(unsafe.Add(b.native, offset))
 	var _v int16 // out
 	_v = int16(*valptr)
 	return _v
@@ -83,7 +66,8 @@ func (b *Border) Right() int16 {
 
 // Top: width of the top border.
 func (b *Border) Top() int16 {
-	valptr := &b.native.top
+	offset := GIRInfoBorder.StructFieldOffset("top")
+	valptr := (*int16)(unsafe.Add(b.native, offset))
 	var _v int16 // out
 	_v = int16(*valptr)
 	return _v
@@ -91,7 +75,8 @@ func (b *Border) Top() int16 {
 
 // Bottom: width of the bottom border.
 func (b *Border) Bottom() int16 {
-	valptr := &b.native.bottom
+	offset := GIRInfoBorder.StructFieldOffset("bottom")
+	valptr := (*int16)(unsafe.Add(b.native, offset))
 	var _v int16 // out
 	_v = int16(*valptr)
 	return _v
@@ -99,52 +84,28 @@ func (b *Border) Bottom() int16 {
 
 // Left: width of the left border.
 func (b *Border) SetLeft(left int16) {
-	valptr := &b.native.left
+	offset := GIRInfoBorder.StructFieldOffset("left")
+	valptr := (*C.gint16)(unsafe.Add(b.native, offset))
 	*valptr = C.gint16(left)
 }
 
 // Right: width of the right border.
 func (b *Border) SetRight(right int16) {
-	valptr := &b.native.right
+	offset := GIRInfoBorder.StructFieldOffset("right")
+	valptr := (*C.gint16)(unsafe.Add(b.native, offset))
 	*valptr = C.gint16(right)
 }
 
 // Top: width of the top border.
 func (b *Border) SetTop(top int16) {
-	valptr := &b.native.top
+	offset := GIRInfoBorder.StructFieldOffset("top")
+	valptr := (*C.gint16)(unsafe.Add(b.native, offset))
 	*valptr = C.gint16(top)
 }
 
 // Bottom: width of the bottom border.
 func (b *Border) SetBottom(bottom int16) {
-	valptr := &b.native.bottom
+	offset := GIRInfoBorder.StructFieldOffset("bottom")
+	valptr := (*C.gint16)(unsafe.Add(b.native, offset))
 	*valptr = C.gint16(bottom)
-}
-
-// Copy copies a Border-struct.
-//
-// The function returns the following values:
-//
-//    - border: copy of border_.
-//
-func (border_ *Border) Copy() *Border {
-	var _arg0 *C.GtkBorder // out
-	var _cret *C.GtkBorder // in
-
-	_arg0 = (*C.GtkBorder)(gextras.StructNative(unsafe.Pointer(border_)))
-
-	_cret = C.gtk_border_copy(_arg0)
-	runtime.KeepAlive(border_)
-
-	var _border *Border // out
-
-	_border = (*Border)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_border)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gtk_border_free((*C.GtkBorder)(intern.C))
-		},
-	)
-
-	return _border
 }

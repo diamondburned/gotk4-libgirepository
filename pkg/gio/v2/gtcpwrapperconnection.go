@@ -5,11 +5,13 @@ package gio
 import (
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // TCPWrapperConnectionClass: instance of this type is always passed by
@@ -20,12 +22,7 @@ type TCPWrapperConnectionClass struct {
 
 // tcpWrapperConnectionClass is the struct that's finalized.
 type tcpWrapperConnectionClass struct {
-	native *C.GTcpWrapperConnectionClass
+	native unsafe.Pointer
 }
 
-func (t *TCPWrapperConnectionClass) ParentClass() *TCPConnectionClass {
-	valptr := &t.native.parent_class
-	var _v *TCPConnectionClass // out
-	_v = (*TCPConnectionClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoTCPWrapperConnectionClass = girepository.MustFind("Gio", "TcpWrapperConnectionClass")

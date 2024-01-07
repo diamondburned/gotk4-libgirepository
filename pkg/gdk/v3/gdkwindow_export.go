@@ -10,12 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gdk3_WindowChildFunc
-func _gotk4_gdk3_WindowChildFunc(arg1 *C.GdkWindow, arg2 C.gpointer) (cret C.gboolean) {
+func _gotk4_gdk3_WindowChildFunc(arg1 *C.void, arg2 C.gpointer) (cret C.gboolean) {
 	var fn WindowChildFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -57,7 +59,7 @@ func _gotk4_gdk3_WindowChildFunc(arg1 *C.GdkWindow, arg2 C.gpointer) (cret C.gbo
 }
 
 //export _gotk4_gdk3_Window_ConnectCreateSurface
-func _gotk4_gdk3_Window_ConnectCreateSurface(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.guintptr) (cret *C.cairo_surface_t) {
+func _gotk4_gdk3_Window_ConnectCreateSurface(arg0 C.gpointer, arg1 C.gint, arg2 C.gint, arg3 C.guintptr) (cret *C.void) {
 	var f func(width, height int) (surface *cairo.Surface)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -79,7 +81,7 @@ func _gotk4_gdk3_Window_ConnectCreateSurface(arg0 C.gpointer, arg1 C.gint, arg2 
 
 	var _ *cairo.Surface
 
-	cret = (*C.cairo_surface_t)(unsafe.Pointer(surface.Native()))
+	cret = (*C.void)(unsafe.Pointer(surface.Native()))
 
 	return cret
 }
@@ -115,7 +117,7 @@ func _gotk4_gdk3_Window_ConnectMovedToRect(arg0 C.gpointer, arg1 C.gpointer, arg
 }
 
 //export _gotk4_gdk3_Window_ConnectPickEmbeddedChild
-func _gotk4_gdk3_Window_ConnectPickEmbeddedChild(arg0 C.gpointer, arg1 C.gdouble, arg2 C.gdouble, arg3 C.guintptr) (cret *C.GdkWindow) {
+func _gotk4_gdk3_Window_ConnectPickEmbeddedChild(arg0 C.gpointer, arg1 C.gdouble, arg2 C.gdouble, arg3 C.guintptr) (cret *C.void) {
 	var f func(x, y float64) (window Windower)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -138,7 +140,7 @@ func _gotk4_gdk3_Window_ConnectPickEmbeddedChild(arg0 C.gpointer, arg1 C.gdouble
 	var _ Windower
 
 	if window != nil {
-		cret = (*C.GdkWindow)(unsafe.Pointer(coreglib.InternObject(window).Native()))
+		cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(window).Native()))
 	}
 
 	return cret

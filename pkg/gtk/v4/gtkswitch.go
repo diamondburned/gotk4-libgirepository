@@ -3,22 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_Switch_ConnectActivate(gpointer, guintptr);
 // extern gboolean _gotk4_gtk4_Switch_ConnectStateSet(gpointer, gboolean, guintptr);
 import "C"
 
 // GType values.
 var (
-	GTypeSwitch = coreglib.Type(C.gtk_switch_get_type())
+	GTypeSwitch = coreglib.Type(girepository.MustFind("Gtk", "Switch").RegisteredGType())
 )
 
 func init() {
@@ -112,8 +113,8 @@ func marshalSwitch(p uintptr) (interface{}, error) {
 //
 // Applications should never connect to this signal, but use the
 // gtk.Switch:active property.
-func (self *Switch) ConnectActivate(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "activate", false, unsafe.Pointer(C._gotk4_gtk4_Switch_ConnectActivate), f)
+func (v *Switch) ConnectActivate(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "activate", false, unsafe.Pointer(C._gotk4_gtk4_Switch_ConnectActivate), f)
 }
 
 // ConnectStateSet is emitted to change the underlying state.
@@ -130,118 +131,6 @@ func (self *Switch) ConnectActivate(f func()) coreglib.SignalHandle {
 // Visually, the underlying state is represented by the trough color of the
 // switch, while the gtk.Switch`:active property is represented by the position
 // of the switch.
-func (self *Switch) ConnectStateSet(f func(state bool) (ok bool)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "state-set", false, unsafe.Pointer(C._gotk4_gtk4_Switch_ConnectStateSet), f)
-}
-
-// NewSwitch creates a new GtkSwitch widget.
-//
-// The function returns the following values:
-//
-//    - _switch: newly created GtkSwitch instance.
-//
-func NewSwitch() *Switch {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_switch_new()
-
-	var __switch *Switch // out
-
-	__switch = wrapSwitch(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return __switch
-}
-
-// Active gets whether the GtkSwitch is in its “on” or “off” state.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the GtkSwitch is active, and FALSE otherwise.
-//
-func (self *Switch) Active() bool {
-	var _arg0 *C.GtkSwitch // out
-	var _cret C.gboolean   // in
-
-	_arg0 = (*C.GtkSwitch)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_switch_get_active(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// State gets the underlying state of the GtkSwitch.
-//
-// The function returns the following values:
-//
-//    - ok: underlying state.
-//
-func (self *Switch) State() bool {
-	var _arg0 *C.GtkSwitch // out
-	var _cret C.gboolean   // in
-
-	_arg0 = (*C.GtkSwitch)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_switch_get_state(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetActive changes the state of self to the desired one.
-//
-// The function takes the following parameters:
-//
-//    - isActive: TRUE if self should be active, and FALSE otherwise.
-//
-func (self *Switch) SetActive(isActive bool) {
-	var _arg0 *C.GtkSwitch // out
-	var _arg1 C.gboolean   // out
-
-	_arg0 = (*C.GtkSwitch)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if isActive {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_switch_set_active(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(isActive)
-}
-
-// SetState sets the underlying state of the GtkSwitch.
-//
-// Normally, this is the same as gtk.Switch:active, unless the switch is set up
-// for delayed state changes. This function is typically called from a
-// gtk.Switch`::state-set signal handler.
-//
-// See gtk.Switch::state-set for details.
-//
-// The function takes the following parameters:
-//
-//    - state: new state.
-//
-func (self *Switch) SetState(state bool) {
-	var _arg0 *C.GtkSwitch // out
-	var _arg1 C.gboolean   // out
-
-	_arg0 = (*C.GtkSwitch)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if state {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_switch_set_state(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(state)
+func (v *Switch) ConnectStateSet(f func(state bool) (ok bool)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "state-set", false, unsafe.Pointer(C._gotk4_gtk4_Switch_ConnectStateSet), f)
 }

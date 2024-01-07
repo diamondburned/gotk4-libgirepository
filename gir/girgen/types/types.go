@@ -6,7 +6,6 @@ import (
 	"unicode"
 
 	"github.com/diamondburned/gotk4/gir"
-	"github.com/diamondburned/gotk4/gir/girgen/pen"
 )
 
 // LinkMode describes the mode that determines how the generator generates
@@ -95,6 +94,7 @@ func RecordIsOpaque(rec gir.Record) bool {
 // methodCanCallDirectly returns true if the method is generated, has no
 // arguments (sans the receiver) and has no returns.
 func methodCanCallDirectly(method *gir.Method) bool {
+	// TODO: why is this needed again?
 	return true &&
 		method.CIdentifier != "" &&
 		method.ShadowedBy == "" &&
@@ -104,73 +104,6 @@ func methodCanCallDirectly(method *gir.Method) bool {
 		method.Parameters.InstanceParameter != nil &&
 		method.Parameters.InstanceParameter.Type != nil &&
 		len(method.Parameters.Parameters) == 0
-}
-
-// RecordHasFree returns the free/unref method if it has one.
-func RecordHasFree(record *gir.Record) *gir.Method {
-	for _, name := range []string{"unref", "free", "destroy"} {
-		if m := FindMethodName(record.Methods, name); m != nil {
-			return m
-		}
-	}
-	return nil
-}
-
-// RecordPrintFree prints the call to the record's free function OR an empty
-// string.
-func RecordPrintFree(gen FileGenerator, parent *gir.TypeFindResult, value string) string {
-	return RecordPrintFreeMethod(gen, parent, value)
-}
-
-// RecordPrintFreeMethod generates a call with 1 argument for either free or
-// unref. If method is nil, then a C.free call is generated. Value is assumed to
-// be an unsafe.Pointer.
-//
-// The caller must import girepository.Argument manually.
-//
-// Deprecated: Use RecordPrintFree.
-func RecordPrintFreeMethod(gen FileGenerator, parent *gir.TypeFindResult, value string) string {
-	rec := parent.Type.(*gir.Record)
-
-	free := RecordHasFree(rec)
-	if free == nil {
-		return fmt.Sprintf("C.free(%s)", value)
-	}
-
-	// TODO: refactor thoughts: should typeconv and girgen/callable be combined?
-	// typeconv has to generate function calling code in some cases for freeing,
-	// and we have various different ways of doing that scattered throughout the
-	// program. It would be far better to have 1 place of doing them all.
-
-	switch gen.LinkMode() {
-	case RuntimeLinkMode:
-		p := pen.NewBlock()
-		p.Linef("var args [1]girepository.Argument")
-		p.Linef("*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(%s)", value)
-		p.Linef("girepository.MustFind(%q, %q).InvokeRecordMethod(%q, args[:], nil)",
-			parent.Namespace.Name, rec.Name, "free")
-		return p.String()
-	case DynamicLinkMode:
-		return fmt.Sprintf(
-			"C.%s((%s)(%s))",
-			free.CIdentifier,
-			AnyTypeCGo(free.Parameters.InstanceParameter.AnyType),
-			value)
-	default:
-		panic("unreachable")
-	}
-}
-
-// RecordHasUnref returns the unref method if it has one.
-func RecordHasUnref(record *gir.Record) *gir.Method {
-	// TODO: runtime link mode support
-	return FindMethodName(record.Methods, "unref")
-}
-
-// RecordHasRef returns the ref method if it has one.
-func RecordHasRef(record *gir.Record) *gir.Method {
-	// TODO: runtime link mode support
-	return FindMethodName(record.Methods, "ref")
 }
 
 // FindMethodName finds from the method the given name.

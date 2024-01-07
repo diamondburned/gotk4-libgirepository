@@ -8,14 +8,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_Notebook_ConnectCreateWindow
-func _gotk4_gtk3_Notebook_ConnectCreateWindow(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.gint, arg3 C.gint, arg4 C.guintptr) (cret *C.GtkNotebook) {
+func _gotk4_gtk3_Notebook_ConnectCreateWindow(arg0 C.gpointer, arg1 *C.void, arg2 C.gint, arg3 C.gint, arg4 C.guintptr) (cret *C.void) {
 	var f func(page Widgetter, x, y int) (notebook *Notebook)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg4))
@@ -55,13 +55,13 @@ func _gotk4_gtk3_Notebook_ConnectCreateWindow(arg0 C.gpointer, arg1 *C.GtkWidget
 
 	var _ *Notebook
 
-	cret = (*C.GtkNotebook)(unsafe.Pointer(coreglib.InternObject(notebook).Native()))
+	cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(notebook).Native()))
 
 	return cret
 }
 
 //export _gotk4_gtk3_Notebook_ConnectPageAdded
-func _gotk4_gtk3_Notebook_ConnectPageAdded(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guint, arg3 C.guintptr) {
+func _gotk4_gtk3_Notebook_ConnectPageAdded(arg0 C.gpointer, arg1 *C.void, arg2 C.guint, arg3 C.guintptr) {
 	var f func(child Widgetter, pageNum uint)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -99,7 +99,7 @@ func _gotk4_gtk3_Notebook_ConnectPageAdded(arg0 C.gpointer, arg1 *C.GtkWidget, a
 }
 
 //export _gotk4_gtk3_Notebook_ConnectPageRemoved
-func _gotk4_gtk3_Notebook_ConnectPageRemoved(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guint, arg3 C.guintptr) {
+func _gotk4_gtk3_Notebook_ConnectPageRemoved(arg0 C.gpointer, arg1 *C.void, arg2 C.guint, arg3 C.guintptr) {
 	var f func(child Widgetter, pageNum uint)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -137,7 +137,7 @@ func _gotk4_gtk3_Notebook_ConnectPageRemoved(arg0 C.gpointer, arg1 *C.GtkWidget,
 }
 
 //export _gotk4_gtk3_Notebook_ConnectPageReordered
-func _gotk4_gtk3_Notebook_ConnectPageReordered(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guint, arg3 C.guintptr) {
+func _gotk4_gtk3_Notebook_ConnectPageReordered(arg0 C.gpointer, arg1 *C.void, arg2 C.guint, arg3 C.guintptr) {
 	var f func(child Widgetter, pageNum uint)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -175,7 +175,7 @@ func _gotk4_gtk3_Notebook_ConnectPageReordered(arg0 C.gpointer, arg1 *C.GtkWidge
 }
 
 //export _gotk4_gtk3_Notebook_ConnectSwitchPage
-func _gotk4_gtk3_Notebook_ConnectSwitchPage(arg0 C.gpointer, arg1 *C.GtkWidget, arg2 C.guint, arg3 C.guintptr) {
+func _gotk4_gtk3_Notebook_ConnectSwitchPage(arg0 C.gpointer, arg1 *C.void, arg2 C.guint, arg3 C.guintptr) {
 	var f func(page Widgetter, pageNum uint)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))

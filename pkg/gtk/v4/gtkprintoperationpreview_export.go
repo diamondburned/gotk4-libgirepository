@@ -8,12 +8,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_PrintOperationPreview_ConnectGotPageSize
-func _gotk4_gtk4_PrintOperationPreview_ConnectGotPageSize(arg0 C.gpointer, arg1 *C.GtkPrintContext, arg2 *C.GtkPageSetup, arg3 C.guintptr) {
+func _gotk4_gtk4_PrintOperationPreview_ConnectGotPageSize(arg0 C.gpointer, arg1 *C.void, arg2 *C.void, arg3 C.guintptr) {
 	var f func(context *PrintContext, pageSetup *PageSetup)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
@@ -35,7 +37,7 @@ func _gotk4_gtk4_PrintOperationPreview_ConnectGotPageSize(arg0 C.gpointer, arg1 
 }
 
 //export _gotk4_gtk4_PrintOperationPreview_ConnectReady
-func _gotk4_gtk4_PrintOperationPreview_ConnectReady(arg0 C.gpointer, arg1 *C.GtkPrintContext, arg2 C.guintptr) {
+func _gotk4_gtk4_PrintOperationPreview_ConnectReady(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(context *PrintContext)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

@@ -3,15 +3,16 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 // extern void _gotk4_gtk4_EventControllerMotion_ConnectMotion(gpointer, gdouble, gdouble, guintptr);
 // extern void _gotk4_gtk4_EventControllerMotion_ConnectLeave(gpointer, guintptr);
 // extern void _gotk4_gtk4_EventControllerMotion_ConnectEnter(gpointer, gdouble, gdouble, guintptr);
@@ -19,7 +20,7 @@ import "C"
 
 // GType values.
 var (
-	GTypeEventControllerMotion = coreglib.Type(C.gtk_event_controller_motion_get_type())
+	GTypeEventControllerMotion = coreglib.Type(girepository.MustFind("Gtk", "EventControllerMotion").RegisteredGType())
 )
 
 func init() {
@@ -58,83 +59,16 @@ func marshalEventControllerMotion(p uintptr) (interface{}, error) {
 }
 
 // ConnectEnter signals that the pointer has entered the widget.
-func (self *EventControllerMotion) ConnectEnter(f func(x, y float64)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "enter", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerMotion_ConnectEnter), f)
+func (v *EventControllerMotion) ConnectEnter(f func(x, y float64)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "enter", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerMotion_ConnectEnter), f)
 }
 
 // ConnectLeave signals that the pointer has left the widget.
-func (self *EventControllerMotion) ConnectLeave(f func()) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "leave", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerMotion_ConnectLeave), f)
+func (v *EventControllerMotion) ConnectLeave(f func()) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "leave", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerMotion_ConnectLeave), f)
 }
 
 // ConnectMotion is emitted when the pointer moves inside the widget.
-func (self *EventControllerMotion) ConnectMotion(f func(x, y float64)) coreglib.SignalHandle {
-	return coreglib.ConnectGeneratedClosure(self, "motion", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerMotion_ConnectMotion), f)
-}
-
-// NewEventControllerMotion creates a new event controller that will handle
-// motion events.
-//
-// The function returns the following values:
-//
-//    - eventControllerMotion: new GtkEventControllerMotion.
-//
-func NewEventControllerMotion() *EventControllerMotion {
-	var _cret *C.GtkEventController // in
-
-	_cret = C.gtk_event_controller_motion_new()
-
-	var _eventControllerMotion *EventControllerMotion // out
-
-	_eventControllerMotion = wrapEventControllerMotion(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _eventControllerMotion
-}
-
-// ContainsPointer returns if a pointer is within self or one of its children.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if a pointer is within self or one of its children.
-//
-func (self *EventControllerMotion) ContainsPointer() bool {
-	var _arg0 *C.GtkEventControllerMotion // out
-	var _cret C.gboolean                  // in
-
-	_arg0 = (*C.GtkEventControllerMotion)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_event_controller_motion_contains_pointer(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// IsPointer returns if a pointer is within self, but not one of its children.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if a pointer is within self but not one of its children.
-//
-func (self *EventControllerMotion) IsPointer() bool {
-	var _arg0 *C.GtkEventControllerMotion // out
-	var _cret C.gboolean                  // in
-
-	_arg0 = (*C.GtkEventControllerMotion)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_event_controller_motion_is_pointer(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
+func (v *EventControllerMotion) ConnectMotion(f func(x, y float64)) coreglib.SignalHandle {
+	return coreglib.ConnectGeneratedClosure(v, "motion", false, unsafe.Pointer(C._gotk4_gtk4_EventControllerMotion_ConnectMotion), f)
 }

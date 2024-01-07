@@ -7,22 +7,24 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeTLSAuthenticationMode = coreglib.Type(C.g_tls_authentication_mode_get_type())
-	GTypeTLSError              = coreglib.Type(C.g_tls_error_get_type())
-	GTypeTLSRehandshakeMode    = coreglib.Type(C.g_tls_rehandshake_mode_get_type())
-	GTypeApplicationFlags      = coreglib.Type(C.g_application_flags_get_type())
-	GTypeIOStreamSpliceFlags   = coreglib.Type(C.g_io_stream_splice_flags_get_type())
-	GTypeTLSCertificateFlags   = coreglib.Type(C.g_tls_certificate_flags_get_type())
+	GTypeTLSAuthenticationMode = coreglib.Type(girepository.MustFind("Gio", "TlsAuthenticationMode").RegisteredGType())
+	GTypeTLSError              = coreglib.Type(girepository.MustFind("Gio", "TlsError").RegisteredGType())
+	GTypeTLSRehandshakeMode    = coreglib.Type(girepository.MustFind("Gio", "TlsRehandshakeMode").RegisteredGType())
+	GTypeApplicationFlags      = coreglib.Type(girepository.MustFind("Gio", "ApplicationFlags").RegisteredGType())
+	GTypeIOStreamSpliceFlags   = coreglib.Type(girepository.MustFind("Gio", "IOStreamSpliceFlags").RegisteredGType())
+	GTypeTLSCertificateFlags   = coreglib.Type(girepository.MustFind("Gio", "TlsCertificateFlags").RegisteredGType())
 )
 
 func init() {

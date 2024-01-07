@@ -11,14 +11,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_ClipboardImageReceivedFunc
-func _gotk4_gtk3_ClipboardImageReceivedFunc(arg1 *C.GtkClipboard, arg2 *C.GdkPixbuf, arg3 C.gpointer) {
+func _gotk4_gtk3_ClipboardImageReceivedFunc(arg1 *C.void, arg2 *C.GdkPixbuf, arg3 C.gpointer) {
 	var fn ClipboardImageReceivedFunc
 	{
 		v := gbox.Get(uintptr(arg3))

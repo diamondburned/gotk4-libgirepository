@@ -6,19 +6,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeCellRendererProgress = coreglib.Type(C.gtk_cell_renderer_progress_get_type())
+	GTypeCellRendererProgress = coreglib.Type(girepository.MustFind("Gtk", "CellRendererProgress").RegisteredGType())
 )
 
 func init() {
@@ -83,24 +83,6 @@ func marshalCellRendererProgress(p uintptr) (interface{}, error) {
 	return wrapCellRendererProgress(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewCellRendererProgress creates a new CellRendererProgress.
-//
-// The function returns the following values:
-//
-//    - cellRendererProgress: new cell renderer.
-//
-func NewCellRendererProgress() *CellRendererProgress {
-	var _cret *C.GtkCellRenderer // in
-
-	_cret = C.gtk_cell_renderer_progress_new()
-
-	var _cellRendererProgress *CellRendererProgress // out
-
-	_cellRendererProgress = wrapCellRendererProgress(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _cellRendererProgress
-}
-
 // CellRendererProgressClass: instance of this type is always passed by
 // reference.
 type CellRendererProgressClass struct {
@@ -109,12 +91,7 @@ type CellRendererProgressClass struct {
 
 // cellRendererProgressClass is the struct that's finalized.
 type cellRendererProgressClass struct {
-	native *C.GtkCellRendererProgressClass
+	native unsafe.Pointer
 }
 
-func (c *CellRendererProgressClass) ParentClass() *CellRendererClass {
-	valptr := &c.native.parent_class
-	var _v *CellRendererClass // out
-	_v = (*CellRendererClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoCellRendererProgressClass = girepository.MustFind("Gtk", "CellRendererProgressClass")

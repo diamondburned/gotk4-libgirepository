@@ -5,17 +5,19 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFileChooserDialog = coreglib.Type(C.gtk_file_chooser_dialog_get_type())
+	GTypeFileChooserDialog = coreglib.Type(girepository.MustFind("Gtk", "FileChooserDialog").RegisteredGType())
 )
 
 func init() {

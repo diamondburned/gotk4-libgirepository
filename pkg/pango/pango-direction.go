@@ -6,17 +6,19 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <pango/pango.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDirection = coreglib.Type(C.pango_direction_get_type())
+	GTypeDirection = coreglib.Type(girepository.MustFind("Pango", "Direction").RegisteredGType())
 )
 
 func init() {

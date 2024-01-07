@@ -7,17 +7,19 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeResolverNameLookupFlags = coreglib.Type(C.g_resolver_name_lookup_flags_get_type())
+	GTypeResolverNameLookupFlags = coreglib.Type(girepository.MustFind("Gio", "ResolverNameLookupFlags").RegisteredGType())
 )
 
 func init() {

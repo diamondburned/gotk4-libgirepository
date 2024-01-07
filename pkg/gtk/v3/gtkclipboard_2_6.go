@@ -6,10 +6,10 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdkpixbuf/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ClipboardImageReceivedFunc: function to be called when the results of

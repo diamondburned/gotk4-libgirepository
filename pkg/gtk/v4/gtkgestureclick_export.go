@@ -10,8 +10,10 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_GestureClick_ConnectPressed
@@ -79,7 +81,7 @@ func _gotk4_gtk4_GestureClick_ConnectStopped(arg0 C.gpointer, arg1 C.guintptr) {
 }
 
 //export _gotk4_gtk4_GestureClick_ConnectUnpairedRelease
-func _gotk4_gtk4_GestureClick_ConnectUnpairedRelease(arg0 C.gpointer, arg1 C.gdouble, arg2 C.gdouble, arg3 C.guint, arg4 *C.GdkEventSequence, arg5 C.guintptr) {
+func _gotk4_gtk4_GestureClick_ConnectUnpairedRelease(arg0 C.gpointer, arg1 C.gdouble, arg2 C.gdouble, arg3 C.guint, arg4 *C.void, arg5 C.guintptr) {
 	var f func(x, y float64, button uint, sequence *gdk.EventSequence)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg5))

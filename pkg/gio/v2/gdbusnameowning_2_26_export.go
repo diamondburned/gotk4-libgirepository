@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gio2_BusAcquiredCallback
-func _gotk4_gio2_BusAcquiredCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 C.gpointer) {
+func _gotk4_gio2_BusAcquiredCallback(arg1 *C.void, arg2 *C.gchar, arg3 C.gpointer) {
 	var fn BusAcquiredCallback
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -34,7 +36,7 @@ func _gotk4_gio2_BusAcquiredCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg
 }
 
 //export _gotk4_gio2_BusNameAcquiredCallback
-func _gotk4_gio2_BusNameAcquiredCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 C.gpointer) {
+func _gotk4_gio2_BusNameAcquiredCallback(arg1 *C.void, arg2 *C.gchar, arg3 C.gpointer) {
 	var fn BusNameAcquiredCallback
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -54,7 +56,7 @@ func _gotk4_gio2_BusNameAcquiredCallback(arg1 *C.GDBusConnection, arg2 *C.gchar,
 }
 
 //export _gotk4_gio2_BusNameLostCallback
-func _gotk4_gio2_BusNameLostCallback(arg1 *C.GDBusConnection, arg2 *C.gchar, arg3 C.gpointer) {
+func _gotk4_gio2_BusNameLostCallback(arg1 *C.void, arg2 *C.gchar, arg3 C.gpointer) {
 	var fn BusNameLostCallback
 	{
 		v := gbox.Get(uintptr(arg3))

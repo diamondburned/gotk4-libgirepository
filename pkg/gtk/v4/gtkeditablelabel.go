@@ -3,21 +3,22 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeEditableLabel = coreglib.Type(C.gtk_editable_label_get_type())
+	GTypeEditableLabel = coreglib.Type(girepository.MustFind("Gtk", "EditableLabel").RegisteredGType())
 )
 
 func init() {
@@ -130,91 +131,6 @@ func marshalEditableLabel(p uintptr) (interface{}, error) {
 	return wrapEditableLabel(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewEditableLabel creates a new GtkEditableLabel widget.
-//
-// The function takes the following parameters:
-//
-//    - str: text for the label.
-//
-// The function returns the following values:
-//
-//    - editableLabel: new GtkEditableLabel.
-//
-func NewEditableLabel(str string) *EditableLabel {
-	var _arg1 *C.char      // out
-	var _cret *C.GtkWidget // in
-
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(str)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	_cret = C.gtk_editable_label_new(_arg1)
-	runtime.KeepAlive(str)
-
-	var _editableLabel *EditableLabel // out
-
-	_editableLabel = wrapEditableLabel(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _editableLabel
-}
-
-// Editing returns whether the label is currently in “editing mode”.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if self is currently in editing mode.
-//
-func (self *EditableLabel) Editing() bool {
-	var _arg0 *C.GtkEditableLabel // out
-	var _cret C.gboolean          // in
-
-	_arg0 = (*C.GtkEditableLabel)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_editable_label_get_editing(_arg0)
-	runtime.KeepAlive(self)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// StartEditing switches the label into “editing mode”.
-func (self *EditableLabel) StartEditing() {
-	var _arg0 *C.GtkEditableLabel // out
-
-	_arg0 = (*C.GtkEditableLabel)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	C.gtk_editable_label_start_editing(_arg0)
-	runtime.KeepAlive(self)
-}
-
-// StopEditing switches the label out of “editing mode”.
-//
-// If commit is TRUE, the resulting text is kept as the gtk.Editable:text
-// property value, otherwise the resulting text is discarded and the label will
-// keep its previous gtk.Editable:text property value.
-//
-// The function takes the following parameters:
-//
-//    - commit: whether to set the edited text on the label.
-//
-func (self *EditableLabel) StopEditing(commit bool) {
-	var _arg0 *C.GtkEditableLabel // out
-	var _arg1 C.gboolean          // out
-
-	_arg0 = (*C.GtkEditableLabel)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if commit {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_editable_label_stop_editing(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(commit)
-}
-
 // EditableLabelClass: instance of this type is always passed by reference.
 type EditableLabelClass struct {
 	*editableLabelClass
@@ -222,12 +138,7 @@ type EditableLabelClass struct {
 
 // editableLabelClass is the struct that's finalized.
 type editableLabelClass struct {
-	native *C.GtkEditableLabelClass
+	native unsafe.Pointer
 }
 
-func (e *EditableLabelClass) ParentClass() *WidgetClass {
-	valptr := &e.native.parent_class
-	var _v *WidgetClass // out
-	_v = (*WidgetClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoEditableLabelClass = girepository.MustFind("Gtk", "EditableLabelClass")

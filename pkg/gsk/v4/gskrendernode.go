@@ -3,28 +3,22 @@
 package gsk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/cairo"
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gdk/v4"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
-	"github.com/diamondburned/gotk4/pkg/graphene"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gsk/gsk.h>
-// extern void _gotk4_gsk4_ParseErrorFunc(GskParseLocation*, GskParseLocation*, GError*, gpointer);
 import "C"
 
 // GType values.
 var (
-	GTypeRenderNode = coreglib.Type(C.gsk_render_node_get_type())
+	GTypeRenderNode = coreglib.Type(girepository.MustFind("Gsk", "RenderNode").RegisteredGType())
 )
 
 func init() {
@@ -80,207 +74,13 @@ func marshalRenderNode(p uintptr) (interface{}, error) {
 	return wrapRenderNode(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-func (node *RenderNode) baseRenderNode() *RenderNode {
-	return node
+func (v *RenderNode) baseRenderNode() *RenderNode {
+	return v
 }
 
 // BaseRenderNode returns the underlying base object.
 func BaseRenderNode(obj RenderNoder) *RenderNode {
 	return obj.baseRenderNode()
-}
-
-// Draw the contents of node to the given cairo context.
-//
-// Typically, you'll use this function to implement fallback rendering of
-// GskRenderNodes on an intermediate Cairo context, instead of using the drawing
-// context associated to a GdkSurface's rendering buffer.
-//
-// For advanced nodes that cannot be supported using Cairo, in particular for
-// nodes doing 3D operations, this function may fail.
-//
-// The function takes the following parameters:
-//
-//    - cr: cairo context to draw to.
-//
-func (node *RenderNode) Draw(cr *cairo.Context) {
-	var _arg0 *C.GskRenderNode // out
-	var _arg1 *C.cairo_t       // out
-
-	_arg0 = (*C.GskRenderNode)(unsafe.Pointer(coreglib.InternObject(node).Native()))
-	_arg1 = (*C.cairo_t)(unsafe.Pointer(cr.Native()))
-
-	C.gsk_render_node_draw(_arg0, _arg1)
-	runtime.KeepAlive(node)
-	runtime.KeepAlive(cr)
-}
-
-// Bounds retrieves the boundaries of the node.
-//
-// The node will not draw outside of its boundaries.
-//
-// The function returns the following values:
-//
-//    - bounds: return location for the boundaries.
-//
-func (node *RenderNode) Bounds() *graphene.Rect {
-	var _arg0 *C.GskRenderNode  // out
-	var _arg1 C.graphene_rect_t // in
-
-	_arg0 = (*C.GskRenderNode)(unsafe.Pointer(coreglib.InternObject(node).Native()))
-
-	C.gsk_render_node_get_bounds(_arg0, &_arg1)
-	runtime.KeepAlive(node)
-
-	var _bounds *graphene.Rect // out
-
-	_bounds = (*graphene.Rect)(gextras.NewStructNative(unsafe.Pointer((&_arg1))))
-
-	return _bounds
-}
-
-// NodeType returns the type of the node.
-//
-// The function returns the following values:
-//
-//    - renderNodeType: type of the GskRenderNode.
-//
-func (node *RenderNode) NodeType() RenderNodeType {
-	var _arg0 *C.GskRenderNode    // out
-	var _cret C.GskRenderNodeType // in
-
-	_arg0 = (*C.GskRenderNode)(unsafe.Pointer(coreglib.InternObject(node).Native()))
-
-	_cret = C.gsk_render_node_get_node_type(_arg0)
-	runtime.KeepAlive(node)
-
-	var _renderNodeType RenderNodeType // out
-
-	_renderNodeType = RenderNodeType(_cret)
-
-	return _renderNodeType
-}
-
-// Serialize serializes the node for later deserialization via
-// gsk_render_node_deserialize(). No guarantees are made about the format used
-// other than that the same version of GTK will be able to deserialize the
-// result of a call to gsk_render_node_serialize() and
-// gsk_render_node_deserialize() will correctly reject files it cannot open that
-// were created with previous versions of GTK.
-//
-// The intended use of this functions is testing, benchmarking and debugging.
-// The format is not meant as a permanent storage format.
-//
-// The function returns the following values:
-//
-//    - bytes representing the node.
-//
-func (node *RenderNode) Serialize() *glib.Bytes {
-	var _arg0 *C.GskRenderNode // out
-	var _cret *C.GBytes        // in
-
-	_arg0 = (*C.GskRenderNode)(unsafe.Pointer(coreglib.InternObject(node).Native()))
-
-	_cret = C.gsk_render_node_serialize(_arg0)
-	runtime.KeepAlive(node)
-
-	var _bytes *glib.Bytes // out
-
-	_bytes = (*glib.Bytes)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(_bytes)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.g_bytes_unref((*C.GBytes)(intern.C))
-		},
-	)
-
-	return _bytes
-}
-
-// WriteToFile: this function is equivalent to calling
-// gsk_render_node_serialize() followed by g_file_set_contents().
-//
-// See those two functions for details on the arguments.
-//
-// It is mostly intended for use inside a debugger to quickly dump a render node
-// to a file for later inspection.
-//
-// The function takes the following parameters:
-//
-//    - filename: file to save it to.
-//
-func (node *RenderNode) WriteToFile(filename string) error {
-	var _arg0 *C.GskRenderNode // out
-	var _arg1 *C.char          // out
-	var _cerr *C.GError        // in
-
-	_arg0 = (*C.GskRenderNode)(unsafe.Pointer(coreglib.InternObject(node).Native()))
-	_arg1 = (*C.char)(unsafe.Pointer(C.CString(filename)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gsk_render_node_write_to_file(_arg0, _arg1, &_cerr)
-	runtime.KeepAlive(node)
-	runtime.KeepAlive(filename)
-
-	var _goerr error // out
-
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _goerr
-}
-
-// RenderNodeDeserialize loads data previously created via
-// gsk_render_node_serialize().
-//
-// For a discussion of the supported format, see that function.
-//
-// The function takes the following parameters:
-//
-//    - bytes containing the data.
-//    - errorFunc (optional): callback on parsing errors or NULL.
-//
-// The function returns the following values:
-//
-//    - renderNode (optional): new GskRenderNode or NULL on error.
-//
-func RenderNodeDeserialize(bytes *glib.Bytes, errorFunc ParseErrorFunc) RenderNoder {
-	var _arg1 *C.GBytes           // out
-	var _arg2 C.GskParseErrorFunc // out
-	var _arg3 C.gpointer
-	var _cret *C.GskRenderNode // in
-
-	_arg1 = (*C.GBytes)(gextras.StructNative(unsafe.Pointer(bytes)))
-	if errorFunc != nil {
-		_arg2 = (*[0]byte)(C._gotk4_gsk4_ParseErrorFunc)
-		_arg3 = C.gpointer(gbox.Assign(errorFunc))
-		defer gbox.Delete(uintptr(_arg3))
-	}
-
-	_cret = C.gsk_render_node_deserialize(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(bytes)
-	runtime.KeepAlive(errorFunc)
-
-	var _renderNode RenderNoder // out
-
-	if _cret != nil {
-		{
-			objptr := unsafe.Pointer(_cret)
-
-			object := coreglib.AssumeOwnership(objptr)
-			casted := object.WalkCast(func(obj coreglib.Objector) bool {
-				_, ok := obj.(RenderNoder)
-				return ok
-			})
-			rv, ok := casted.(RenderNoder)
-			if !ok {
-				panic("no marshaler for " + object.TypeFromInstance().String() + " matching gsk.RenderNoder")
-			}
-			_renderNode = rv
-		}
-	}
-
-	return _renderNode
 }
 
 // ColorStop: color stop in a gradient node.
@@ -292,30 +92,10 @@ type ColorStop struct {
 
 // colorStop is the struct that's finalized.
 type colorStop struct {
-	native *C.GskColorStop
+	native unsafe.Pointer
 }
 
-// Offset: offset of the color stop.
-func (c *ColorStop) Offset() float32 {
-	valptr := &c.native.offset
-	var _v float32 // out
-	_v = float32(*valptr)
-	return _v
-}
-
-// Color: color at the given offset.
-func (c *ColorStop) Color() *gdk.RGBA {
-	valptr := &c.native.color
-	var _v *gdk.RGBA // out
-	_v = (*gdk.RGBA)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
-
-// Offset: offset of the color stop.
-func (c *ColorStop) SetOffset(offset float32) {
-	valptr := &c.native.offset
-	*valptr = C.float(offset)
-}
+var GIRInfoColorStop = girepository.MustFind("Gsk", "ColorStop")
 
 // ParseLocation: location in a parse buffer.
 //
@@ -326,8 +106,10 @@ type ParseLocation struct {
 
 // parseLocation is the struct that's finalized.
 type parseLocation struct {
-	native *C.GskParseLocation
+	native unsafe.Pointer
 }
+
+var GIRInfoParseLocation = girepository.MustFind("Gsk", "ParseLocation")
 
 // NewParseLocation creates a new ParseLocation instance from the given
 // fields. Beware that this function allocates on the Go heap; be careful
@@ -344,20 +126,37 @@ func NewParseLocation(bytes, chars, lines, lineBytes, lineChars uint) ParseLocat
 	var f4 C.gsize // out
 	f4 = C.gsize(lineChars)
 
-	v := C.GskParseLocation{
-		bytes:      f0,
-		chars:      f1,
-		lines:      f2,
-		line_bytes: f3,
-		line_chars: f4,
-	}
+	size := GIRInfoParseLocation.StructSize()
+	native := make([]byte, size)
+	gextras.Sink(&native[0])
 
-	return *(*ParseLocation)(gextras.NewStructNative(unsafe.Pointer(&v)))
+	offset0 := GIRInfoParseLocation.StructFieldOffset("bytes")
+	valptr0 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset0))
+	*valptr0 = f0
+
+	offset1 := GIRInfoParseLocation.StructFieldOffset("chars")
+	valptr1 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset1))
+	*valptr1 = f1
+
+	offset2 := GIRInfoParseLocation.StructFieldOffset("lines")
+	valptr2 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset2))
+	*valptr2 = f2
+
+	offset3 := GIRInfoParseLocation.StructFieldOffset("line_bytes")
+	valptr3 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset3))
+	*valptr3 = f3
+
+	offset4 := GIRInfoParseLocation.StructFieldOffset("line_chars")
+	valptr4 := (*C.gsize)(unsafe.Add(unsafe.Pointer(&native[0]), offset4))
+	*valptr4 = f4
+
+	return *(*ParseLocation)(gextras.NewStructNative(unsafe.Pointer(&native[0])))
 }
 
 // Bytes: offset of the location in the parse buffer, as bytes.
 func (p *ParseLocation) Bytes() uint {
-	valptr := &p.native.bytes
+	offset := GIRInfoParseLocation.StructFieldOffset("bytes")
+	valptr := (*uint)(unsafe.Add(p.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -365,7 +164,8 @@ func (p *ParseLocation) Bytes() uint {
 
 // Chars: offset of the location in the parse buffer, as characters.
 func (p *ParseLocation) Chars() uint {
-	valptr := &p.native.chars
+	offset := GIRInfoParseLocation.StructFieldOffset("chars")
+	valptr := (*uint)(unsafe.Add(p.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -373,7 +173,8 @@ func (p *ParseLocation) Chars() uint {
 
 // Lines: line of the location in the parse buffer.
 func (p *ParseLocation) Lines() uint {
-	valptr := &p.native.lines
+	offset := GIRInfoParseLocation.StructFieldOffset("lines")
+	valptr := (*uint)(unsafe.Add(p.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -381,7 +182,8 @@ func (p *ParseLocation) Lines() uint {
 
 // LineBytes: position in the line, as bytes.
 func (p *ParseLocation) LineBytes() uint {
-	valptr := &p.native.line_bytes
+	offset := GIRInfoParseLocation.StructFieldOffset("line_bytes")
+	valptr := (*uint)(unsafe.Add(p.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -389,7 +191,8 @@ func (p *ParseLocation) LineBytes() uint {
 
 // LineChars: position in the line, as characters.
 func (p *ParseLocation) LineChars() uint {
-	valptr := &p.native.line_chars
+	offset := GIRInfoParseLocation.StructFieldOffset("line_chars")
+	valptr := (*uint)(unsafe.Add(p.native, offset))
 	var _v uint // out
 	_v = uint(*valptr)
 	return _v
@@ -397,31 +200,36 @@ func (p *ParseLocation) LineChars() uint {
 
 // Bytes: offset of the location in the parse buffer, as bytes.
 func (p *ParseLocation) SetBytes(bytes uint) {
-	valptr := &p.native.bytes
+	offset := GIRInfoParseLocation.StructFieldOffset("bytes")
+	valptr := (*C.gsize)(unsafe.Add(p.native, offset))
 	*valptr = C.gsize(bytes)
 }
 
 // Chars: offset of the location in the parse buffer, as characters.
 func (p *ParseLocation) SetChars(chars uint) {
-	valptr := &p.native.chars
+	offset := GIRInfoParseLocation.StructFieldOffset("chars")
+	valptr := (*C.gsize)(unsafe.Add(p.native, offset))
 	*valptr = C.gsize(chars)
 }
 
 // Lines: line of the location in the parse buffer.
 func (p *ParseLocation) SetLines(lines uint) {
-	valptr := &p.native.lines
+	offset := GIRInfoParseLocation.StructFieldOffset("lines")
+	valptr := (*C.gsize)(unsafe.Add(p.native, offset))
 	*valptr = C.gsize(lines)
 }
 
 // LineBytes: position in the line, as bytes.
 func (p *ParseLocation) SetLineBytes(lineBytes uint) {
-	valptr := &p.native.line_bytes
+	offset := GIRInfoParseLocation.StructFieldOffset("line_bytes")
+	valptr := (*C.gsize)(unsafe.Add(p.native, offset))
 	*valptr = C.gsize(lineBytes)
 }
 
 // LineChars: position in the line, as characters.
 func (p *ParseLocation) SetLineChars(lineChars uint) {
-	valptr := &p.native.line_chars
+	offset := GIRInfoParseLocation.StructFieldOffset("line_chars")
+	valptr := (*C.gsize)(unsafe.Add(p.native, offset))
 	*valptr = C.gsize(lineChars)
 }
 
@@ -434,55 +242,7 @@ type Shadow struct {
 
 // shadow is the struct that's finalized.
 type shadow struct {
-	native *C.GskShadow
+	native unsafe.Pointer
 }
 
-// Color: color of the shadow.
-func (s *Shadow) Color() *gdk.RGBA {
-	valptr := &s.native.color
-	var _v *gdk.RGBA // out
-	_v = (*gdk.RGBA)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
-
-// Dx: horizontal offset of the shadow.
-func (s *Shadow) Dx() float32 {
-	valptr := &s.native.dx
-	var _v float32 // out
-	_v = float32(*valptr)
-	return _v
-}
-
-// Dy: vertical offset of the shadow.
-func (s *Shadow) Dy() float32 {
-	valptr := &s.native.dy
-	var _v float32 // out
-	_v = float32(*valptr)
-	return _v
-}
-
-// Radius radius of the shadow.
-func (s *Shadow) Radius() float32 {
-	valptr := &s.native.radius
-	var _v float32 // out
-	_v = float32(*valptr)
-	return _v
-}
-
-// Dx: horizontal offset of the shadow.
-func (s *Shadow) SetDx(dx float32) {
-	valptr := &s.native.dx
-	*valptr = C.float(dx)
-}
-
-// Dy: vertical offset of the shadow.
-func (s *Shadow) SetDy(dy float32) {
-	valptr := &s.native.dy
-	*valptr = C.float(dy)
-}
-
-// Radius radius of the shadow.
-func (s *Shadow) SetRadius(radius float32) {
-	valptr := &s.native.radius
-	*valptr = C.float(radius)
-}
+var GIRInfoShadow = girepository.MustFind("Gsk", "Shadow")

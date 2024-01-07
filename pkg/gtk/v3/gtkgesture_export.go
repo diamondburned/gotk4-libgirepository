@@ -10,14 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gdk/v3"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_Gesture_ConnectBegin
-func _gotk4_gtk3_Gesture_ConnectBegin(arg0 C.gpointer, arg1 *C.GdkEventSequence, arg2 C.guintptr) {
+func _gotk4_gtk3_Gesture_ConnectBegin(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(sequence *gdk.EventSequence)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -39,7 +39,7 @@ func _gotk4_gtk3_Gesture_ConnectBegin(arg0 C.gpointer, arg1 *C.GdkEventSequence,
 }
 
 //export _gotk4_gtk3_Gesture_ConnectCancel
-func _gotk4_gtk3_Gesture_ConnectCancel(arg0 C.gpointer, arg1 *C.GdkEventSequence, arg2 C.guintptr) {
+func _gotk4_gtk3_Gesture_ConnectCancel(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(sequence *gdk.EventSequence)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -61,7 +61,7 @@ func _gotk4_gtk3_Gesture_ConnectCancel(arg0 C.gpointer, arg1 *C.GdkEventSequence
 }
 
 //export _gotk4_gtk3_Gesture_ConnectEnd
-func _gotk4_gtk3_Gesture_ConnectEnd(arg0 C.gpointer, arg1 *C.GdkEventSequence, arg2 C.guintptr) {
+func _gotk4_gtk3_Gesture_ConnectEnd(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(sequence *gdk.EventSequence)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -82,32 +82,8 @@ func _gotk4_gtk3_Gesture_ConnectEnd(arg0 C.gpointer, arg1 *C.GdkEventSequence, a
 	f(_sequence)
 }
 
-//export _gotk4_gtk3_Gesture_ConnectSequenceStateChanged
-func _gotk4_gtk3_Gesture_ConnectSequenceStateChanged(arg0 C.gpointer, arg1 *C.GdkEventSequence, arg2 C.GtkEventSequenceState, arg3 C.guintptr) {
-	var f func(sequence *gdk.EventSequence, state EventSequenceState)
-	{
-		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))
-		if closure == nil {
-			panic("given unknown closure user_data")
-		}
-		defer closure.TryRepanic()
-
-		f = closure.Func.(func(sequence *gdk.EventSequence, state EventSequenceState))
-	}
-
-	var _sequence *gdk.EventSequence // out
-	var _state EventSequenceState    // out
-
-	if arg1 != nil {
-		_sequence = (*gdk.EventSequence)(gextras.NewStructNative(unsafe.Pointer(arg1)))
-	}
-	_state = EventSequenceState(arg2)
-
-	f(_sequence, _state)
-}
-
 //export _gotk4_gtk3_Gesture_ConnectUpdate
-func _gotk4_gtk3_Gesture_ConnectUpdate(arg0 C.gpointer, arg1 *C.GdkEventSequence, arg2 C.guintptr) {
+func _gotk4_gtk3_Gesture_ConnectUpdate(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(sequence *gdk.EventSequence)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

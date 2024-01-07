@@ -5,17 +5,19 @@ package gtk
 import (
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeCellRendererSpin = coreglib.Type(C.gtk_cell_renderer_spin_get_type())
+	GTypeCellRendererSpin = coreglib.Type(girepository.MustFind("Gtk", "CellRendererSpin").RegisteredGType())
 )
 
 func init() {
@@ -62,22 +64,4 @@ func wrapCellRendererSpin(obj *coreglib.Object) *CellRendererSpin {
 
 func marshalCellRendererSpin(p uintptr) (interface{}, error) {
 	return wrapCellRendererSpin(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewCellRendererSpin creates a new CellRendererSpin.
-//
-// The function returns the following values:
-//
-//    - cellRendererSpin: new CellRendererSpin.
-//
-func NewCellRendererSpin() *CellRendererSpin {
-	var _cret *C.GtkCellRenderer // in
-
-	_cret = C.gtk_cell_renderer_spin_new()
-
-	var _cellRendererSpin *CellRendererSpin // out
-
-	_cellRendererSpin = wrapCellRendererSpin(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _cellRendererSpin
 }

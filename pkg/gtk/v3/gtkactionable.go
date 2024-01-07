@@ -2,10 +2,16 @@
 
 package gtk
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ActionableInterface: interface vtable for Actionable.
@@ -17,5 +23,7 @@ type ActionableInterface struct {
 
 // actionableInterface is the struct that's finalized.
 type actionableInterface struct {
-	native *C.GtkActionableInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoActionableInterface = girepository.MustFind("Gtk", "ActionableInterface")

@@ -3,20 +3,21 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFileIcon = coreglib.Type(C.g_file_icon_get_type())
+	GTypeFileIcon = coreglib.Type(girepository.MustFind("Gio", "FileIcon").RegisteredGType())
 )
 
 func init() {
@@ -50,52 +51,4 @@ func wrapFileIcon(obj *coreglib.Object) *FileIcon {
 
 func marshalFileIcon(p uintptr) (interface{}, error) {
 	return wrapFileIcon(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewFileIcon creates a new icon for a file.
-//
-// The function takes the following parameters:
-//
-//    - file: #GFile.
-//
-// The function returns the following values:
-//
-//    - fileIcon for the given file, or NULL on error.
-//
-func NewFileIcon(file Filer) *FileIcon {
-	var _arg1 *C.GFile // out
-	var _cret *C.GIcon // in
-
-	_arg1 = (*C.GFile)(unsafe.Pointer(coreglib.InternObject(file).Native()))
-
-	_cret = C.g_file_icon_new(_arg1)
-	runtime.KeepAlive(file)
-
-	var _fileIcon *FileIcon // out
-
-	_fileIcon = wrapFileIcon(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _fileIcon
-}
-
-// File gets the #GFile associated with the given icon.
-//
-// The function returns the following values:
-//
-//    - file: #GFile.
-//
-func (icon *FileIcon) File() *File {
-	var _arg0 *C.GFileIcon // out
-	var _cret *C.GFile     // in
-
-	_arg0 = (*C.GFileIcon)(unsafe.Pointer(coreglib.InternObject(icon).Native()))
-
-	_cret = C.g_file_icon_get_file(_arg0)
-	runtime.KeepAlive(icon)
-
-	var _file *File // out
-
-	_file = wrapFile(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _file
 }

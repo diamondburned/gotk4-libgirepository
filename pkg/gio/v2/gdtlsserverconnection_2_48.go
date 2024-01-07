@@ -3,21 +3,21 @@
 package gio
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gerror"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeDTLSServerConnection = coreglib.Type(C.g_dtls_server_connection_get_type())
+	GTypeDTLSServerConnection = coreglib.Type(girepository.MustFind("Gio", "DtlsServerConnection").RegisteredGType())
 )
 
 func init() {
@@ -77,43 +77,6 @@ func BaseDTLSServerConnection(obj DTLSServerConnectioner) *DTLSServerConnection 
 	return obj.baseDTLSServerConnection()
 }
 
-// NewDTLSServerConnection creates a new ServerConnection wrapping base_socket.
-//
-// The function takes the following parameters:
-//
-//    - baseSocket to wrap.
-//    - certificate (optional): default server certificate, or NULL.
-//
-// The function returns the following values:
-//
-//    - dtlsServerConnection: new ServerConnection, or NULL on error.
-//
-func NewDTLSServerConnection(baseSocket DatagramBasedder, certificate TLSCertificater) (*DTLSServerConnection, error) {
-	var _arg1 *C.GDatagramBased  // out
-	var _arg2 *C.GTlsCertificate // out
-	var _cret *C.GDatagramBased  // in
-	var _cerr *C.GError          // in
-
-	_arg1 = (*C.GDatagramBased)(unsafe.Pointer(coreglib.InternObject(baseSocket).Native()))
-	if certificate != nil {
-		_arg2 = (*C.GTlsCertificate)(unsafe.Pointer(coreglib.InternObject(certificate).Native()))
-	}
-
-	_cret = C.g_dtls_server_connection_new(_arg1, _arg2, &_cerr)
-	runtime.KeepAlive(baseSocket)
-	runtime.KeepAlive(certificate)
-
-	var _dtlsServerConnection *DTLSServerConnection // out
-	var _goerr error                                // out
-
-	_dtlsServerConnection = wrapDTLSServerConnection(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	if _cerr != nil {
-		_goerr = gerror.Take(unsafe.Pointer(_cerr))
-	}
-
-	return _dtlsServerConnection, _goerr
-}
-
 // DTLSServerConnectionInterface: vtable for a ServerConnection implementation.
 //
 // An instance of this type is always passed by reference.
@@ -123,5 +86,7 @@ type DTLSServerConnectionInterface struct {
 
 // dtlsServerConnectionInterface is the struct that's finalized.
 type dtlsServerConnectionInterface struct {
-	native *C.GDtlsServerConnectionInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoDTLSServerConnectionInterface = girepository.MustFind("Gio", "DtlsServerConnectionInterface")

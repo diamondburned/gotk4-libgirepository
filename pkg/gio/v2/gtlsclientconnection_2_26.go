@@ -2,8 +2,16 @@
 
 package gio
 
+import (
+	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
+)
+
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // TLSClientConnectionInterface: vtable for a ClientConnection implementation.
@@ -15,5 +23,7 @@ type TLSClientConnectionInterface struct {
 
 // tlsClientConnectionInterface is the struct that's finalized.
 type tlsClientConnectionInterface struct {
-	native *C.GTlsClientConnectionInterface
+	native unsafe.Pointer
 }
+
+var GIRInfoTLSClientConnectionInterface = girepository.MustFind("Gio", "TlsClientConnectionInterface")

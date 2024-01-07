@@ -3,29 +3,21 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
-// GtkIconFactory* _gotk4_gtk3_StyleProvider_virtual_get_icon_factory(void* fnptr, GtkStyleProvider* arg0, GtkWidgetPath* arg1) {
-//   return ((GtkIconFactory* (*)(GtkStyleProvider*, GtkWidgetPath*))(fnptr))(arg0, arg1);
-// };
-// GtkStyleProperties* _gotk4_gtk3_StyleProvider_virtual_get_style(void* fnptr, GtkStyleProvider* arg0, GtkWidgetPath* arg1) {
-//   return ((GtkStyleProperties* (*)(GtkStyleProvider*, GtkWidgetPath*))(fnptr))(arg0, arg1);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeStyleProvider = coreglib.Type(C.gtk_style_provider_get_type())
+	GTypeStyleProvider = coreglib.Type(girepository.MustFind("Gtk", "StyleProvider").RegisteredGType())
 )
 
 func init() {
@@ -64,6 +56,10 @@ const STYLE_PROVIDER_PRIORITY_THEME = 200
 // word.
 const STYLE_PROVIDER_PRIORITY_USER = 800
 
+// StyleProviderOverrider contains methods that are overridable.
+type StyleProviderOverrider interface {
+}
+
 // StyleProvider is an interface used to provide style information to a
 // StyleContext. See gtk_style_context_add_provider() and
 // gtk_style_context_add_provider_for_screen().
@@ -83,15 +79,13 @@ var (
 type StyleProviderer interface {
 	coreglib.Objector
 
-	// IconFactory returns the IconFactory defined to be in use for path, or
-	// NULL if none is defined.
-	IconFactory(path *WidgetPath) *IconFactory
-	// Style returns the style settings affecting a widget defined by path, or
-	// NULL if provider doesn’t contemplate styling path.
-	Style(path *WidgetPath) *StyleProperties
+	baseStyleProvider() *StyleProvider
 }
 
 var _ StyleProviderer = (*StyleProvider)(nil)
+
+func ifaceInitStyleProviderer(gifacePtr, data C.gpointer) {
+}
 
 func wrapStyleProvider(obj *coreglib.Object) *StyleProvider {
 	return &StyleProvider{
@@ -103,148 +97,13 @@ func marshalStyleProvider(p uintptr) (interface{}, error) {
 	return wrapStyleProvider(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// IconFactory returns the IconFactory defined to be in use for path, or NULL if
-// none is defined.
-//
-// Deprecated: Will always return NULL for all GTK-provided style providers.
-//
-// The function takes the following parameters:
-//
-//    - path to query.
-//
-// The function returns the following values:
-//
-//    - iconFactory (optional): icon factory to use for path, or NULL.
-//
-func (provider *StyleProvider) IconFactory(path *WidgetPath) *IconFactory {
-	var _arg0 *C.GtkStyleProvider // out
-	var _arg1 *C.GtkWidgetPath    // out
-	var _cret *C.GtkIconFactory   // in
-
-	_arg0 = (*C.GtkStyleProvider)(unsafe.Pointer(coreglib.InternObject(provider).Native()))
-	_arg1 = (*C.GtkWidgetPath)(gextras.StructNative(unsafe.Pointer(path)))
-
-	_cret = C.gtk_style_provider_get_icon_factory(_arg0, _arg1)
-	runtime.KeepAlive(provider)
-	runtime.KeepAlive(path)
-
-	var _iconFactory *IconFactory // out
-
-	if _cret != nil {
-		_iconFactory = wrapIconFactory(coreglib.Take(unsafe.Pointer(_cret)))
-	}
-
-	return _iconFactory
+func (v *StyleProvider) baseStyleProvider() *StyleProvider {
+	return v
 }
 
-// Style returns the style settings affecting a widget defined by path, or NULL
-// if provider doesn’t contemplate styling path.
-//
-// Deprecated: Will always return NULL for all GTK-provided style providers as
-// the interface cannot correctly work the way CSS is specified.
-//
-// The function takes the following parameters:
-//
-//    - path to query.
-//
-// The function returns the following values:
-//
-//    - styleProperties (optional) containing the style settings affecting path.
-//
-func (provider *StyleProvider) Style(path *WidgetPath) *StyleProperties {
-	var _arg0 *C.GtkStyleProvider   // out
-	var _arg1 *C.GtkWidgetPath      // out
-	var _cret *C.GtkStyleProperties // in
-
-	_arg0 = (*C.GtkStyleProvider)(unsafe.Pointer(coreglib.InternObject(provider).Native()))
-	_arg1 = (*C.GtkWidgetPath)(gextras.StructNative(unsafe.Pointer(path)))
-
-	_cret = C.gtk_style_provider_get_style(_arg0, _arg1)
-	runtime.KeepAlive(provider)
-	runtime.KeepAlive(path)
-
-	var _styleProperties *StyleProperties // out
-
-	if _cret != nil {
-		_styleProperties = wrapStyleProperties(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	}
-
-	return _styleProperties
-}
-
-// iconFactory returns the IconFactory defined to be in use for path, or NULL if
-// none is defined.
-//
-// Deprecated: Will always return NULL for all GTK-provided style providers.
-//
-// The function takes the following parameters:
-//
-//    - path to query.
-//
-// The function returns the following values:
-//
-//    - iconFactory (optional): icon factory to use for path, or NULL.
-//
-func (provider *StyleProvider) iconFactory(path *WidgetPath) *IconFactory {
-	gclass := (*C.GtkStyleProviderIface)(coreglib.PeekParentClass(provider))
-	fnarg := gclass.get_icon_factory
-
-	var _arg0 *C.GtkStyleProvider // out
-	var _arg1 *C.GtkWidgetPath    // out
-	var _cret *C.GtkIconFactory   // in
-
-	_arg0 = (*C.GtkStyleProvider)(unsafe.Pointer(coreglib.InternObject(provider).Native()))
-	_arg1 = (*C.GtkWidgetPath)(gextras.StructNative(unsafe.Pointer(path)))
-
-	_cret = C._gotk4_gtk3_StyleProvider_virtual_get_icon_factory(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(provider)
-	runtime.KeepAlive(path)
-
-	var _iconFactory *IconFactory // out
-
-	if _cret != nil {
-		_iconFactory = wrapIconFactory(coreglib.Take(unsafe.Pointer(_cret)))
-	}
-
-	return _iconFactory
-}
-
-// Style returns the style settings affecting a widget defined by path, or NULL
-// if provider doesn’t contemplate styling path.
-//
-// Deprecated: Will always return NULL for all GTK-provided style providers as
-// the interface cannot correctly work the way CSS is specified.
-//
-// The function takes the following parameters:
-//
-//    - path to query.
-//
-// The function returns the following values:
-//
-//    - styleProperties (optional) containing the style settings affecting path.
-//
-func (provider *StyleProvider) style(path *WidgetPath) *StyleProperties {
-	gclass := (*C.GtkStyleProviderIface)(coreglib.PeekParentClass(provider))
-	fnarg := gclass.get_style
-
-	var _arg0 *C.GtkStyleProvider   // out
-	var _arg1 *C.GtkWidgetPath      // out
-	var _cret *C.GtkStyleProperties // in
-
-	_arg0 = (*C.GtkStyleProvider)(unsafe.Pointer(coreglib.InternObject(provider).Native()))
-	_arg1 = (*C.GtkWidgetPath)(gextras.StructNative(unsafe.Pointer(path)))
-
-	_cret = C._gotk4_gtk3_StyleProvider_virtual_get_style(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(provider)
-	runtime.KeepAlive(path)
-
-	var _styleProperties *StyleProperties // out
-
-	if _cret != nil {
-		_styleProperties = wrapStyleProperties(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-	}
-
-	return _styleProperties
+// BaseStyleProvider returns the underlying base object.
+func BaseStyleProvider(obj StyleProviderer) *StyleProvider {
+	return obj.baseStyleProvider()
 }
 
 // StyleProviderIface: instance of this type is always passed by reference.
@@ -254,5 +113,7 @@ type StyleProviderIface struct {
 
 // styleProviderIface is the struct that's finalized.
 type styleProviderIface struct {
-	native *C.GtkStyleProviderIface
+	native unsafe.Pointer
 }
+
+var GIRInfoStyleProviderIface = girepository.MustFind("Gtk", "StyleProviderIface")

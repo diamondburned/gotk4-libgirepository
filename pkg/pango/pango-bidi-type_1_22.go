@@ -4,20 +4,21 @@ package pango
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <pango/pango.h>
 import "C"
 
 // GType values.
 var (
-	GTypeBidiType = coreglib.Type(C.pango_bidi_type_get_type())
+	GTypeBidiType = coreglib.Type(girepository.MustFind("Pango", "BidiType").RegisteredGType())
 )
 
 func init() {
@@ -123,35 +124,4 @@ func (b BidiType) String() string {
 	default:
 		return fmt.Sprintf("BidiType(%d)", b)
 	}
-}
-
-// BidiTypeForUnichar determines the bidirectional type of a character.
-//
-// The bidirectional type is specified in the Unicode Character Database.
-//
-// A simplified version of this function is available as unichar_direction.
-//
-// The function takes the following parameters:
-//
-//    - ch: unicode character.
-//
-// The function returns the following values:
-//
-//    - bidiType: bidirectional character type, as used in the Unicode
-//      bidirectional algorithm.
-//
-func BidiTypeForUnichar(ch uint32) BidiType {
-	var _arg1 C.gunichar      // out
-	var _cret C.PangoBidiType // in
-
-	_arg1 = C.gunichar(ch)
-
-	_cret = C.pango_bidi_type_for_unichar(_arg1)
-	runtime.KeepAlive(ch)
-
-	var _bidiType BidiType // out
-
-	_bidiType = BidiType(_cret)
-
-	return _bidiType
 }

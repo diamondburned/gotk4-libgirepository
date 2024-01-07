@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeColorChooserDialog = coreglib.Type(C.gtk_color_chooser_dialog_get_type())
+	GTypeColorChooserDialog = coreglib.Type(girepository.MustFind("Gtk", "ColorChooserDialog").RegisteredGType())
 )
 
 func init() {
@@ -99,39 +98,4 @@ func wrapColorChooserDialog(obj *coreglib.Object) *ColorChooserDialog {
 
 func marshalColorChooserDialog(p uintptr) (interface{}, error) {
 	return wrapColorChooserDialog(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
-}
-
-// NewColorChooserDialog creates a new ColorChooserDialog.
-//
-// The function takes the following parameters:
-//
-//    - title (optional): title of the dialog, or NULL.
-//    - parent (optional): transient parent of the dialog, or NULL.
-//
-// The function returns the following values:
-//
-//    - colorChooserDialog: new ColorChooserDialog.
-//
-func NewColorChooserDialog(title string, parent *Window) *ColorChooserDialog {
-	var _arg1 *C.gchar     // out
-	var _arg2 *C.GtkWindow // out
-	var _cret *C.GtkWidget // in
-
-	if title != "" {
-		_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(title)))
-		defer C.free(unsafe.Pointer(_arg1))
-	}
-	if parent != nil {
-		_arg2 = (*C.GtkWindow)(unsafe.Pointer(coreglib.InternObject(parent).Native()))
-	}
-
-	_cret = C.gtk_color_chooser_dialog_new(_arg1, _arg2)
-	runtime.KeepAlive(title)
-	runtime.KeepAlive(parent)
-
-	var _colorChooserDialog *ColorChooserDialog // out
-
-	_colorChooserDialog = wrapColorChooserDialog(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _colorChooserDialog
 }

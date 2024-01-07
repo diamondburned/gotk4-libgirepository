@@ -3,58 +3,16 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
-
-// DistributeNaturalAllocation distributes extra_space to child sizes by
-// bringing smaller children up to natural size first.
-//
-// The remaining space will be added to the minimum_size member of the
-// GtkRequestedSize struct. If all sizes reach their natural size then the
-// remaining space is returned.
-//
-// The function takes the following parameters:
-//
-//    - extraSpace: extra space to redistribute among children after subtracting
-//      minimum sizes and any child padding from the overall allocation.
-//    - nRequestedSizes: number of requests to fit into the allocation.
-//    - sizes: array of structs with a client pointer and a minimum/natural size
-//      in the orientation of the allocation.
-//
-// The function returns the following values:
-//
-//    - gint: remainder of extra_space after redistributing space to sizes.
-//
-func DistributeNaturalAllocation(extraSpace int, nRequestedSizes uint, sizes *RequestedSize) int {
-	var _arg1 C.gint              // out
-	var _arg2 C.guint             // out
-	var _arg3 *C.GtkRequestedSize // out
-	var _cret C.gint              // in
-
-	_arg1 = C.gint(extraSpace)
-	_arg2 = C.guint(nRequestedSizes)
-	_arg3 = (*C.GtkRequestedSize)(gextras.StructNative(unsafe.Pointer(sizes)))
-
-	_cret = C.gtk_distribute_natural_allocation(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(extraSpace)
-	runtime.KeepAlive(nRequestedSizes)
-	runtime.KeepAlive(sizes)
-
-	var _gint int // out
-
-	_gint = int(_cret)
-
-	return _gint
-}
 
 // RequestedSize represents a request of a screen object in a given orientation.
 // These are primarily used in container implementations when allocating a
@@ -67,12 +25,15 @@ type RequestedSize struct {
 
 // requestedSize is the struct that's finalized.
 type requestedSize struct {
-	native *C.GtkRequestedSize
+	native unsafe.Pointer
 }
+
+var GIRInfoRequestedSize = girepository.MustFind("Gtk", "RequestedSize")
 
 // Data: client pointer.
 func (r *RequestedSize) Data() unsafe.Pointer {
-	valptr := &r.native.data
+	offset := GIRInfoRequestedSize.StructFieldOffset("data")
+	valptr := (*unsafe.Pointer)(unsafe.Add(r.native, offset))
 	var _v unsafe.Pointer // out
 	_v = (unsafe.Pointer)(unsafe.Pointer(*valptr))
 	return _v
@@ -80,7 +41,8 @@ func (r *RequestedSize) Data() unsafe.Pointer {
 
 // MinimumSize: minimum size needed for allocation in a given orientation.
 func (r *RequestedSize) MinimumSize() int {
-	valptr := &r.native.minimum_size
+	offset := GIRInfoRequestedSize.StructFieldOffset("minimum_size")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
@@ -88,7 +50,8 @@ func (r *RequestedSize) MinimumSize() int {
 
 // NaturalSize: natural size for allocation in a given orientation.
 func (r *RequestedSize) NaturalSize() int {
-	valptr := &r.native.natural_size
+	offset := GIRInfoRequestedSize.StructFieldOffset("natural_size")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
@@ -96,12 +59,14 @@ func (r *RequestedSize) NaturalSize() int {
 
 // MinimumSize: minimum size needed for allocation in a given orientation.
 func (r *RequestedSize) SetMinimumSize(minimumSize int) {
-	valptr := &r.native.minimum_size
+	offset := GIRInfoRequestedSize.StructFieldOffset("minimum_size")
+	valptr := (*C.gint)(unsafe.Add(r.native, offset))
 	*valptr = C.gint(minimumSize)
 }
 
 // NaturalSize: natural size for allocation in a given orientation.
 func (r *RequestedSize) SetNaturalSize(naturalSize int) {
-	valptr := &r.native.natural_size
+	offset := GIRInfoRequestedSize.StructFieldOffset("natural_size")
+	valptr := (*C.gint)(unsafe.Add(r.native, offset))
 	*valptr = C.gint(naturalSize)
 }

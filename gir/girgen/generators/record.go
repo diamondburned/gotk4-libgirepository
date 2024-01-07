@@ -36,6 +36,10 @@ var recordTmpl = gotmpl.NewGoTemplate(`
 		native {{ .CGoPtrType }}
 	}
 
+	{{ if .IsRuntimeLinkMode }}
+	var GIRInfo{{ .GoName }} = girepository.MustFind({{ Quote .Namespace.Name }}, {{ Quote .Name }})
+	{{ end }}
+
 	{{ if .Marshaler }}
 	func marshal{{ .GoName }}(p uintptr) (interface{}, error) {
 		b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
@@ -167,7 +171,7 @@ func GenerateRecord(gen FileGeneratorWriter, record *gir.Record) bool {
 
 	if gtype, ok := GenerateGType(gen, recordGen.Name, recordGen.GLibGetType); ok {
 		recordGen.Marshaler = true
-		writer.Header().AddMarshaler(gtype.GetType, recordGen.GoName)
+		gtype.AddToHeader(writer.Header(), recordGen.GoName)
 	}
 
 	writer.Pen().WriteTmpl(recordTmpl, &recordGen)
@@ -249,6 +253,10 @@ func (rg *RecordGenerator) Use(rec *gir.Record) bool {
 	rg.methods()
 	rg.getters()
 
+	if rg.IsRuntimeLinkMode() {
+		rg.hdr.ImportCore("girepository")
+	}
+
 	return true
 }
 
@@ -266,6 +274,11 @@ func (rg *RecordGenerator) UseConstructor(ctor *gir.Constructor) bool {
 	rg.Callable.Name = "New" + rg.GoName + rg.Callable.Name
 
 	return true
+}
+
+// Namespace returns the generator's namespace.
+func (rg *RecordGenerator) Namespace() *gir.Namespace {
+	return rg.gen.Namespace().Namespace
 }
 
 func (rg *RecordGenerator) methods() {
@@ -332,8 +345,8 @@ func (rg *RecordGenerator) getters() {
 			willDoConstructor = false
 			continue
 		}
-		// We can't generate bitfield accesses if we're in runtime mode.
-		if field.Bits > 0 && rg.gen.LinkMode() == types.RuntimeLinkMode {
+		// We can't generate bitfield accesses.
+		if field.Bits > 0 {
 			continue
 		}
 
@@ -369,7 +382,7 @@ func (rg *RecordGenerator) getters() {
 	}
 
 	converter := typeconv.NewConverter(rg.gen, &rg.typ, values)
-	converter.MustCast = rg.gen.LinkMode() == types.RuntimeLinkMode
+	// converter.MustCast = rg.gen.LinkMode() == types.RuntimeLinkMode
 	converter.UseLogger(rg)
 
 	for i := range values {
@@ -401,10 +414,9 @@ func (rg *RecordGenerator) getters() {
 		// Go type.
 
 		// Runtime-link mode assumes a hard-coded valptr name.
-		if rg.gen.LinkMode() == types.RuntimeLinkMode {
-			rg.hdr.ImportCore("girepository")
-			b.Linef("offset := girepository.MustFind(%q, %q).StructFieldOffset(%q)", rg.typ.Namespace.Name, rg.typ.Name(), fields[i])
-			b.Linef("valptr := (*uintptr)(unsafe.Add(%s.native, offset))", recv)
+		if rg.IsRuntimeLinkMode() {
+			b.Linef("offset := GIRInfo%s.StructFieldOffset(%q)", rg.GoName, fields[i])
+			b.Linef("valptr := (*%s)(unsafe.Add(%s.native, offset))", converted.Out.Type, recv)
 		} else {
 			b.Linef("valptr := &%s.native.%s", recv, strcases.CGoField(fields[i]))
 		}
@@ -469,27 +481,48 @@ func (rg *RecordGenerator) genManualConstructor() {
 	}
 
 	p := pen.NewBlockSections(512, 512)
-	p.Linef(1, "v := C.%s{", rg.CType)
-
-	for i, result := range results {
-		if result.Direction != typeconv.ConvertGoToC {
-			continue
-		}
-
+	results.EachGoToC(func(_ int, result typeconv.ValueConverted) {
 		p.Line(0, result.Out.Declare)
 		p.Line(0, result.Conversion)
-		p.Linef(1, "%s: %s,", rg.Fields[i].Name, result.OutName)
-	}
+	})
 
-	p.Linef(1, "}")
-	p.Linef(1, "")
+	var dst string
+	if rg.IsRuntimeLinkMode() {
+		rg.hdr.ImportCore("gextras")
+		rg.hdr.Import("unsafe")
+
+		p.Linef(1, "size := GIRInfo%s.StructSize()", rg.GoName)
+		p.Linef(1, "native := make([]byte, size)")
+		p.Linef(1, "gextras.Sink(&native[0])")
+		p.EmptyLine(1)
+
+		results.EachGoToC(func(i int, result typeconv.ValueConverted) {
+			field := rg.Fields[i]
+			p.Linef(1, "offset%d := GIRInfo%s.StructFieldOffset(%q)", i, rg.GoName, field.Name)
+			p.Linef(1, "valptr%d := (*%s)(unsafe.Add(unsafe.Pointer(&native[0]), offset%d))", i, result.Out.Type, i)
+			p.Linef(1, "*valptr%d = %s", i, result.Out.Name)
+			p.EmptyLine(1)
+		})
+
+		dst = "&native[0]"
+	} else {
+		p.Linef(1, "v := C.%s{", rg.CType)
+		results.EachGoToC(func(i int, result typeconv.ValueConverted) {
+			field := rg.Fields[i]
+			p.Linef(1, "%s: %s,", field.Name, result.OutName)
+		})
+		p.Linef(1, "}")
+		p.Linef(1, "")
+
+		dst = "&v"
+	}
 
 	rg.hdr.Import("unsafe")
 	rg.hdr.ImportCore("gextras")
 
 	// No finalizers needed, since the struct is completely allocated on the Go
 	// heap.
-	p.Linef(1, "return *(*%s)(gextras.NewStructNative(unsafe.Pointer(&v)))", rg.GoName)
+	p.Linef(1, "return *(*%s)(gextras.NewStructNative(unsafe.Pointer(%s)))", rg.GoName, dst)
 
 	rg.ManualConstructor = &RecordConstructor{
 		Fields: params.Join(),
@@ -530,6 +563,7 @@ func (rg *RecordGenerator) CGoPtrType() string {
 	case types.DynamicLinkMode:
 		return "*C." + rg.Record.CType
 	case types.RuntimeLinkMode:
+		rg.hdr.Import("unsafe")
 		return "unsafe.Pointer"
 	default:
 		panic("unreachable")
@@ -539,6 +573,10 @@ func (rg *RecordGenerator) CGoPtrType() string {
 func (rg *RecordGenerator) Logln(lvl logger.Level, v ...interface{}) {
 	p := fmt.Sprintf("record %s (C.%s):", rg.GoName, rg.Record.CType)
 	rg.gen.Logln(lvl, logger.Prefix(v, p)...)
+}
+
+func (rg *RecordGenerator) IsRuntimeLinkMode() bool {
+	return rg.gen.LinkMode() == types.RuntimeLinkMode
 }
 
 // GenerateCPrimitiveRecord generates C struct code with primitive C types.

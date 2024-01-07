@@ -4,29 +4,30 @@ package gdk
 
 import (
 	"fmt"
-	"runtime"
 	"strings"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
 import "C"
 
 // GType values.
 var (
-	GTypeAxisUse        = coreglib.Type(C.gdk_axis_use_get_type())
-	GTypeByteOrder      = coreglib.Type(C.gdk_byte_order_get_type())
-	GTypeGrabOwnership  = coreglib.Type(C.gdk_grab_ownership_get_type())
-	GTypeGrabStatus     = coreglib.Type(C.gdk_grab_status_get_type())
-	GTypeWindowTypeHint = coreglib.Type(C.gdk_window_type_hint_get_type())
-	GTypeEventMask      = coreglib.Type(C.gdk_event_mask_get_type())
-	GTypeModifierType   = coreglib.Type(C.gdk_modifier_type_get_type())
-	GTypeRectangle      = coreglib.Type(C.gdk_rectangle_get_type())
+	GTypeAxisUse        = coreglib.Type(girepository.MustFind("Gdk", "AxisUse").RegisteredGType())
+	GTypeByteOrder      = coreglib.Type(girepository.MustFind("Gdk", "ByteOrder").RegisteredGType())
+	GTypeGrabOwnership  = coreglib.Type(girepository.MustFind("Gdk", "GrabOwnership").RegisteredGType())
+	GTypeGrabStatus     = coreglib.Type(girepository.MustFind("Gdk", "GrabStatus").RegisteredGType())
+	GTypeWindowTypeHint = coreglib.Type(girepository.MustFind("Gdk", "WindowTypeHint").RegisteredGType())
+	GTypeEventMask      = coreglib.Type(girepository.MustFind("Gdk", "EventMask").RegisteredGType())
+	GTypeModifierType   = coreglib.Type(girepository.MustFind("Gdk", "ModifierType").RegisteredGType())
+	GTypeRectangle      = coreglib.Type(girepository.MustFind("Gdk", "Rectangle").RegisteredGType())
 )
 
 func init() {
@@ -682,8 +683,10 @@ type Point struct {
 
 // point is the struct that's finalized.
 type point struct {
-	native *C.GdkPoint
+	native unsafe.Pointer
 }
+
+var GIRInfoPoint = girepository.MustFind("Gdk", "Point")
 
 // NewPoint creates a new Point instance from the given
 // fields. Beware that this function allocates on the Go heap; be careful
@@ -694,17 +697,25 @@ func NewPoint(x, y int) Point {
 	var f1 C.gint // out
 	f1 = C.gint(y)
 
-	v := C.GdkPoint{
-		x: f0,
-		y: f1,
-	}
+	size := GIRInfoPoint.StructSize()
+	native := make([]byte, size)
+	gextras.Sink(&native[0])
 
-	return *(*Point)(gextras.NewStructNative(unsafe.Pointer(&v)))
+	offset0 := GIRInfoPoint.StructFieldOffset("x")
+	valptr0 := (*C.gint)(unsafe.Add(unsafe.Pointer(&native[0]), offset0))
+	*valptr0 = f0
+
+	offset1 := GIRInfoPoint.StructFieldOffset("y")
+	valptr1 := (*C.gint)(unsafe.Add(unsafe.Pointer(&native[0]), offset1))
+	*valptr1 = f1
+
+	return *(*Point)(gextras.NewStructNative(unsafe.Pointer(&native[0])))
 }
 
 // X: x coordinate of the point.
 func (p *Point) X() int {
-	valptr := &p.native.x
+	offset := GIRInfoPoint.StructFieldOffset("x")
+	valptr := (*int)(unsafe.Add(p.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
@@ -712,7 +723,8 @@ func (p *Point) X() int {
 
 // Y: y coordinate of the point.
 func (p *Point) Y() int {
-	valptr := &p.native.y
+	offset := GIRInfoPoint.StructFieldOffset("y")
+	valptr := (*int)(unsafe.Add(p.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
@@ -720,13 +732,15 @@ func (p *Point) Y() int {
 
 // X: x coordinate of the point.
 func (p *Point) SetX(x int) {
-	valptr := &p.native.x
+	offset := GIRInfoPoint.StructFieldOffset("x")
+	valptr := (*C.gint)(unsafe.Add(p.native, offset))
 	*valptr = C.gint(x)
 }
 
 // Y: y coordinate of the point.
 func (p *Point) SetY(y int) {
-	valptr := &p.native.y
+	offset := GIRInfoPoint.StructFieldOffset("y")
+	valptr := (*C.gint)(unsafe.Add(p.native, offset))
 	*valptr = C.gint(y)
 }
 
@@ -740,12 +754,14 @@ type Rectangle struct {
 
 // rectangle is the struct that's finalized.
 type rectangle struct {
-	native *C.GdkRectangle
+	native unsafe.Pointer
 }
+
+var GIRInfoRectangle = girepository.MustFind("Gdk", "Rectangle")
 
 func marshalRectangle(p uintptr) (interface{}, error) {
 	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
-	return &Rectangle{&rectangle{(*C.GdkRectangle)(b)}}, nil
+	return &Rectangle{&rectangle{(unsafe.Pointer)(b)}}, nil
 }
 
 // NewRectangle creates a new Rectangle instance from the given
@@ -761,165 +777,81 @@ func NewRectangle(x, y, width, height int) Rectangle {
 	var f3 C.int // out
 	f3 = C.int(height)
 
-	v := C.GdkRectangle{
-		x:      f0,
-		y:      f1,
-		width:  f2,
-		height: f3,
-	}
+	size := GIRInfoRectangle.StructSize()
+	native := make([]byte, size)
+	gextras.Sink(&native[0])
 
-	return *(*Rectangle)(gextras.NewStructNative(unsafe.Pointer(&v)))
+	offset0 := GIRInfoRectangle.StructFieldOffset("x")
+	valptr0 := (*C.int)(unsafe.Add(unsafe.Pointer(&native[0]), offset0))
+	*valptr0 = f0
+
+	offset1 := GIRInfoRectangle.StructFieldOffset("y")
+	valptr1 := (*C.int)(unsafe.Add(unsafe.Pointer(&native[0]), offset1))
+	*valptr1 = f1
+
+	offset2 := GIRInfoRectangle.StructFieldOffset("width")
+	valptr2 := (*C.int)(unsafe.Add(unsafe.Pointer(&native[0]), offset2))
+	*valptr2 = f2
+
+	offset3 := GIRInfoRectangle.StructFieldOffset("height")
+	valptr3 := (*C.int)(unsafe.Add(unsafe.Pointer(&native[0]), offset3))
+	*valptr3 = f3
+
+	return *(*Rectangle)(gextras.NewStructNative(unsafe.Pointer(&native[0])))
 }
 
 func (r *Rectangle) X() int {
-	valptr := &r.native.x
+	offset := GIRInfoRectangle.StructFieldOffset("x")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
 }
 
 func (r *Rectangle) Y() int {
-	valptr := &r.native.y
+	offset := GIRInfoRectangle.StructFieldOffset("y")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
 }
 
 func (r *Rectangle) Width() int {
-	valptr := &r.native.width
+	offset := GIRInfoRectangle.StructFieldOffset("width")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
 }
 
 func (r *Rectangle) Height() int {
-	valptr := &r.native.height
+	offset := GIRInfoRectangle.StructFieldOffset("height")
+	valptr := (*int)(unsafe.Add(r.native, offset))
 	var _v int // out
 	_v = int(*valptr)
 	return _v
 }
 
 func (r *Rectangle) SetX(x int) {
-	valptr := &r.native.x
+	offset := GIRInfoRectangle.StructFieldOffset("x")
+	valptr := (*C.int)(unsafe.Add(r.native, offset))
 	*valptr = C.int(x)
 }
 
 func (r *Rectangle) SetY(y int) {
-	valptr := &r.native.y
+	offset := GIRInfoRectangle.StructFieldOffset("y")
+	valptr := (*C.int)(unsafe.Add(r.native, offset))
 	*valptr = C.int(y)
 }
 
 func (r *Rectangle) SetWidth(width int) {
-	valptr := &r.native.width
+	offset := GIRInfoRectangle.StructFieldOffset("width")
+	valptr := (*C.int)(unsafe.Add(r.native, offset))
 	*valptr = C.int(width)
 }
 
 func (r *Rectangle) SetHeight(height int) {
-	valptr := &r.native.height
+	offset := GIRInfoRectangle.StructFieldOffset("height")
+	valptr := (*C.int)(unsafe.Add(r.native, offset))
 	*valptr = C.int(height)
-}
-
-// Equal checks if the two given rectangles are equal.
-//
-// The function takes the following parameters:
-//
-//    - rect2: Rectangle.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the rectangles are equal.
-//
-func (rect1 *Rectangle) Equal(rect2 *Rectangle) bool {
-	var _arg0 *C.GdkRectangle // out
-	var _arg1 *C.GdkRectangle // out
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(rect1)))
-	_arg1 = (*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(rect2)))
-
-	_cret = C.gdk_rectangle_equal(_arg0, _arg1)
-	runtime.KeepAlive(rect1)
-	runtime.KeepAlive(rect2)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// Intersect calculates the intersection of two rectangles. It is allowed for
-// dest to be the same as either src1 or src2. If the rectangles do not
-// intersect, dest’s width and height is set to 0 and its x and y values are
-// undefined. If you are only interested in whether the rectangles intersect,
-// but not in the intersecting area itself, pass NULL for dest.
-//
-// The function takes the following parameters:
-//
-//    - src2: Rectangle.
-//
-// The function returns the following values:
-//
-//    - dest (optional): return location for the intersection of src1 and src2,
-//      or NULL.
-//    - ok: TRUE if the rectangles intersect.
-//
-func (src1 *Rectangle) Intersect(src2 *Rectangle) (*Rectangle, bool) {
-	var _arg0 *C.GdkRectangle // out
-	var _arg1 *C.GdkRectangle // out
-	var _arg2 C.GdkRectangle  // in
-	var _cret C.gboolean      // in
-
-	_arg0 = (*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(src1)))
-	_arg1 = (*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(src2)))
-
-	_cret = C.gdk_rectangle_intersect(_arg0, _arg1, &_arg2)
-	runtime.KeepAlive(src1)
-	runtime.KeepAlive(src2)
-
-	var _dest *Rectangle // out
-	var _ok bool         // out
-
-	_dest = (*Rectangle)(gextras.NewStructNative(unsafe.Pointer((&_arg2))))
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _dest, _ok
-}
-
-// Union calculates the union of two rectangles. The union of rectangles src1
-// and src2 is the smallest rectangle which includes both src1 and src2 within
-// it. It is allowed for dest to be the same as either src1 or src2.
-//
-// Note that this function does not ignore 'empty' rectangles (ie. with zero
-// width or height).
-//
-// The function takes the following parameters:
-//
-//    - src2: Rectangle.
-//
-// The function returns the following values:
-//
-//    - dest: return location for the union of src1 and src2.
-//
-func (src1 *Rectangle) Union(src2 *Rectangle) *Rectangle {
-	var _arg0 *C.GdkRectangle // out
-	var _arg1 *C.GdkRectangle // out
-	var _arg2 C.GdkRectangle  // in
-
-	_arg0 = (*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(src1)))
-	_arg1 = (*C.GdkRectangle)(gextras.StructNative(unsafe.Pointer(src2)))
-
-	C.gdk_rectangle_union(_arg0, _arg1, &_arg2)
-	runtime.KeepAlive(src1)
-	runtime.KeepAlive(src2)
-
-	var _dest *Rectangle // out
-
-	_dest = (*Rectangle)(gextras.NewStructNative(unsafe.Pointer((&_arg2))))
-
-	return _dest
 }

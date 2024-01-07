@@ -10,12 +10,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_TreeIterCompareFunc
-func _gotk4_gtk4_TreeIterCompareFunc(arg1 *C.GtkTreeModel, arg2 *C.GtkTreeIter, arg3 *C.GtkTreeIter, arg4 C.gpointer) (cret C.int) {
+func _gotk4_gtk4_TreeIterCompareFunc(arg1 *C.void, arg2 *C.void, arg3 *C.void, arg4 C.gpointer) (cret C.int) {
 	var fn TreeIterCompareFunc
 	{
 		v := gbox.Get(uintptr(arg4))

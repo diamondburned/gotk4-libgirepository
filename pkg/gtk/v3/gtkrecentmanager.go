@@ -4,12 +4,14 @@ package gtk
 
 import (
 	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // RecentData: meta-data to be passed to gtk_recent_manager_add_full() when
@@ -22,13 +24,16 @@ type RecentData struct {
 
 // recentData is the struct that's finalized.
 type recentData struct {
-	native *C.GtkRecentData
+	native unsafe.Pointer
 }
+
+var GIRInfoRecentData = girepository.MustFind("Gtk", "RecentData")
 
 // DisplayName: UTF-8 encoded string, containing the name of the recently used
 // resource to be displayed, or NULL;.
 func (r *RecentData) DisplayName() string {
-	valptr := &r.native.display_name
+	offset := GIRInfoRecentData.StructFieldOffset("display_name")
+	valptr := (*string)(unsafe.Add(r.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -37,7 +42,8 @@ func (r *RecentData) DisplayName() string {
 // Description: UTF-8 encoded string, containing a short description of the
 // resource, or NULL;.
 func (r *RecentData) Description() string {
-	valptr := &r.native.description
+	offset := GIRInfoRecentData.StructFieldOffset("description")
+	valptr := (*string)(unsafe.Add(r.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -45,7 +51,8 @@ func (r *RecentData) Description() string {
 
 // MIMEType: MIME type of the resource;.
 func (r *RecentData) MIMEType() string {
-	valptr := &r.native.mime_type
+	offset := GIRInfoRecentData.StructFieldOffset("mime_type")
+	valptr := (*string)(unsafe.Add(r.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -54,7 +61,8 @@ func (r *RecentData) MIMEType() string {
 // AppName: name of the application that is registering this recently used
 // resource;.
 func (r *RecentData) AppName() string {
-	valptr := &r.native.app_name
+	offset := GIRInfoRecentData.StructFieldOffset("app_name")
+	valptr := (*string)(unsafe.Add(r.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -64,7 +72,8 @@ func (r *RecentData) AppName() string {
 // “\u” escape characters which will be expanded to the resource file path and
 // URI respectively when the command line is retrieved;.
 func (r *RecentData) AppExec() string {
-	valptr := &r.native.app_exec
+	offset := GIRInfoRecentData.StructFieldOffset("app_exec")
+	valptr := (*string)(unsafe.Add(r.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -72,7 +81,8 @@ func (r *RecentData) AppExec() string {
 
 // Groups: vector of strings containing groups names;.
 func (r *RecentData) Groups() []string {
-	valptr := &r.native.groups
+	offset := GIRInfoRecentData.StructFieldOffset("groups")
+	valptr := (*[]string)(unsafe.Add(r.native, offset))
 	var _v []string // out
 	{
 		var i int
@@ -93,7 +103,8 @@ func (r *RecentData) Groups() []string {
 // IsPrivate: whether this resource should be displayed only by the applications
 // that have registered it or not.
 func (r *RecentData) IsPrivate() bool {
-	valptr := &r.native.is_private
+	offset := GIRInfoRecentData.StructFieldOffset("is_private")
+	valptr := (*bool)(unsafe.Add(r.native, offset))
 	var _v bool // out
 	if *valptr != 0 {
 		_v = true
@@ -104,7 +115,8 @@ func (r *RecentData) IsPrivate() bool {
 // IsPrivate: whether this resource should be displayed only by the applications
 // that have registered it or not.
 func (r *RecentData) SetIsPrivate(isPrivate bool) {
-	valptr := &r.native.is_private
+	offset := GIRInfoRecentData.StructFieldOffset("is_private")
+	valptr := (*C.gboolean)(unsafe.Add(r.native, offset))
 	if isPrivate {
 		*valptr = C.TRUE
 	}

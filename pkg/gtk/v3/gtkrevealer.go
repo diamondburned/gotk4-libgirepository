@@ -4,25 +4,24 @@ package gtk
 
 import (
 	"fmt"
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeRevealerTransitionType = coreglib.Type(C.gtk_revealer_transition_type_get_type())
-	GTypeRevealer               = coreglib.Type(C.gtk_revealer_get_type())
+	GTypeRevealerTransitionType = coreglib.Type(girepository.MustFind("Gtk", "RevealerTransitionType").RegisteredGType())
+	GTypeRevealer               = coreglib.Type(girepository.MustFind("Gtk", "Revealer").RegisteredGType())
 )
 
 func init() {
@@ -147,184 +146,6 @@ func marshalRevealer(p uintptr) (interface{}, error) {
 	return wrapRevealer(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewRevealer creates a new Revealer.
-//
-// The function returns the following values:
-//
-//    - revealer: newly created Revealer.
-//
-func NewRevealer() *Revealer {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_revealer_new()
-
-	var _revealer *Revealer // out
-
-	_revealer = wrapRevealer(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _revealer
-}
-
-// ChildRevealed returns whether the child is fully revealed, in other words
-// whether the transition to the revealed state is completed.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the child is fully revealed.
-//
-func (revealer *Revealer) ChildRevealed() bool {
-	var _arg0 *C.GtkRevealer // out
-	var _cret C.gboolean     // in
-
-	_arg0 = (*C.GtkRevealer)(unsafe.Pointer(coreglib.InternObject(revealer).Native()))
-
-	_cret = C.gtk_revealer_get_child_revealed(_arg0)
-	runtime.KeepAlive(revealer)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// RevealChild returns whether the child is currently revealed. See
-// gtk_revealer_set_reveal_child().
-//
-// This function returns TRUE as soon as the transition is to the revealed state
-// is started. To learn whether the child is fully revealed (ie the transition
-// is completed), use gtk_revealer_get_child_revealed().
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the child is revealed.
-//
-func (revealer *Revealer) RevealChild() bool {
-	var _arg0 *C.GtkRevealer // out
-	var _cret C.gboolean     // in
-
-	_arg0 = (*C.GtkRevealer)(unsafe.Pointer(coreglib.InternObject(revealer).Native()))
-
-	_cret = C.gtk_revealer_get_reveal_child(_arg0)
-	runtime.KeepAlive(revealer)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// TransitionDuration returns the amount of time (in milliseconds) that
-// transitions will take.
-//
-// The function returns the following values:
-//
-//    - guint: transition duration.
-//
-func (revealer *Revealer) TransitionDuration() uint {
-	var _arg0 *C.GtkRevealer // out
-	var _cret C.guint        // in
-
-	_arg0 = (*C.GtkRevealer)(unsafe.Pointer(coreglib.InternObject(revealer).Native()))
-
-	_cret = C.gtk_revealer_get_transition_duration(_arg0)
-	runtime.KeepAlive(revealer)
-
-	var _guint uint // out
-
-	_guint = uint(_cret)
-
-	return _guint
-}
-
-// TransitionType gets the type of animation that will be used for transitions
-// in revealer.
-//
-// The function returns the following values:
-//
-//    - revealerTransitionType: current transition type of revealer.
-//
-func (revealer *Revealer) TransitionType() RevealerTransitionType {
-	var _arg0 *C.GtkRevealer              // out
-	var _cret C.GtkRevealerTransitionType // in
-
-	_arg0 = (*C.GtkRevealer)(unsafe.Pointer(coreglib.InternObject(revealer).Native()))
-
-	_cret = C.gtk_revealer_get_transition_type(_arg0)
-	runtime.KeepAlive(revealer)
-
-	var _revealerTransitionType RevealerTransitionType // out
-
-	_revealerTransitionType = RevealerTransitionType(_cret)
-
-	return _revealerTransitionType
-}
-
-// SetRevealChild tells the Revealer to reveal or conceal its child.
-//
-// The transition will be animated with the current transition type of revealer.
-//
-// The function takes the following parameters:
-//
-//    - revealChild: TRUE to reveal the child.
-//
-func (revealer *Revealer) SetRevealChild(revealChild bool) {
-	var _arg0 *C.GtkRevealer // out
-	var _arg1 C.gboolean     // out
-
-	_arg0 = (*C.GtkRevealer)(unsafe.Pointer(coreglib.InternObject(revealer).Native()))
-	if revealChild {
-		_arg1 = C.TRUE
-	}
-
-	C.gtk_revealer_set_reveal_child(_arg0, _arg1)
-	runtime.KeepAlive(revealer)
-	runtime.KeepAlive(revealChild)
-}
-
-// SetTransitionDuration sets the duration that transitions will take.
-//
-// The function takes the following parameters:
-//
-//    - duration: new duration, in milliseconds.
-//
-func (revealer *Revealer) SetTransitionDuration(duration uint) {
-	var _arg0 *C.GtkRevealer // out
-	var _arg1 C.guint        // out
-
-	_arg0 = (*C.GtkRevealer)(unsafe.Pointer(coreglib.InternObject(revealer).Native()))
-	_arg1 = C.guint(duration)
-
-	C.gtk_revealer_set_transition_duration(_arg0, _arg1)
-	runtime.KeepAlive(revealer)
-	runtime.KeepAlive(duration)
-}
-
-// SetTransitionType sets the type of animation that will be used for
-// transitions in revealer. Available types include various kinds of fades and
-// slides.
-//
-// The function takes the following parameters:
-//
-//    - transition: new transition type.
-//
-func (revealer *Revealer) SetTransitionType(transition RevealerTransitionType) {
-	var _arg0 *C.GtkRevealer              // out
-	var _arg1 C.GtkRevealerTransitionType // out
-
-	_arg0 = (*C.GtkRevealer)(unsafe.Pointer(coreglib.InternObject(revealer).Native()))
-	_arg1 = C.GtkRevealerTransitionType(transition)
-
-	C.gtk_revealer_set_transition_type(_arg0, _arg1)
-	runtime.KeepAlive(revealer)
-	runtime.KeepAlive(transition)
-}
-
 // RevealerClass: instance of this type is always passed by reference.
 type RevealerClass struct {
 	*revealerClass
@@ -332,13 +153,7 @@ type RevealerClass struct {
 
 // revealerClass is the struct that's finalized.
 type revealerClass struct {
-	native *C.GtkRevealerClass
+	native unsafe.Pointer
 }
 
-// ParentClass: parent class.
-func (r *RevealerClass) ParentClass() *BinClass {
-	valptr := &r.native.parent_class
-	var _v *BinClass // out
-	_v = (*BinClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoRevealerClass = girepository.MustFind("Gtk", "RevealerClass")

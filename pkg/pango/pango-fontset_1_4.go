@@ -4,8 +4,10 @@ package pango
 
 import ()
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <pango/pango.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // FontsetForEachFunc: callback used by pango_fontset_foreach() when enumerating

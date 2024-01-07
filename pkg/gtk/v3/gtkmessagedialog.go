@@ -9,14 +9,14 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 // GtkWidget* _gotk4_gtk_message_dialog_new2(GtkWindow* parent, GtkDialogFlags flags, GtkMessageType type, GtkButtonsType buttons) {
 // 	return gtk_message_dialog_new_with_markup(parent, flags, type, buttons, NULL);
 // }
@@ -24,8 +24,8 @@ import "C"
 
 // GType values.
 var (
-	GTypeButtonsType   = coreglib.Type(C.gtk_buttons_type_get_type())
-	GTypeMessageDialog = coreglib.Type(C.gtk_message_dialog_get_type())
+	GTypeButtonsType   = coreglib.Type(girepository.MustFind("Gtk", "ButtonsType").RegisteredGType())
+	GTypeMessageDialog = coreglib.Type(girepository.MustFind("Gtk", "MessageDialog").RegisteredGType())
 )
 
 func init() {
@@ -181,128 +181,6 @@ func marshalMessageDialog(p uintptr) (interface{}, error) {
 	return wrapMessageDialog(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Image gets the dialog’s image.
-//
-// Deprecated: Use Dialog for dialogs with images.
-//
-// The function returns the following values:
-//
-//    - widget dialog’s image.
-//
-func (dialog *MessageDialog) Image() Widgetter {
-	var _arg0 *C.GtkMessageDialog // out
-	var _cret *C.GtkWidget        // in
-
-	_arg0 = (*C.GtkMessageDialog)(unsafe.Pointer(coreglib.InternObject(dialog).Native()))
-
-	_cret = C.gtk_message_dialog_get_image(_arg0)
-	runtime.KeepAlive(dialog)
-
-	var _widget Widgetter // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gtk.Widgetter is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Widgetter)
-			return ok
-		})
-		rv, ok := casted.(Widgetter)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-		}
-		_widget = rv
-	}
-
-	return _widget
-}
-
-// MessageArea returns the message area of the dialog. This is the box where the
-// dialog’s primary and secondary labels are packed. You can add your own extra
-// content to that box and it will appear below those labels. See
-// gtk_dialog_get_content_area() for the corresponding function in the parent
-// Dialog.
-//
-// The function returns the following values:
-//
-//    - widget corresponding to the “message area” in the message_dialog.
-//
-func (messageDialog *MessageDialog) MessageArea() Widgetter {
-	var _arg0 *C.GtkMessageDialog // out
-	var _cret *C.GtkWidget        // in
-
-	_arg0 = (*C.GtkMessageDialog)(unsafe.Pointer(coreglib.InternObject(messageDialog).Native()))
-
-	_cret = C.gtk_message_dialog_get_message_area(_arg0)
-	runtime.KeepAlive(messageDialog)
-
-	var _widget Widgetter // out
-
-	{
-		objptr := unsafe.Pointer(_cret)
-		if objptr == nil {
-			panic("object of type gtk.Widgetter is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Widgetter)
-			return ok
-		})
-		rv, ok := casted.(Widgetter)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gtk.Widgetter")
-		}
-		_widget = rv
-	}
-
-	return _widget
-}
-
-// SetImage sets the dialog’s image to image.
-//
-// Deprecated: Use Dialog to create dialogs with images.
-//
-// The function takes the following parameters:
-//
-//    - image: image.
-//
-func (dialog *MessageDialog) SetImage(image Widgetter) {
-	var _arg0 *C.GtkMessageDialog // out
-	var _arg1 *C.GtkWidget        // out
-
-	_arg0 = (*C.GtkMessageDialog)(unsafe.Pointer(coreglib.InternObject(dialog).Native()))
-	_arg1 = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(image).Native()))
-
-	C.gtk_message_dialog_set_image(_arg0, _arg1)
-	runtime.KeepAlive(dialog)
-	runtime.KeepAlive(image)
-}
-
-// SetMarkup sets the text of the message dialog to be str, which is marked up
-// with the [Pango text markup language][PangoMarkupFormat].
-//
-// The function takes the following parameters:
-//
-//    - str: markup string (see [Pango markup format][PangoMarkupFormat]).
-//
-func (messageDialog *MessageDialog) SetMarkup(str string) {
-	var _arg0 *C.GtkMessageDialog // out
-	var _arg1 *C.gchar            // out
-
-	_arg0 = (*C.GtkMessageDialog)(unsafe.Pointer(coreglib.InternObject(messageDialog).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(str)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_message_dialog_set_markup(_arg0, _arg1)
-	runtime.KeepAlive(messageDialog)
-	runtime.KeepAlive(str)
-}
-
 // MessageDialogClass: instance of this type is always passed by reference.
 type MessageDialogClass struct {
 	*messageDialogClass
@@ -310,15 +188,10 @@ type MessageDialogClass struct {
 
 // messageDialogClass is the struct that's finalized.
 type messageDialogClass struct {
-	native *C.GtkMessageDialogClass
+	native unsafe.Pointer
 }
 
-func (m *MessageDialogClass) ParentClass() *DialogClass {
-	valptr := &m.native.parent_class
-	var _v *DialogClass // out
-	_v = (*DialogClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoMessageDialogClass = girepository.MustFind("Gtk", "MessageDialogClass")
 
 // NewMessageDialog creates a new message dialog. This is a simple
 // dialog with some text taht the user may want to see. When the user

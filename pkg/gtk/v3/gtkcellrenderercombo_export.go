@@ -9,14 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk3_CellRendererCombo_ConnectChanged
-func _gotk4_gtk3_CellRendererCombo_ConnectChanged(arg0 C.gpointer, arg1 *C.gchar, arg2 *C.GtkTreeIter, arg3 C.guintptr) {
+func _gotk4_gtk3_CellRendererCombo_ConnectChanged(arg0 C.gpointer, arg1 *C.gchar, arg2 *C.void, arg3 C.guintptr) {
 	var f func(pathString string, newIter *TreeIter)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg3))

@@ -8,34 +8,32 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/diamondburned/gotk4/pkg/cairo"
-	"github.com/diamondburned/gotk4/pkg/core/gbox"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gdk/gdk.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// extern void callbackDelete(gpointer);
-// extern void _gotk4_gdk3_EventFunc(GdkEvent*, gpointer);
 import "C"
 
 // GType values.
 var (
-	GTypeCrossingMode         = coreglib.Type(C.gdk_crossing_mode_get_type())
-	GTypeEventType            = coreglib.Type(C.gdk_event_type_get_type())
-	GTypeFilterReturn         = coreglib.Type(C.gdk_filter_return_get_type())
-	GTypeNotifyType           = coreglib.Type(C.gdk_notify_type_get_type())
-	GTypeOwnerChange          = coreglib.Type(C.gdk_owner_change_get_type())
-	GTypePropertyState        = coreglib.Type(C.gdk_property_state_get_type())
-	GTypeScrollDirection      = coreglib.Type(C.gdk_scroll_direction_get_type())
-	GTypeSettingAction        = coreglib.Type(C.gdk_setting_action_get_type())
-	GTypeTouchpadGesturePhase = coreglib.Type(C.gdk_touchpad_gesture_phase_get_type())
-	GTypeVisibilityState      = coreglib.Type(C.gdk_visibility_state_get_type())
-	GTypeWindowState          = coreglib.Type(C.gdk_window_state_get_type())
-	GTypeEventSequence        = coreglib.Type(C.gdk_event_sequence_get_type())
-	GTypeEvent                = coreglib.Type(C.gdk_event_get_type())
+	GTypeCrossingMode         = coreglib.Type(girepository.MustFind("Gdk", "CrossingMode").RegisteredGType())
+	GTypeEventType            = coreglib.Type(girepository.MustFind("Gdk", "EventType").RegisteredGType())
+	GTypeFilterReturn         = coreglib.Type(girepository.MustFind("Gdk", "FilterReturn").RegisteredGType())
+	GTypeNotifyType           = coreglib.Type(girepository.MustFind("Gdk", "NotifyType").RegisteredGType())
+	GTypeOwnerChange          = coreglib.Type(girepository.MustFind("Gdk", "OwnerChange").RegisteredGType())
+	GTypePropertyState        = coreglib.Type(girepository.MustFind("Gdk", "PropertyState").RegisteredGType())
+	GTypeScrollDirection      = coreglib.Type(girepository.MustFind("Gdk", "ScrollDirection").RegisteredGType())
+	GTypeSettingAction        = coreglib.Type(girepository.MustFind("Gdk", "SettingAction").RegisteredGType())
+	GTypeTouchpadGesturePhase = coreglib.Type(girepository.MustFind("Gdk", "TouchpadGesturePhase").RegisteredGType())
+	GTypeVisibilityState      = coreglib.Type(girepository.MustFind("Gdk", "VisibilityState").RegisteredGType())
+	GTypeWindowState          = coreglib.Type(girepository.MustFind("Gdk", "WindowState").RegisteredGType())
+	GTypeEventSequence        = coreglib.Type(girepository.MustFind("Gdk", "EventSequence").RegisteredGType())
+	GTypeEvent                = coreglib.Type(girepository.MustFind("Gdk", "Event").RegisteredGType())
 )
 
 func init() {
@@ -785,100 +783,6 @@ func (w WindowState) Has(other WindowState) bool {
 // handle all GDK events.
 type EventFunc func(event *Event)
 
-// EventsPending checks if any events are ready to be processed for any display.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if any events are pending.
-//
-func EventsPending() bool {
-	var _cret C.gboolean // in
-
-	_cret = C.gdk_events_pending()
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// GetShowEvents gets whether event debugging output is enabled.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if event debugging output is enabled.
-//
-func GetShowEvents() bool {
-	var _cret C.gboolean // in
-
-	_cret = C.gdk_get_show_events()
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
-// SetShowEvents sets whether a trace of received events is output. Note that
-// GTK+ must be compiled with debugging (that is, configured using the
-// --enable-debug option) to use this option.
-//
-// The function takes the following parameters:
-//
-//    - showEvents: TRUE to output event debugging information.
-//
-func SetShowEvents(showEvents bool) {
-	var _arg1 C.gboolean // out
-
-	if showEvents {
-		_arg1 = C.TRUE
-	}
-
-	C.gdk_set_show_events(_arg1)
-	runtime.KeepAlive(showEvents)
-}
-
-// SettingGet obtains a desktop-wide setting, such as the double-click time, for
-// the default screen. See gdk_screen_get_setting().
-//
-// The function takes the following parameters:
-//
-//    - name of the setting.
-//    - value: location to store the value of the setting.
-//
-// The function returns the following values:
-//
-//    - ok: TRUE if the setting existed and a value was stored in value, FALSE
-//      otherwise.
-//
-func SettingGet(name string, value *coreglib.Value) bool {
-	var _arg1 *C.gchar   // out
-	var _arg2 *C.GValue  // out
-	var _cret C.gboolean // in
-
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-	_arg2 = (*C.GValue)(unsafe.Pointer(value.Native()))
-
-	_cret = C.gdk_setting_get(_arg1, _arg2)
-	runtime.KeepAlive(name)
-	runtime.KeepAlive(value)
-
-	var _ok bool // out
-
-	if _cret != 0 {
-		_ok = true
-	}
-
-	return _ok
-}
-
 // EventAny contains the fields which are common to all event structs. Any event
 // pointer can safely be cast to a pointer to a EventAny to access these fields.
 //
@@ -889,54 +793,10 @@ type EventAny struct {
 
 // eventAny is the struct that's finalized.
 type eventAny struct {
-	native *C.GdkEventAny
+	native unsafe.Pointer
 }
 
-// Type: type of the event.
-func (e *EventAny) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventAny) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventAny) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventAny) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
+var GIRInfoEventAny = girepository.MustFind("Gdk", "EventAny")
 
 // EventButton: used for button press and button release events. The type field
 // will be one of GDK_BUTTON_PRESS, GDK_2BUTTON_PRESS, GDK_3BUTTON_PRESS or
@@ -990,187 +850,10 @@ type EventButton struct {
 
 // eventButton is the struct that's finalized.
 type eventButton struct {
-	native *C.GdkEventButton
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_BUTTON_PRESS, GDK_2BUTTON_PRESS,
-// GDK_3BUTTON_PRESS or GDK_BUTTON_RELEASE).
-func (e *EventButton) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventButton) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventButton) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventButton) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventButton) X() float64 {
-	valptr := &e.native.x
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventButton) Y() float64 {
-	valptr := &e.native.y
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Axes: x, y translated to the axes of device, or NULL if device is the mouse.
-func (e *EventButton) Axes() *float64 {
-	valptr := &e.native.axes
-	var _v *float64 // out
-	_v = (*float64)(unsafe.Pointer(*valptr))
-	return _v
-}
-
-// State: bit-mask representing the state of the modifier keys (e.g. Control,
-// Shift and Alt) and the pointer buttons. See ModifierType.
-func (e *EventButton) State() ModifierType {
-	valptr := &e.native.state
-	var _v ModifierType // out
-	_v = ModifierType(*valptr)
-	return _v
-}
-
-// Button: button which was pressed or released, numbered from 1 to 5. Normally
-// button 1 is the left mouse button, 2 is the middle button, and 3 is the right
-// button. On 2-button mice, the middle button can often be simulated by
-// pressing both mouse buttons together.
-func (e *EventButton) Button() uint {
-	valptr := &e.native.button
-	var _v uint // out
-	_v = uint(*valptr)
-	return _v
-}
-
-// Device: master device that the event originated from. Use
-// gdk_event_get_source_device() to get the slave device.
-func (e *EventButton) Device() Devicer {
-	valptr := &e.native.device
-	var _v Devicer // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Devicer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Devicer)
-			return ok
-		})
-		rv, ok := casted.(Devicer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Devicer")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventButton) XRoot() float64 {
-	valptr := &e.native.x_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventButton) YRoot() float64 {
-	valptr := &e.native.y_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventButton) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventButton) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventButton) SetX(x float64) {
-	valptr := &e.native.x
-	*valptr = C.gdouble(x)
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventButton) SetY(y float64) {
-	valptr := &e.native.y
-	*valptr = C.gdouble(y)
-}
-
-// Button: button which was pressed or released, numbered from 1 to 5. Normally
-// button 1 is the left mouse button, 2 is the middle button, and 3 is the right
-// button. On 2-button mice, the middle button can often be simulated by
-// pressing both mouse buttons together.
-func (e *EventButton) SetButton(button uint) {
-	valptr := &e.native.button
-	*valptr = C.guint(button)
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventButton) SetXRoot(xRoot float64) {
-	valptr := &e.native.x_root
-	*valptr = C.gdouble(xRoot)
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventButton) SetYRoot(yRoot float64) {
-	valptr := &e.native.y_root
-	*valptr = C.gdouble(yRoot)
-}
+var GIRInfoEventButton = girepository.MustFind("Gdk", "EventButton")
 
 // EventConfigure: generated when a window size or position has changed.
 //
@@ -1181,110 +864,10 @@ type EventConfigure struct {
 
 // eventConfigure is the struct that's finalized.
 type eventConfigure struct {
-	native *C.GdkEventConfigure
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_CONFIGURE).
-func (e *EventConfigure) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventConfigure) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventConfigure) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// X: new x coordinate of the window, relative to its parent.
-func (e *EventConfigure) X() int {
-	valptr := &e.native.x
-	var _v int // out
-	_v = int(*valptr)
-	return _v
-}
-
-// Y: new y coordinate of the window, relative to its parent.
-func (e *EventConfigure) Y() int {
-	valptr := &e.native.y
-	var _v int // out
-	_v = int(*valptr)
-	return _v
-}
-
-// Width: new width of the window.
-func (e *EventConfigure) Width() int {
-	valptr := &e.native.width
-	var _v int // out
-	_v = int(*valptr)
-	return _v
-}
-
-// Height: new height of the window.
-func (e *EventConfigure) Height() int {
-	valptr := &e.native.height
-	var _v int // out
-	_v = int(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventConfigure) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// X: new x coordinate of the window, relative to its parent.
-func (e *EventConfigure) SetX(x int) {
-	valptr := &e.native.x
-	*valptr = C.gint(x)
-}
-
-// Y: new y coordinate of the window, relative to its parent.
-func (e *EventConfigure) SetY(y int) {
-	valptr := &e.native.y
-	*valptr = C.gint(y)
-}
-
-// Width: new width of the window.
-func (e *EventConfigure) SetWidth(width int) {
-	valptr := &e.native.width
-	*valptr = C.gint(width)
-}
-
-// Height: new height of the window.
-func (e *EventConfigure) SetHeight(height int) {
-	valptr := &e.native.height
-	*valptr = C.gint(height)
-}
+var GIRInfoEventConfigure = girepository.MustFind("Gdk", "EventConfigure")
 
 // EventCrossing: generated when the pointer enters or leaves a window.
 //
@@ -1295,197 +878,10 @@ type EventCrossing struct {
 
 // eventCrossing is the struct that's finalized.
 type eventCrossing struct {
-	native *C.GdkEventCrossing
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_ENTER_NOTIFY or GDK_LEAVE_NOTIFY).
-func (e *EventCrossing) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventCrossing) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventCrossing) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Subwindow: window that was entered or left.
-func (e *EventCrossing) Subwindow() Windower {
-	valptr := &e.native.subwindow
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventCrossing) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventCrossing) X() float64 {
-	valptr := &e.native.x
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventCrossing) Y() float64 {
-	valptr := &e.native.y
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventCrossing) XRoot() float64 {
-	valptr := &e.native.x_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventCrossing) YRoot() float64 {
-	valptr := &e.native.y_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Mode: crossing mode (GDK_CROSSING_NORMAL, GDK_CROSSING_GRAB,
-// GDK_CROSSING_UNGRAB, GDK_CROSSING_GTK_GRAB, GDK_CROSSING_GTK_UNGRAB or
-// GDK_CROSSING_STATE_CHANGED). GDK_CROSSING_GTK_GRAB, GDK_CROSSING_GTK_UNGRAB,
-// and GDK_CROSSING_STATE_CHANGED were added in 2.14 and are always synthesized,
-// never native.
-func (e *EventCrossing) Mode() CrossingMode {
-	valptr := &e.native.mode
-	var _v CrossingMode // out
-	_v = CrossingMode(*valptr)
-	return _v
-}
-
-// Detail: kind of crossing that happened (GDK_NOTIFY_INFERIOR,
-// GDK_NOTIFY_ANCESTOR, GDK_NOTIFY_VIRTUAL, GDK_NOTIFY_NONLINEAR or
-// GDK_NOTIFY_NONLINEAR_VIRTUAL).
-func (e *EventCrossing) Detail() NotifyType {
-	valptr := &e.native.detail
-	var _v NotifyType // out
-	_v = NotifyType(*valptr)
-	return _v
-}
-
-// Focus: TRUE if window is the focus window or an inferior.
-func (e *EventCrossing) Focus() bool {
-	valptr := &e.native.focus
-	var _v bool // out
-	if *valptr != 0 {
-		_v = true
-	}
-	return _v
-}
-
-// State: bit-mask representing the state of the modifier keys (e.g. Control,
-// Shift and Alt) and the pointer buttons. See ModifierType.
-func (e *EventCrossing) State() ModifierType {
-	valptr := &e.native.state
-	var _v ModifierType // out
-	_v = ModifierType(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventCrossing) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventCrossing) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventCrossing) SetX(x float64) {
-	valptr := &e.native.x
-	*valptr = C.gdouble(x)
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventCrossing) SetY(y float64) {
-	valptr := &e.native.y
-	*valptr = C.gdouble(y)
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventCrossing) SetXRoot(xRoot float64) {
-	valptr := &e.native.x_root
-	*valptr = C.gdouble(xRoot)
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventCrossing) SetYRoot(yRoot float64) {
-	valptr := &e.native.y_root
-	*valptr = C.gdouble(yRoot)
-}
-
-// Focus: TRUE if window is the focus window or an inferior.
-func (e *EventCrossing) SetFocus(focus bool) {
-	valptr := &e.native.focus
-	if focus {
-		*valptr = C.TRUE
-	}
-}
+var GIRInfoEventCrossing = girepository.MustFind("Gdk", "EventCrossing")
 
 // EventDND: generated during DND operations.
 //
@@ -1496,109 +892,10 @@ type EventDND struct {
 
 // eventDND is the struct that's finalized.
 type eventDND struct {
-	native *C.GdkEventDND
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_DRAG_ENTER, GDK_DRAG_LEAVE, GDK_DRAG_MOTION,
-// GDK_DRAG_STATUS, GDK_DROP_START or GDK_DROP_FINISHED).
-func (e *EventDND) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventDND) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventDND) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Context for the current DND operation.
-func (e *EventDND) Context() *DragContext {
-	valptr := &e.native.context
-	var _v *DragContext // out
-	_v = wrapDragContext(coreglib.Take(unsafe.Pointer(*valptr)))
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventDND) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen, only
-// set for GDK_DRAG_MOTION and GDK_DROP_START.
-func (e *EventDND) XRoot() int16 {
-	valptr := &e.native.x_root
-	var _v int16 // out
-	_v = int16(*valptr)
-	return _v
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen, only
-// set for GDK_DRAG_MOTION and GDK_DROP_START.
-func (e *EventDND) YRoot() int16 {
-	valptr := &e.native.y_root
-	var _v int16 // out
-	_v = int16(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventDND) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventDND) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen, only
-// set for GDK_DRAG_MOTION and GDK_DROP_START.
-func (e *EventDND) SetXRoot(xRoot int16) {
-	valptr := &e.native.x_root
-	*valptr = C.gshort(xRoot)
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen, only
-// set for GDK_DRAG_MOTION and GDK_DROP_START.
-func (e *EventDND) SetYRoot(yRoot int16) {
-	valptr := &e.native.y_root
-	*valptr = C.gshort(yRoot)
-}
+var GIRInfoEventDND = girepository.MustFind("Gdk", "EventDND")
 
 // EventExpose: generated when all or part of a window becomes visible and needs
 // to be redrawn.
@@ -1610,97 +907,10 @@ type EventExpose struct {
 
 // eventExpose is the struct that's finalized.
 type eventExpose struct {
-	native *C.GdkEventExpose
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_EXPOSE or GDK_DAMAGE).
-func (e *EventExpose) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventExpose) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventExpose) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Area: bounding box of region.
-func (e *EventExpose) Area() *Rectangle {
-	valptr := &e.native.area
-	var _v *Rectangle // out
-	_v = (*Rectangle)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
-
-// Region: region that needs to be redrawn.
-func (e *EventExpose) Region() *cairo.Region {
-	valptr := &e.native.region
-	var _v *cairo.Region // out
-	{
-		_pp := &struct{ p unsafe.Pointer }{unsafe.Pointer(*valptr)}
-		_v = (*cairo.Region)(unsafe.Pointer(_pp))
-	}
-	C.cairo_region_reference(*valptr)
-	runtime.SetFinalizer(_v, func(v *cairo.Region) {
-		C.cairo_region_destroy((*C.cairo_region_t)(unsafe.Pointer(v.Native())))
-	})
-	return _v
-}
-
-// Count: number of contiguous GDK_EXPOSE events following this one. The only
-// use for this is “exposure compression”, i.e. handling all contiguous
-// GDK_EXPOSE events in one go, though GDK performs some exposure compression so
-// this is not normally needed.
-func (e *EventExpose) Count() int {
-	valptr := &e.native.count
-	var _v int // out
-	_v = int(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventExpose) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Count: number of contiguous GDK_EXPOSE events following this one. The only
-// use for this is “exposure compression”, i.e. handling all contiguous
-// GDK_EXPOSE events in one go, though GDK performs some exposure compression so
-// this is not normally needed.
-func (e *EventExpose) SetCount(count int) {
-	valptr := &e.native.count
-	*valptr = C.gint(count)
-}
+var GIRInfoEventExpose = girepository.MustFind("Gdk", "EventExpose")
 
 // EventFocus describes a change of keyboard focus.
 //
@@ -1711,70 +921,10 @@ type EventFocus struct {
 
 // eventFocus is the struct that's finalized.
 type eventFocus struct {
-	native *C.GdkEventFocus
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_FOCUS_CHANGE).
-func (e *EventFocus) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventFocus) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventFocus) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// In: TRUE if the window has gained the keyboard focus, FALSE if it has lost
-// the focus.
-func (e *EventFocus) In() int16 {
-	valptr := &e.native.in
-	var _v int16 // out
-	_v = int16(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventFocus) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// In: TRUE if the window has gained the keyboard focus, FALSE if it has lost
-// the focus.
-func (e *EventFocus) SetIn(in int16) {
-	valptr := &e.native.in
-	*valptr = C.gint16(in)
-}
+var GIRInfoEventFocus = girepository.MustFind("Gdk", "EventFocus")
 
 // EventKey describes a key press or key release event.
 //
@@ -1785,151 +935,10 @@ type EventKey struct {
 
 // eventKey is the struct that's finalized.
 type eventKey struct {
-	native *C.GdkEventKey
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_KEY_PRESS or GDK_KEY_RELEASE).
-func (e *EventKey) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventKey) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventKey) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventKey) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// State: bit-mask representing the state of the modifier keys (e.g. Control,
-// Shift and Alt) and the pointer buttons. See ModifierType.
-func (e *EventKey) State() ModifierType {
-	valptr := &e.native.state
-	var _v ModifierType // out
-	_v = ModifierType(*valptr)
-	return _v
-}
-
-// Keyval: key that was pressed or released. See the gdk/gdkkeysyms.h header
-// file for a complete list of GDK key codes.
-func (e *EventKey) Keyval() uint {
-	valptr := &e.native.keyval
-	var _v uint // out
-	_v = uint(*valptr)
-	return _v
-}
-
-// Length: length of string.
-func (e *EventKey) Length() int {
-	valptr := &e.native.length
-	var _v int // out
-	_v = int(*valptr)
-	return _v
-}
-
-// String: string containing an approximation of the text that would result from
-// this keypress. The only correct way to handle text input of text is using
-// input methods (see IMContext), so this field is deprecated and should never
-// be used. (gdk_unicode_to_keyval() provides a non-deprecated way of getting an
-// approximate translation for a key.) The string is encoded in the encoding of
-// the current locale (Note: this for backwards compatibility: strings in GTK+
-// and GDK are typically in UTF-8.) and NUL-terminated. In some cases, the
-// translation of the key code will be a single NUL byte, in which case looking
-// at length is necessary to distinguish it from the an empty translation.
-func (e *EventKey) String() string {
-	valptr := &e.native.string
-	var _v string // out
-	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
-	return _v
-}
-
-// HardwareKeycode: raw code of the key that was pressed or released.
-func (e *EventKey) HardwareKeycode() uint16 {
-	valptr := &e.native.hardware_keycode
-	var _v uint16 // out
-	_v = uint16(*valptr)
-	return _v
-}
-
-// Group: keyboard group.
-func (e *EventKey) Group() byte {
-	valptr := &e.native.group
-	var _v byte // out
-	_v = byte(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventKey) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventKey) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// Keyval: key that was pressed or released. See the gdk/gdkkeysyms.h header
-// file for a complete list of GDK key codes.
-func (e *EventKey) SetKeyval(keyval uint) {
-	valptr := &e.native.keyval
-	*valptr = C.guint(keyval)
-}
-
-// Length: length of string.
-func (e *EventKey) SetLength(length int) {
-	valptr := &e.native.length
-	*valptr = C.gint(length)
-}
-
-// HardwareKeycode: raw code of the key that was pressed or released.
-func (e *EventKey) SetHardwareKeycode(hardwareKeycode uint16) {
-	valptr := &e.native.hardware_keycode
-	*valptr = C.guint16(hardwareKeycode)
-}
-
-// Group: keyboard group.
-func (e *EventKey) SetGroup(group byte) {
-	valptr := &e.native.group
-	*valptr = C.guint8(group)
-}
+var GIRInfoEventKey = girepository.MustFind("Gdk", "EventKey")
 
 // EventMotion: generated when the pointer moves.
 //
@@ -1940,182 +949,10 @@ type EventMotion struct {
 
 // eventMotion is the struct that's finalized.
 type eventMotion struct {
-	native *C.GdkEventMotion
+	native unsafe.Pointer
 }
 
-// Type: type of the event.
-func (e *EventMotion) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventMotion) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventMotion) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventMotion) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventMotion) X() float64 {
-	valptr := &e.native.x
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventMotion) Y() float64 {
-	valptr := &e.native.y
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Axes: x, y translated to the axes of device, or NULL if device is the mouse.
-func (e *EventMotion) Axes() *float64 {
-	valptr := &e.native.axes
-	var _v *float64 // out
-	_v = (*float64)(unsafe.Pointer(*valptr))
-	return _v
-}
-
-// State: bit-mask representing the state of the modifier keys (e.g. Control,
-// Shift and Alt) and the pointer buttons. See ModifierType.
-func (e *EventMotion) State() ModifierType {
-	valptr := &e.native.state
-	var _v ModifierType // out
-	_v = ModifierType(*valptr)
-	return _v
-}
-
-// IsHint: set to 1 if this event is just a hint, see the
-// GDK_POINTER_MOTION_HINT_MASK value of EventMask.
-func (e *EventMotion) IsHint() int16 {
-	valptr := &e.native.is_hint
-	var _v int16 // out
-	_v = int16(*valptr)
-	return _v
-}
-
-// Device: master device that the event originated from. Use
-// gdk_event_get_source_device() to get the slave device.
-func (e *EventMotion) Device() Devicer {
-	valptr := &e.native.device
-	var _v Devicer // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Devicer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Devicer)
-			return ok
-		})
-		rv, ok := casted.(Devicer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Devicer")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventMotion) XRoot() float64 {
-	valptr := &e.native.x_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventMotion) YRoot() float64 {
-	valptr := &e.native.y_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventMotion) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventMotion) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventMotion) SetX(x float64) {
-	valptr := &e.native.x
-	*valptr = C.gdouble(x)
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventMotion) SetY(y float64) {
-	valptr := &e.native.y
-	*valptr = C.gdouble(y)
-}
-
-// IsHint: set to 1 if this event is just a hint, see the
-// GDK_POINTER_MOTION_HINT_MASK value of EventMask.
-func (e *EventMotion) SetIsHint(isHint int16) {
-	valptr := &e.native.is_hint
-	*valptr = C.gint16(isHint)
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventMotion) SetXRoot(xRoot float64) {
-	valptr := &e.native.x_root
-	*valptr = C.gdouble(xRoot)
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventMotion) SetYRoot(yRoot float64) {
-	valptr := &e.native.y_root
-	*valptr = C.gdouble(yRoot)
-}
+var GIRInfoEventMotion = girepository.MustFind("Gdk", "EventMotion")
 
 // EventProperty describes a property change on a window.
 //
@@ -2126,8 +963,10 @@ type EventProperty struct {
 
 // eventProperty is the struct that's finalized.
 type eventProperty struct {
-	native *C.GdkEventProperty
+	native unsafe.Pointer
 }
+
+var GIRInfoEventProperty = girepository.MustFind("Gdk", "EventProperty")
 
 // EventProximity: proximity events are generated when using GDK’s wrapper for
 // the XInput extension. The XInput extension is an add-on for standard X that
@@ -2146,93 +985,10 @@ type EventProximity struct {
 
 // eventProximity is the struct that's finalized.
 type eventProximity struct {
-	native *C.GdkEventProximity
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_PROXIMITY_IN or GDK_PROXIMITY_OUT).
-func (e *EventProximity) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventProximity) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventProximity) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventProximity) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// Device: master device that the event originated from. Use
-// gdk_event_get_source_device() to get the slave device.
-func (e *EventProximity) Device() Devicer {
-	valptr := &e.native.device
-	var _v Devicer // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Devicer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Devicer)
-			return ok
-		})
-		rv, ok := casted.(Devicer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Devicer")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventProximity) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventProximity) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
+var GIRInfoEventProximity = girepository.MustFind("Gdk", "EventProximity")
 
 // EventScroll: generated from button presses for the buttons 4 to 7. Wheel mice
 // are usually configured to generate button press events for buttons 4 and 5
@@ -2249,195 +1005,10 @@ type EventScroll struct {
 
 // eventScroll is the struct that's finalized.
 type eventScroll struct {
-	native *C.GdkEventScroll
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_SCROLL).
-func (e *EventScroll) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventScroll) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventScroll) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventScroll) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventScroll) X() float64 {
-	valptr := &e.native.x
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventScroll) Y() float64 {
-	valptr := &e.native.y
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// State: bit-mask representing the state of the modifier keys (e.g. Control,
-// Shift and Alt) and the pointer buttons. See ModifierType.
-func (e *EventScroll) State() ModifierType {
-	valptr := &e.native.state
-	var _v ModifierType // out
-	_v = ModifierType(*valptr)
-	return _v
-}
-
-// Direction: direction to scroll to (one of GDK_SCROLL_UP, GDK_SCROLL_DOWN,
-// GDK_SCROLL_LEFT, GDK_SCROLL_RIGHT or GDK_SCROLL_SMOOTH).
-func (e *EventScroll) Direction() ScrollDirection {
-	valptr := &e.native.direction
-	var _v ScrollDirection // out
-	_v = ScrollDirection(*valptr)
-	return _v
-}
-
-// Device: master device that the event originated from. Use
-// gdk_event_get_source_device() to get the slave device.
-func (e *EventScroll) Device() Devicer {
-	valptr := &e.native.device
-	var _v Devicer // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Devicer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Devicer)
-			return ok
-		})
-		rv, ok := casted.(Devicer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Devicer")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventScroll) XRoot() float64 {
-	valptr := &e.native.x_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventScroll) YRoot() float64 {
-	valptr := &e.native.y_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// DeltaX: x coordinate of the scroll delta.
-func (e *EventScroll) DeltaX() float64 {
-	valptr := &e.native.delta_x
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// DeltaY: y coordinate of the scroll delta.
-func (e *EventScroll) DeltaY() float64 {
-	valptr := &e.native.delta_y
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventScroll) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventScroll) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventScroll) SetX(x float64) {
-	valptr := &e.native.x
-	*valptr = C.gdouble(x)
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventScroll) SetY(y float64) {
-	valptr := &e.native.y
-	*valptr = C.gdouble(y)
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventScroll) SetXRoot(xRoot float64) {
-	valptr := &e.native.x_root
-	*valptr = C.gdouble(xRoot)
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventScroll) SetYRoot(yRoot float64) {
-	valptr := &e.native.y_root
-	*valptr = C.gdouble(yRoot)
-}
-
-// DeltaX: x coordinate of the scroll delta.
-func (e *EventScroll) SetDeltaX(deltaX float64) {
-	valptr := &e.native.delta_x
-	*valptr = C.gdouble(deltaX)
-}
-
-// DeltaY: y coordinate of the scroll delta.
-func (e *EventScroll) SetDeltaY(deltaY float64) {
-	valptr := &e.native.delta_y
-	*valptr = C.gdouble(deltaY)
-}
+var GIRInfoEventScroll = girepository.MustFind("Gdk", "EventScroll")
 
 // EventSelection: generated when a selection is requested or ownership of a
 // selection is taken over by another client application.
@@ -2449,8 +1020,10 @@ type EventSelection struct {
 
 // eventSelection is the struct that's finalized.
 type eventSelection struct {
-	native *C.GdkEventSelection
+	native unsafe.Pointer
 }
+
+var GIRInfoEventSelection = girepository.MustFind("Gdk", "EventSelection")
 
 // EventSequence: instance of this type is always passed by reference.
 type EventSequence struct {
@@ -2459,12 +1032,14 @@ type EventSequence struct {
 
 // eventSequence is the struct that's finalized.
 type eventSequence struct {
-	native *C.GdkEventSequence
+	native unsafe.Pointer
 }
+
+var GIRInfoEventSequence = girepository.MustFind("Gdk", "EventSequence")
 
 func marshalEventSequence(p uintptr) (interface{}, error) {
 	b := coreglib.ValueFromNative(unsafe.Pointer(p)).Boxed()
-	return &EventSequence{&eventSequence{(*C.GdkEventSequence)(b)}}, nil
+	return &EventSequence{&eventSequence{(unsafe.Pointer)(b)}}, nil
 }
 
 // EventSetting: generated when a setting is modified.
@@ -2476,71 +1051,10 @@ type EventSetting struct {
 
 // eventSetting is the struct that's finalized.
 type eventSetting struct {
-	native *C.GdkEventSetting
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_SETTING).
-func (e *EventSetting) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventSetting) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventSetting) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Action: what happened to the setting (GDK_SETTING_ACTION_NEW,
-// GDK_SETTING_ACTION_CHANGED or GDK_SETTING_ACTION_DELETED).
-func (e *EventSetting) Action() SettingAction {
-	valptr := &e.native.action
-	var _v SettingAction // out
-	_v = SettingAction(*valptr)
-	return _v
-}
-
-// Name: name of the setting.
-func (e *EventSetting) Name() string {
-	valptr := &e.native.name
-	var _v string // out
-	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventSetting) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
+var GIRInfoEventSetting = girepository.MustFind("Gdk", "EventSetting")
 
 // EventTouch: used for touch events. type field will be one of GDK_TOUCH_BEGIN,
 // GDK_TOUCH_UPDATE, GDK_TOUCH_END or GDK_TOUCH_CANCEL.
@@ -2559,195 +1073,10 @@ type EventTouch struct {
 
 // eventTouch is the struct that's finalized.
 type eventTouch struct {
-	native *C.GdkEventTouch
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_TOUCH_BEGIN, GDK_TOUCH_UPDATE, GDK_TOUCH_END,
-// GDK_TOUCH_CANCEL).
-func (e *EventTouch) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventTouch) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventTouch) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventTouch) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventTouch) X() float64 {
-	valptr := &e.native.x
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventTouch) Y() float64 {
-	valptr := &e.native.y
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Axes: x, y translated to the axes of device, or NULL if device is the mouse.
-func (e *EventTouch) Axes() *float64 {
-	valptr := &e.native.axes
-	var _v *float64 // out
-	_v = (*float64)(unsafe.Pointer(*valptr))
-	return _v
-}
-
-// State: bit-mask representing the state of the modifier keys (e.g. Control,
-// Shift and Alt) and the pointer buttons. See ModifierType.
-func (e *EventTouch) State() ModifierType {
-	valptr := &e.native.state
-	var _v ModifierType // out
-	_v = ModifierType(*valptr)
-	return _v
-}
-
-// Sequence: event sequence that the event belongs to.
-func (e *EventTouch) Sequence() *EventSequence {
-	valptr := &e.native.sequence
-	var _v *EventSequence // out
-	_v = (*EventSequence)(gextras.NewStructNative(unsafe.Pointer(*valptr)))
-	return _v
-}
-
-// EmulatingPointer: whether the event should be used for emulating pointer
-// event.
-func (e *EventTouch) EmulatingPointer() bool {
-	valptr := &e.native.emulating_pointer
-	var _v bool // out
-	if *valptr != 0 {
-		_v = true
-	}
-	return _v
-}
-
-// Device: master device that the event originated from. Use
-// gdk_event_get_source_device() to get the slave device.
-func (e *EventTouch) Device() Devicer {
-	valptr := &e.native.device
-	var _v Devicer // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Devicer is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Devicer)
-			return ok
-		})
-		rv, ok := casted.(Devicer)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Devicer")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventTouch) XRoot() float64 {
-	valptr := &e.native.x_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventTouch) YRoot() float64 {
-	valptr := &e.native.y_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventTouch) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventTouch) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// X: x coordinate of the pointer relative to the window.
-func (e *EventTouch) SetX(x float64) {
-	valptr := &e.native.x
-	*valptr = C.gdouble(x)
-}
-
-// Y: y coordinate of the pointer relative to the window.
-func (e *EventTouch) SetY(y float64) {
-	valptr := &e.native.y
-	*valptr = C.gdouble(y)
-}
-
-// EmulatingPointer: whether the event should be used for emulating pointer
-// event.
-func (e *EventTouch) SetEmulatingPointer(emulatingPointer bool) {
-	valptr := &e.native.emulating_pointer
-	if emulatingPointer {
-		*valptr = C.TRUE
-	}
-}
-
-// XRoot: x coordinate of the pointer relative to the root of the screen.
-func (e *EventTouch) SetXRoot(xRoot float64) {
-	valptr := &e.native.x_root
-	*valptr = C.gdouble(xRoot)
-}
-
-// YRoot: y coordinate of the pointer relative to the root of the screen.
-func (e *EventTouch) SetYRoot(yRoot float64) {
-	valptr := &e.native.y_root
-	*valptr = C.gdouble(yRoot)
-}
+var GIRInfoEventTouch = girepository.MustFind("Gdk", "EventTouch")
 
 // EventTouchpadPinch: generated during touchpad swipe gestures.
 //
@@ -2758,221 +1087,10 @@ type EventTouchpadPinch struct {
 
 // eventTouchpadPinch is the struct that's finalized.
 type eventTouchpadPinch struct {
-	native *C.GdkEventTouchpadPinch
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_TOUCHPAD_PINCH).
-func (e *EventTouchpadPinch) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventTouchpadPinch) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventTouchpadPinch) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Phase: current phase of the gesture.
-func (e *EventTouchpadPinch) Phase() int8 {
-	valptr := &e.native.phase
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// NFingers: number of fingers triggering the pinch.
-func (e *EventTouchpadPinch) NFingers() int8 {
-	valptr := &e.native.n_fingers
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventTouchpadPinch) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// X coordinate of the pointer.
-func (e *EventTouchpadPinch) X() float64 {
-	valptr := &e.native.x
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Y coordinate of the pointer.
-func (e *EventTouchpadPinch) Y() float64 {
-	valptr := &e.native.y
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Dx: movement delta in the X axis of the swipe focal point.
-func (e *EventTouchpadPinch) Dx() float64 {
-	valptr := &e.native.dx
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Dy: movement delta in the Y axis of the swipe focal point.
-func (e *EventTouchpadPinch) Dy() float64 {
-	valptr := &e.native.dy
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// AngleDelta: angle change in radians, negative angles denote counter-clockwise
-// movements.
-func (e *EventTouchpadPinch) AngleDelta() float64 {
-	valptr := &e.native.angle_delta
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Scale: current scale, relative to that at the time of the corresponding
-// GDK_TOUCHPAD_GESTURE_PHASE_BEGIN event.
-func (e *EventTouchpadPinch) Scale() float64 {
-	valptr := &e.native.scale
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// XRoot: x coordinate of the pointer, relative to the root of the screen.
-func (e *EventTouchpadPinch) XRoot() float64 {
-	valptr := &e.native.x_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// YRoot: y coordinate of the pointer, relative to the root of the screen.
-func (e *EventTouchpadPinch) YRoot() float64 {
-	valptr := &e.native.y_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// State: bit-mask representing the state of the modifier keys (e.g. Control,
-// Shift and Alt) and the pointer buttons. See ModifierType.
-func (e *EventTouchpadPinch) State() ModifierType {
-	valptr := &e.native.state
-	var _v ModifierType // out
-	_v = ModifierType(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventTouchpadPinch) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Phase: current phase of the gesture.
-func (e *EventTouchpadPinch) SetPhase(phase int8) {
-	valptr := &e.native.phase
-	*valptr = C.gint8(phase)
-}
-
-// NFingers: number of fingers triggering the pinch.
-func (e *EventTouchpadPinch) SetNFingers(nFingers int8) {
-	valptr := &e.native.n_fingers
-	*valptr = C.gint8(nFingers)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventTouchpadPinch) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// X coordinate of the pointer.
-func (e *EventTouchpadPinch) SetX(x float64) {
-	valptr := &e.native.x
-	*valptr = C.gdouble(x)
-}
-
-// Y coordinate of the pointer.
-func (e *EventTouchpadPinch) SetY(y float64) {
-	valptr := &e.native.y
-	*valptr = C.gdouble(y)
-}
-
-// Dx: movement delta in the X axis of the swipe focal point.
-func (e *EventTouchpadPinch) SetDx(dx float64) {
-	valptr := &e.native.dx
-	*valptr = C.gdouble(dx)
-}
-
-// Dy: movement delta in the Y axis of the swipe focal point.
-func (e *EventTouchpadPinch) SetDy(dy float64) {
-	valptr := &e.native.dy
-	*valptr = C.gdouble(dy)
-}
-
-// AngleDelta: angle change in radians, negative angles denote counter-clockwise
-// movements.
-func (e *EventTouchpadPinch) SetAngleDelta(angleDelta float64) {
-	valptr := &e.native.angle_delta
-	*valptr = C.gdouble(angleDelta)
-}
-
-// Scale: current scale, relative to that at the time of the corresponding
-// GDK_TOUCHPAD_GESTURE_PHASE_BEGIN event.
-func (e *EventTouchpadPinch) SetScale(scale float64) {
-	valptr := &e.native.scale
-	*valptr = C.gdouble(scale)
-}
-
-// XRoot: x coordinate of the pointer, relative to the root of the screen.
-func (e *EventTouchpadPinch) SetXRoot(xRoot float64) {
-	valptr := &e.native.x_root
-	*valptr = C.gdouble(xRoot)
-}
-
-// YRoot: y coordinate of the pointer, relative to the root of the screen.
-func (e *EventTouchpadPinch) SetYRoot(yRoot float64) {
-	valptr := &e.native.y_root
-	*valptr = C.gdouble(yRoot)
-}
+var GIRInfoEventTouchpadPinch = girepository.MustFind("Gdk", "EventTouchpadPinch")
 
 // EventTouchpadSwipe: generated during touchpad swipe gestures.
 //
@@ -2983,189 +1101,10 @@ type EventTouchpadSwipe struct {
 
 // eventTouchpadSwipe is the struct that's finalized.
 type eventTouchpadSwipe struct {
-	native *C.GdkEventTouchpadSwipe
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_TOUCHPAD_SWIPE).
-func (e *EventTouchpadSwipe) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventTouchpadSwipe) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventTouchpadSwipe) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Phase: current phase of the gesture.
-func (e *EventTouchpadSwipe) Phase() int8 {
-	valptr := &e.native.phase
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// NFingers: number of fingers triggering the swipe.
-func (e *EventTouchpadSwipe) NFingers() int8 {
-	valptr := &e.native.n_fingers
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventTouchpadSwipe) Time() uint32 {
-	valptr := &e.native.time
-	var _v uint32 // out
-	_v = uint32(*valptr)
-	return _v
-}
-
-// X coordinate of the pointer.
-func (e *EventTouchpadSwipe) X() float64 {
-	valptr := &e.native.x
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Y coordinate of the pointer.
-func (e *EventTouchpadSwipe) Y() float64 {
-	valptr := &e.native.y
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Dx: movement delta in the X axis of the swipe focal point.
-func (e *EventTouchpadSwipe) Dx() float64 {
-	valptr := &e.native.dx
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// Dy: movement delta in the Y axis of the swipe focal point.
-func (e *EventTouchpadSwipe) Dy() float64 {
-	valptr := &e.native.dy
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// XRoot: x coordinate of the pointer, relative to the root of the screen.
-func (e *EventTouchpadSwipe) XRoot() float64 {
-	valptr := &e.native.x_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// YRoot: y coordinate of the pointer, relative to the root of the screen.
-func (e *EventTouchpadSwipe) YRoot() float64 {
-	valptr := &e.native.y_root
-	var _v float64 // out
-	_v = float64(*valptr)
-	return _v
-}
-
-// State: bit-mask representing the state of the modifier keys (e.g. Control,
-// Shift and Alt) and the pointer buttons. See ModifierType.
-func (e *EventTouchpadSwipe) State() ModifierType {
-	valptr := &e.native.state
-	var _v ModifierType // out
-	_v = ModifierType(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventTouchpadSwipe) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
-
-// Phase: current phase of the gesture.
-func (e *EventTouchpadSwipe) SetPhase(phase int8) {
-	valptr := &e.native.phase
-	*valptr = C.gint8(phase)
-}
-
-// NFingers: number of fingers triggering the swipe.
-func (e *EventTouchpadSwipe) SetNFingers(nFingers int8) {
-	valptr := &e.native.n_fingers
-	*valptr = C.gint8(nFingers)
-}
-
-// Time: time of the event in milliseconds.
-func (e *EventTouchpadSwipe) SetTime(time uint32) {
-	valptr := &e.native.time
-	*valptr = C.guint32(time)
-}
-
-// X coordinate of the pointer.
-func (e *EventTouchpadSwipe) SetX(x float64) {
-	valptr := &e.native.x
-	*valptr = C.gdouble(x)
-}
-
-// Y coordinate of the pointer.
-func (e *EventTouchpadSwipe) SetY(y float64) {
-	valptr := &e.native.y
-	*valptr = C.gdouble(y)
-}
-
-// Dx: movement delta in the X axis of the swipe focal point.
-func (e *EventTouchpadSwipe) SetDx(dx float64) {
-	valptr := &e.native.dx
-	*valptr = C.gdouble(dx)
-}
-
-// Dy: movement delta in the Y axis of the swipe focal point.
-func (e *EventTouchpadSwipe) SetDy(dy float64) {
-	valptr := &e.native.dy
-	*valptr = C.gdouble(dy)
-}
-
-// XRoot: x coordinate of the pointer, relative to the root of the screen.
-func (e *EventTouchpadSwipe) SetXRoot(xRoot float64) {
-	valptr := &e.native.x_root
-	*valptr = C.gdouble(xRoot)
-}
-
-// YRoot: y coordinate of the pointer, relative to the root of the screen.
-func (e *EventTouchpadSwipe) SetYRoot(yRoot float64) {
-	valptr := &e.native.y_root
-	*valptr = C.gdouble(yRoot)
-}
+var GIRInfoEventTouchpadSwipe = girepository.MustFind("Gdk", "EventTouchpadSwipe")
 
 // EventVisibility: generated when the window visibility status has changed.
 //
@@ -3180,63 +1119,10 @@ type EventVisibility struct {
 
 // eventVisibility is the struct that's finalized.
 type eventVisibility struct {
-	native *C.GdkEventVisibility
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_VISIBILITY_NOTIFY).
-func (e *EventVisibility) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventVisibility) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventVisibility) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// State: new visibility state (GDK_VISIBILITY_FULLY_OBSCURED,
-// GDK_VISIBILITY_PARTIAL or GDK_VISIBILITY_UNOBSCURED).
-func (e *EventVisibility) State() VisibilityState {
-	valptr := &e.native.state
-	var _v VisibilityState // out
-	_v = VisibilityState(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventVisibility) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
+var GIRInfoEventVisibility = girepository.MustFind("Gdk", "EventVisibility")
 
 // EventWindowState: generated when the state of a toplevel window changes.
 //
@@ -3247,70 +1133,10 @@ type EventWindowState struct {
 
 // eventWindowState is the struct that's finalized.
 type eventWindowState struct {
-	native *C.GdkEventWindowState
+	native unsafe.Pointer
 }
 
-// Type: type of the event (GDK_WINDOW_STATE).
-func (e *EventWindowState) Type() EventType {
-	valptr := &e.native._type
-	var _v EventType // out
-	_v = EventType(*valptr)
-	return _v
-}
-
-// Window: window which received the event.
-func (e *EventWindowState) Window() Windower {
-	valptr := &e.native.window
-	var _v Windower // out
-	{
-		objptr := unsafe.Pointer(*valptr)
-		if objptr == nil {
-			panic("object of type gdk.Windower is nil")
-		}
-
-		object := coreglib.Take(objptr)
-		casted := object.WalkCast(func(obj coreglib.Objector) bool {
-			_, ok := obj.(Windower)
-			return ok
-		})
-		rv, ok := casted.(Windower)
-		if !ok {
-			panic("no marshaler for " + object.TypeFromInstance().String() + " matching gdk.Windower")
-		}
-		_v = rv
-	}
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventWindowState) SendEvent() int8 {
-	valptr := &e.native.send_event
-	var _v int8 // out
-	_v = int8(*valptr)
-	return _v
-}
-
-// ChangedMask: mask specifying what flags have changed.
-func (e *EventWindowState) ChangedMask() WindowState {
-	valptr := &e.native.changed_mask
-	var _v WindowState // out
-	_v = WindowState(*valptr)
-	return _v
-}
-
-// NewWindowState: new window state, a combination of WindowState bits.
-func (e *EventWindowState) NewWindowState() WindowState {
-	valptr := &e.native.new_window_state
-	var _v WindowState // out
-	_v = WindowState(*valptr)
-	return _v
-}
-
-// SendEvent: TRUE if the event was sent explicitly.
-func (e *EventWindowState) SetSendEvent(sendEvent int8) {
-	valptr := &e.native.send_event
-	*valptr = C.gint8(sendEvent)
-}
+var GIRInfoEventWindowState = girepository.MustFind("Gdk", "EventWindowState")
 
 // Event contains a union of all of the event types, and allows access to the
 // data fields in a number of ways.
@@ -3375,7 +1201,11 @@ func CopyEventer(e Eventer) *Event {
 	runtime.SetFinalizer(
 		gextras.StructIntern(unsafe.Pointer(dst)),
 		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
+			{
+				var args [1]girepository.Argument
+				*(*unsafe.Pointer)(unsafe.Pointer(&args[0])) = unsafe.Pointer(intern.C)
+				Gdk.GIRInfoEvent.InvokeRecordMethod("free", args[:], nil)
+			}
 		},
 	)
 	return dst
@@ -3410,15 +1240,9 @@ func (v *EventAny) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsAny() *EventAny {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventAny
 	dst = (*EventAny)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3432,15 +1256,9 @@ func (v *EventExpose) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsExpose() *EventExpose {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventExpose
 	dst = (*EventExpose)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3454,15 +1272,9 @@ func (v *EventVisibility) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsVisibility() *EventVisibility {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventVisibility
 	dst = (*EventVisibility)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3476,15 +1288,9 @@ func (v *EventMotion) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsMotion() *EventMotion {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventMotion
 	dst = (*EventMotion)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3498,15 +1304,9 @@ func (v *EventButton) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsButton() *EventButton {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventButton
 	dst = (*EventButton)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3520,15 +1320,9 @@ func (v *EventTouch) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsTouch() *EventTouch {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventTouch
 	dst = (*EventTouch)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3542,15 +1336,9 @@ func (v *EventScroll) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsScroll() *EventScroll {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventScroll
 	dst = (*EventScroll)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3564,15 +1352,9 @@ func (v *EventKey) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsKey() *EventKey {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventKey
 	dst = (*EventKey)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3586,15 +1368,9 @@ func (v *EventCrossing) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsCrossing() *EventCrossing {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventCrossing
 	dst = (*EventCrossing)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3608,15 +1384,9 @@ func (v *EventFocus) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsFocusChange() *EventFocus {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventFocus
 	dst = (*EventFocus)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3630,15 +1400,9 @@ func (v *EventConfigure) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsConfigure() *EventConfigure {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventConfigure
 	dst = (*EventConfigure)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3652,15 +1416,9 @@ func (v *EventProperty) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsProperty() *EventProperty {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventProperty
 	dst = (*EventProperty)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3674,15 +1432,9 @@ func (v *EventSelection) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsSelection() *EventSelection {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventSelection
 	dst = (*EventSelection)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3696,15 +1448,9 @@ func (v *EventOwnerChange) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsOwnerChange() *EventOwnerChange {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventOwnerChange
 	dst = (*EventOwnerChange)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3718,15 +1464,9 @@ func (v *EventProximity) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsProximity() *EventProximity {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventProximity
 	dst = (*EventProximity)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3740,15 +1480,9 @@ func (v *EventDND) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsDND() *EventDND {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventDND
 	dst = (*EventDND)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3762,15 +1496,9 @@ func (v *EventWindowState) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsWindowState() *EventWindowState {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventWindowState
 	dst = (*EventWindowState)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3784,15 +1512,9 @@ func (v *EventSetting) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsSetting() *EventSetting {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventSetting
 	dst = (*EventSetting)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3806,15 +1528,9 @@ func (v *EventGrabBroken) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsGrabBroken() *EventGrabBroken {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventGrabBroken
 	dst = (*EventGrabBroken)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3828,15 +1544,9 @@ func (v *EventTouchpadSwipe) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsTouchpadSwipe() *EventTouchpadSwipe {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventTouchpadSwipe
 	dst = (*EventTouchpadSwipe)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3850,15 +1560,9 @@ func (v *EventTouchpadPinch) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsTouchpadPinch() *EventTouchpadPinch {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventTouchpadPinch
 	dst = (*EventTouchpadPinch)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3872,15 +1576,9 @@ func (v *EventPadButton) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsPadButton() *EventPadButton {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventPadButton
 	dst = (*EventPadButton)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3894,15 +1592,9 @@ func (v *EventPadAxis) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsPadAxis() *EventPadAxis {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventPadAxis
 	dst = (*EventPadAxis)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
 }
@@ -3916,90 +1608,9 @@ func (v *EventPadGroupMode) underlyingEvent() unsafe.Pointer {
 // It does this without any knowledge on the actual type of the value, so
 // the caller must take care of type-checking beforehand.
 func (e *Event) AsPadGroupMode() *EventPadGroupMode {
-	cpy := (*C.GdkEvent)(C.gdk_event_copy(e.event.native))
+	cpy := e.event.native
 	var dst *EventPadGroupMode
 	dst = (*EventPadGroupMode)(gextras.NewStructNative(unsafe.Pointer(cpy)))
-	runtime.SetFinalizer(
-		gextras.StructIntern(unsafe.Pointer(dst)),
-		func(intern *struct{ C unsafe.Pointer }) {
-			C.gdk_event_free((*C.GdkEvent)(intern.C))
-		},
-	)
 	runtime.KeepAlive(e.event)
 	return dst
-}
-
-// EventGet checks all open displays for a Event to process,to be processed on,
-// fetching events from the windowing system if necessary. See
-// gdk_display_get_event().
-//
-// The function returns the following values:
-//
-//    - event (optional): next Event to be processed, or NULL if no events are
-//      pending. The returned Event should be freed with gdk_event_free().
-//
-func EventGet() *Event {
-	var _cret *C.GdkEvent // in
-
-	_cret = C.gdk_event_get()
-
-	var _event *Event // out
-
-	if _cret != nil {
-		{
-			v := (*Event)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-			_event = v
-		}
-	}
-
-	return _event
-}
-
-// EventHandlerSet sets the function to call to handle all events from GDK.
-//
-// Note that GTK+ uses this to install its own event handler, so it is usually
-// not useful for GTK+ applications. (Although an application can call this
-// function then call gtk_main_do_event() to pass events to GTK+.).
-//
-// The function takes the following parameters:
-//
-//    - fn: function to call to handle events from GDK.
-//
-func EventHandlerSet(fn EventFunc) {
-	var _arg1 C.GdkEventFunc // out
-	var _arg2 C.gpointer
-	var _arg3 C.GDestroyNotify
-
-	_arg1 = (*[0]byte)(C._gotk4_gdk3_EventFunc)
-	_arg2 = C.gpointer(gbox.Assign(fn))
-	_arg3 = (C.GDestroyNotify)((*[0]byte)(C.callbackDelete))
-
-	C.gdk_event_handler_set(_arg1, _arg2, _arg3)
-	runtime.KeepAlive(fn)
-}
-
-// EventPeek: if there is an event waiting in the event queue of some open
-// display, returns a copy of it. See gdk_display_peek_event().
-//
-// The function returns the following values:
-//
-//    - event (optional): copy of the first Event on some event queue, or NULL if
-//      no events are in any queues. The returned Event should be freed with
-//      gdk_event_free().
-//
-func EventPeek() *Event {
-	var _cret *C.GdkEvent // in
-
-	_cret = C.gdk_event_peek()
-
-	var _event *Event // out
-
-	if _cret != nil {
-		{
-			v := (*Event)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-			_event = v
-		}
-	}
-
-	return _event
 }

@@ -146,7 +146,7 @@ func GenerateEnum(gen FileGeneratorWriter, enum *gir.Enum) bool {
 
 	if gtype, ok := GenerateGType(gen, enum.Name, enum.GLibGetType); ok {
 		data.Marshaler = true
-		writer.Header().AddMarshaler(gtype.GetType, goName)
+		gtype.AddToHeader(writer.Header(), goName)
 	}
 
 	for i := 0; i < len(enum.Members); i++ {

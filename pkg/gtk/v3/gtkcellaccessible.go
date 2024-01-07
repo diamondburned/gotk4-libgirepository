@@ -3,28 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
-// extern void _gotk4_gtk3_CellAccessibleClass_update_cache(GtkCellAccessible*, gboolean);
-// void _gotk4_gtk3_CellAccessible_virtual_update_cache(void* fnptr, GtkCellAccessible* arg0, gboolean arg1) {
-//   ((void (*)(GtkCellAccessible*, gboolean))(fnptr))(arg0, arg1);
-// };
 import "C"
 
 // GType values.
 var (
-	GTypeCellAccessible = coreglib.Type(C.gtk_cell_accessible_get_type())
+	GTypeCellAccessible = coreglib.Type(girepository.MustFind("Gtk", "CellAccessible").RegisteredGType())
 )
 
 func init() {
@@ -35,15 +30,10 @@ func init() {
 
 // CellAccessibleOverrides contains methods that are overridable.
 type CellAccessibleOverrides struct {
-	// The function takes the following parameters:
-	//
-	UpdateCache func(emitSignal bool)
 }
 
 func defaultCellAccessibleOverrides(v *CellAccessible) CellAccessibleOverrides {
-	return CellAccessibleOverrides{
-		UpdateCache: v.updateCache,
-	}
+	return CellAccessibleOverrides{}
 }
 
 type CellAccessible struct {
@@ -71,12 +61,6 @@ func init() {
 }
 
 func initCellAccessibleClass(gclass unsafe.Pointer, overrides CellAccessibleOverrides, classInitFunc func(*CellAccessibleClass)) {
-	pclass := (*C.GtkCellAccessibleClass)(unsafe.Pointer(C.g_type_check_class_cast((*C.GTypeClass)(gclass), C.GType(GTypeCellAccessible))))
-
-	if overrides.UpdateCache != nil {
-		pclass.update_cache = (*[0]byte)(C._gotk4_gtk3_CellAccessibleClass_update_cache)
-	}
-
 	if classInitFunc != nil {
 		class := (*CellAccessibleClass)(gextras.NewStructNative(gclass))
 		classInitFunc(class)
@@ -112,25 +96,6 @@ func marshalCellAccessible(p uintptr) (interface{}, error) {
 	return wrapCellAccessible(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// The function takes the following parameters:
-//
-func (cell *CellAccessible) updateCache(emitSignal bool) {
-	gclass := (*C.GtkCellAccessibleClass)(coreglib.PeekParentClass(cell))
-	fnarg := gclass.update_cache
-
-	var _arg0 *C.GtkCellAccessible // out
-	var _arg1 C.gboolean           // out
-
-	_arg0 = (*C.GtkCellAccessible)(unsafe.Pointer(coreglib.InternObject(cell).Native()))
-	if emitSignal {
-		_arg1 = C.TRUE
-	}
-
-	C._gotk4_gtk3_CellAccessible_virtual_update_cache(unsafe.Pointer(fnarg), _arg0, _arg1)
-	runtime.KeepAlive(cell)
-	runtime.KeepAlive(emitSignal)
-}
-
 // CellAccessibleClass: instance of this type is always passed by reference.
 type CellAccessibleClass struct {
 	*cellAccessibleClass
@@ -138,12 +103,7 @@ type CellAccessibleClass struct {
 
 // cellAccessibleClass is the struct that's finalized.
 type cellAccessibleClass struct {
-	native *C.GtkCellAccessibleClass
+	native unsafe.Pointer
 }
 
-func (c *CellAccessibleClass) ParentClass() *AccessibleClass {
-	valptr := &c.native.parent_class
-	var _v *AccessibleClass // out
-	_v = (*AccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoCellAccessibleClass = girepository.MustFind("Gtk", "CellAccessibleClass")

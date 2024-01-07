@@ -3,22 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeNoSelection = coreglib.Type(C.gtk_no_selection_get_type())
+	GTypeNoSelection = coreglib.Type(girepository.MustFind("Gtk", "NoSelection").RegisteredGType())
 )
 
 func init() {
@@ -82,84 +83,6 @@ func marshalNoSelection(p uintptr) (interface{}, error) {
 	return wrapNoSelection(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewNoSelection creates a new selection to handle model.
-//
-// The function takes the following parameters:
-//
-//    - model (optional): GListModel to manage, or NULL.
-//
-// The function returns the following values:
-//
-//    - noSelection: new GtkNoSelection.
-//
-func NewNoSelection(model gio.ListModeller) *NoSelection {
-	var _arg1 *C.GListModel     // out
-	var _cret *C.GtkNoSelection // in
-
-	if model != nil {
-		_arg1 = (*C.GListModel)(unsafe.Pointer(coreglib.InternObject(model).Native()))
-		C.g_object_ref(C.gpointer(coreglib.InternObject(model).Native()))
-	}
-
-	_cret = C.gtk_no_selection_new(_arg1)
-	runtime.KeepAlive(model)
-
-	var _noSelection *NoSelection // out
-
-	_noSelection = wrapNoSelection(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _noSelection
-}
-
-// Model gets the model that self is wrapping.
-//
-// The function returns the following values:
-//
-//    - listModel: model being wrapped.
-//
-func (self *NoSelection) Model() *gio.ListModel {
-	var _arg0 *C.GtkNoSelection // out
-	var _cret *C.GListModel     // in
-
-	_arg0 = (*C.GtkNoSelection)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-
-	_cret = C.gtk_no_selection_get_model(_arg0)
-	runtime.KeepAlive(self)
-
-	var _listModel *gio.ListModel // out
-
-	{
-		obj := coreglib.Take(unsafe.Pointer(_cret))
-		_listModel = &gio.ListModel{
-			Object: obj,
-		}
-	}
-
-	return _listModel
-}
-
-// SetModel sets the model that self should wrap.
-//
-// If model is NULL, this model will be empty.
-//
-// The function takes the following parameters:
-//
-//    - model (optional): GListModel to wrap.
-//
-func (self *NoSelection) SetModel(model gio.ListModeller) {
-	var _arg0 *C.GtkNoSelection // out
-	var _arg1 *C.GListModel     // out
-
-	_arg0 = (*C.GtkNoSelection)(unsafe.Pointer(coreglib.InternObject(self).Native()))
-	if model != nil {
-		_arg1 = (*C.GListModel)(unsafe.Pointer(coreglib.InternObject(model).Native()))
-	}
-
-	C.gtk_no_selection_set_model(_arg0, _arg1)
-	runtime.KeepAlive(self)
-	runtime.KeepAlive(model)
-}
-
 // NoSelectionClass: instance of this type is always passed by reference.
 type NoSelectionClass struct {
 	*noSelectionClass
@@ -167,5 +90,7 @@ type NoSelectionClass struct {
 
 // noSelectionClass is the struct that's finalized.
 type noSelectionClass struct {
-	native *C.GtkNoSelectionClass
+	native unsafe.Pointer
 }
+
+var GIRInfoNoSelectionClass = girepository.MustFind("Gtk", "NoSelectionClass")

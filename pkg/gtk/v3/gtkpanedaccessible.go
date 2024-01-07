@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypePanedAccessible = coreglib.Type(C.gtk_paned_accessible_get_type())
+	GTypePanedAccessible = coreglib.Type(girepository.MustFind("Gtk", "PanedAccessible").RegisteredGType())
 )
 
 func init() {
@@ -94,12 +94,7 @@ type PanedAccessibleClass struct {
 
 // panedAccessibleClass is the struct that's finalized.
 type panedAccessibleClass struct {
-	native *C.GtkPanedAccessibleClass
+	native unsafe.Pointer
 }
 
-func (p *PanedAccessibleClass) ParentClass() *ContainerAccessibleClass {
-	valptr := &p.native.parent_class
-	var _v *ContainerAccessibleClass // out
-	_v = (*ContainerAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoPanedAccessibleClass = girepository.MustFind("Gtk", "PanedAccessibleClass")

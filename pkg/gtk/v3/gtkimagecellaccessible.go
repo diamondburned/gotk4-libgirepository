@@ -7,19 +7,19 @@ import (
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeImageCellAccessible = coreglib.Type(C.gtk_image_cell_accessible_get_type())
+	GTypeImageCellAccessible = coreglib.Type(girepository.MustFind("Gtk", "ImageCellAccessible").RegisteredGType())
 )
 
 func init() {
@@ -113,12 +113,7 @@ type ImageCellAccessibleClass struct {
 
 // imageCellAccessibleClass is the struct that's finalized.
 type imageCellAccessibleClass struct {
-	native *C.GtkImageCellAccessibleClass
+	native unsafe.Pointer
 }
 
-func (i *ImageCellAccessibleClass) ParentClass() *RendererCellAccessibleClass {
-	valptr := &i.native.parent_class
-	var _v *RendererCellAccessibleClass // out
-	_v = (*RendererCellAccessibleClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoImageCellAccessibleClass = girepository.MustFind("Gtk", "ImageCellAccessibleClass")

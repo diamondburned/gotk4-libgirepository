@@ -3,23 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
-	"github.com/diamondburned/gotk4/pkg/gsk/v4"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk.h>
 import "C"
 
 // GType values.
 var (
-	GTypeFixedLayout      = coreglib.Type(C.gtk_fixed_layout_get_type())
-	GTypeFixedLayoutChild = coreglib.Type(C.gtk_fixed_layout_child_get_type())
+	GTypeFixedLayout      = coreglib.Type(girepository.MustFind("Gtk", "FixedLayout").RegisteredGType())
+	GTypeFixedLayoutChild = coreglib.Type(girepository.MustFind("Gtk", "FixedLayoutChild").RegisteredGType())
 )
 
 func init() {
@@ -103,24 +103,6 @@ func marshalFixedLayout(p uintptr) (interface{}, error) {
 	return wrapFixedLayout(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewFixedLayout creates a new GtkFixedLayout.
-//
-// The function returns the following values:
-//
-//    - fixedLayout: newly created GtkFixedLayout.
-//
-func NewFixedLayout() *FixedLayout {
-	var _cret *C.GtkLayoutManager // in
-
-	_cret = C.gtk_fixed_layout_new()
-
-	var _fixedLayout *FixedLayout // out
-
-	_fixedLayout = wrapFixedLayout(coreglib.AssumeOwnership(unsafe.Pointer(_cret)))
-
-	return _fixedLayout
-}
-
 // FixedLayoutChildOverrides contains methods that are overridable.
 type FixedLayoutChildOverrides struct {
 }
@@ -167,55 +149,6 @@ func marshalFixedLayoutChild(p uintptr) (interface{}, error) {
 	return wrapFixedLayoutChild(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// Transform retrieves the transformation of the child.
-//
-// The function returns the following values:
-//
-//    - transform (optional): GskTransform.
-//
-func (child *FixedLayoutChild) Transform() *gsk.Transform {
-	var _arg0 *C.GtkFixedLayoutChild // out
-	var _cret *C.GskTransform        // in
-
-	_arg0 = (*C.GtkFixedLayoutChild)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-
-	_cret = C.gtk_fixed_layout_child_get_transform(_arg0)
-	runtime.KeepAlive(child)
-
-	var _transform *gsk.Transform // out
-
-	if _cret != nil {
-		_transform = (*gsk.Transform)(gextras.NewStructNative(unsafe.Pointer(_cret)))
-		C.gsk_transform_ref(_cret)
-		runtime.SetFinalizer(
-			gextras.StructIntern(unsafe.Pointer(_transform)),
-			func(intern *struct{ C unsafe.Pointer }) {
-				C.gsk_transform_unref((*C.GskTransform)(intern.C))
-			},
-		)
-	}
-
-	return _transform
-}
-
-// SetTransform sets the transformation of the child of a GtkFixedLayout.
-//
-// The function takes the following parameters:
-//
-//    - transform: GskTransform.
-//
-func (child *FixedLayoutChild) SetTransform(transform *gsk.Transform) {
-	var _arg0 *C.GtkFixedLayoutChild // out
-	var _arg1 *C.GskTransform        // out
-
-	_arg0 = (*C.GtkFixedLayoutChild)(unsafe.Pointer(coreglib.InternObject(child).Native()))
-	_arg1 = (*C.GskTransform)(gextras.StructNative(unsafe.Pointer(transform)))
-
-	C.gtk_fixed_layout_child_set_transform(_arg0, _arg1)
-	runtime.KeepAlive(child)
-	runtime.KeepAlive(transform)
-}
-
 // FixedLayoutChildClass: instance of this type is always passed by reference.
 type FixedLayoutChildClass struct {
 	*fixedLayoutChildClass
@@ -223,15 +156,10 @@ type FixedLayoutChildClass struct {
 
 // fixedLayoutChildClass is the struct that's finalized.
 type fixedLayoutChildClass struct {
-	native *C.GtkFixedLayoutChildClass
+	native unsafe.Pointer
 }
 
-func (f *FixedLayoutChildClass) ParentClass() *LayoutChildClass {
-	valptr := &f.native.parent_class
-	var _v *LayoutChildClass // out
-	_v = (*LayoutChildClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoFixedLayoutChildClass = girepository.MustFind("Gtk", "FixedLayoutChildClass")
 
 // FixedLayoutClass: instance of this type is always passed by reference.
 type FixedLayoutClass struct {
@@ -240,12 +168,7 @@ type FixedLayoutClass struct {
 
 // fixedLayoutClass is the struct that's finalized.
 type fixedLayoutClass struct {
-	native *C.GtkFixedLayoutClass
+	native unsafe.Pointer
 }
 
-func (f *FixedLayoutClass) ParentClass() *LayoutManagerClass {
-	valptr := &f.native.parent_class
-	var _v *LayoutManagerClass // out
-	_v = (*LayoutManagerClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoFixedLayoutClass = girepository.MustFind("Gtk", "FixedLayoutClass")

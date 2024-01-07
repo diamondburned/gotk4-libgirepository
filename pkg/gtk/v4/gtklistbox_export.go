@@ -9,12 +9,14 @@ import (
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 //export _gotk4_gtk4_ListBoxCreateWidgetFunc
-func _gotk4_gtk4_ListBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret *C.GtkWidget) {
+func _gotk4_gtk4_ListBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret *C.void) {
 	var fn ListBoxCreateWidgetFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -32,14 +34,14 @@ func _gotk4_gtk4_ListBoxCreateWidgetFunc(arg1 C.gpointer, arg2 C.gpointer) (cret
 
 	var _ Widgetter
 
-	cret = (*C.GtkWidget)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
+	cret = (*C.void)(unsafe.Pointer(coreglib.InternObject(widget).Native()))
 	C.g_object_ref(C.gpointer(coreglib.InternObject(widget).Native()))
 
 	return cret
 }
 
 //export _gotk4_gtk4_ListBoxFilterFunc
-func _gotk4_gtk4_ListBoxFilterFunc(arg1 *C.GtkListBoxRow, arg2 C.gpointer) (cret C.gboolean) {
+func _gotk4_gtk4_ListBoxFilterFunc(arg1 *C.void, arg2 C.gpointer) (cret C.gboolean) {
 	var fn ListBoxFilterFunc
 	{
 		v := gbox.Get(uintptr(arg2))
@@ -65,7 +67,7 @@ func _gotk4_gtk4_ListBoxFilterFunc(arg1 *C.GtkListBoxRow, arg2 C.gpointer) (cret
 }
 
 //export _gotk4_gtk4_ListBoxForEachFunc
-func _gotk4_gtk4_ListBoxForEachFunc(arg1 *C.GtkListBox, arg2 *C.GtkListBoxRow, arg3 C.gpointer) {
+func _gotk4_gtk4_ListBoxForEachFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) {
 	var fn ListBoxForEachFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -85,7 +87,7 @@ func _gotk4_gtk4_ListBoxForEachFunc(arg1 *C.GtkListBox, arg2 *C.GtkListBoxRow, a
 }
 
 //export _gotk4_gtk4_ListBoxSortFunc
-func _gotk4_gtk4_ListBoxSortFunc(arg1 *C.GtkListBoxRow, arg2 *C.GtkListBoxRow, arg3 C.gpointer) (cret C.int) {
+func _gotk4_gtk4_ListBoxSortFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) (cret C.int) {
 	var fn ListBoxSortFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -111,7 +113,7 @@ func _gotk4_gtk4_ListBoxSortFunc(arg1 *C.GtkListBoxRow, arg2 *C.GtkListBoxRow, a
 }
 
 //export _gotk4_gtk4_ListBoxUpdateHeaderFunc
-func _gotk4_gtk4_ListBoxUpdateHeaderFunc(arg1 *C.GtkListBoxRow, arg2 *C.GtkListBoxRow, arg3 C.gpointer) {
+func _gotk4_gtk4_ListBoxUpdateHeaderFunc(arg1 *C.void, arg2 *C.void, arg3 C.gpointer) {
 	var fn ListBoxUpdateHeaderFunc
 	{
 		v := gbox.Get(uintptr(arg3))
@@ -133,7 +135,7 @@ func _gotk4_gtk4_ListBoxUpdateHeaderFunc(arg1 *C.GtkListBoxRow, arg2 *C.GtkListB
 }
 
 //export _gotk4_gtk4_ListBox_ConnectRowActivated
-func _gotk4_gtk4_ListBox_ConnectRowActivated(arg0 C.gpointer, arg1 *C.GtkListBoxRow, arg2 C.guintptr) {
+func _gotk4_gtk4_ListBox_ConnectRowActivated(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(row *ListBoxRow)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))
@@ -153,7 +155,7 @@ func _gotk4_gtk4_ListBox_ConnectRowActivated(arg0 C.gpointer, arg1 *C.GtkListBox
 }
 
 //export _gotk4_gtk4_ListBox_ConnectRowSelected
-func _gotk4_gtk4_ListBox_ConnectRowSelected(arg0 C.gpointer, arg1 *C.GtkListBoxRow, arg2 C.guintptr) {
+func _gotk4_gtk4_ListBox_ConnectRowSelected(arg0 C.gpointer, arg1 *C.void, arg2 C.guintptr) {
 	var f func(row *ListBoxRow)
 	{
 		closure := coreglib.ConnectedGeneratedClosure(uintptr(arg2))

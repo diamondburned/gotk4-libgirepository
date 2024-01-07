@@ -3,24 +3,23 @@
 package gtk
 
 import (
-	"runtime"
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/atk"
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypePopoverMenu = coreglib.Type(C.gtk_popover_menu_get_type())
+	GTypePopoverMenu = coreglib.Type(girepository.MustFind("Gtk", "PopoverMenu").RegisteredGType())
 )
 
 func init() {
@@ -157,49 +156,6 @@ func marshalPopoverMenu(p uintptr) (interface{}, error) {
 	return wrapPopoverMenu(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewPopoverMenu creates a new popover menu.
-//
-// The function returns the following values:
-//
-//    - popoverMenu: new PopoverMenu.
-//
-func NewPopoverMenu() *PopoverMenu {
-	var _cret *C.GtkWidget // in
-
-	_cret = C.gtk_popover_menu_new()
-
-	var _popoverMenu *PopoverMenu // out
-
-	_popoverMenu = wrapPopoverMenu(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _popoverMenu
-}
-
-// OpenSubmenu opens a submenu of the popover. The name must be one of the names
-// given to the submenus of popover with PopoverMenu:submenu, or "main" to
-// switch back to the main menu.
-//
-// ModelButton will open submenus automatically when the ModelButton:menu-name
-// property is set, so this function is only needed when you are using other
-// kinds of widgets to initiate menu changes.
-//
-// The function takes the following parameters:
-//
-//    - name of the menu to switch to.
-//
-func (popover *PopoverMenu) OpenSubmenu(name string) {
-	var _arg0 *C.GtkPopoverMenu // out
-	var _arg1 *C.gchar          // out
-
-	_arg0 = (*C.GtkPopoverMenu)(unsafe.Pointer(coreglib.InternObject(popover).Native()))
-	_arg1 = (*C.gchar)(unsafe.Pointer(C.CString(name)))
-	defer C.free(unsafe.Pointer(_arg1))
-
-	C.gtk_popover_menu_open_submenu(_arg0, _arg1)
-	runtime.KeepAlive(popover)
-	runtime.KeepAlive(name)
-}
-
 // PopoverMenuClass: instance of this type is always passed by reference.
 type PopoverMenuClass struct {
 	*popoverMenuClass
@@ -207,12 +163,7 @@ type PopoverMenuClass struct {
 
 // popoverMenuClass is the struct that's finalized.
 type popoverMenuClass struct {
-	native *C.GtkPopoverMenuClass
+	native unsafe.Pointer
 }
 
-func (p *PopoverMenuClass) ParentClass() *PopoverClass {
-	valptr := &p.native.parent_class
-	var _v *PopoverClass // out
-	_v = (*PopoverClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoPopoverMenuClass = girepository.MustFind("Gtk", "PopoverMenuClass")

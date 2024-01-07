@@ -4,10 +4,14 @@ package gio
 
 import (
 	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gio/gio.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // ActionEntry: this struct defines a single action. It is for use with
@@ -27,12 +31,15 @@ type ActionEntry struct {
 
 // actionEntry is the struct that's finalized.
 type actionEntry struct {
-	native *C.GActionEntry
+	native unsafe.Pointer
 }
+
+var GIRInfoActionEntry = girepository.MustFind("Gio", "ActionEntry")
 
 // Name: name of the action.
 func (a *ActionEntry) Name() string {
-	valptr := &a.native.name
+	offset := GIRInfoActionEntry.StructFieldOffset("name")
+	valptr := (*string)(unsafe.Add(a.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -42,7 +49,8 @@ func (a *ActionEntry) Name() string {
 // function for this action, given as a single GVariant type string (or NULL for
 // no parameter).
 func (a *ActionEntry) ParameterType() string {
-	valptr := &a.native.parameter_type
+	offset := GIRInfoActionEntry.StructFieldOffset("parameter_type")
+	valptr := (*string)(unsafe.Add(a.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -53,7 +61,8 @@ func (a *ActionEntry) ParameterType() string {
 // so type tags must be added to the string if they are necessary. Stateless
 // actions should give NULL here.
 func (a *ActionEntry) State() string {
-	valptr := &a.native.state
+	offset := GIRInfoActionEntry.StructFieldOffset("state")
+	valptr := (*string)(unsafe.Add(a.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v

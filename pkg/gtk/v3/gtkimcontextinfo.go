@@ -4,12 +4,14 @@ package gtk
 
 import (
 	"unsafe"
+
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
+// #include <glib.h>
+// #include <glib-object.h>
 import "C"
 
 // IMContextInfo: bookkeeping information about a loadable input method.
@@ -21,12 +23,15 @@ type IMContextInfo struct {
 
 // imContextInfo is the struct that's finalized.
 type imContextInfo struct {
-	native *C.GtkIMContextInfo
+	native unsafe.Pointer
 }
+
+var GIRInfoIMContextInfo = girepository.MustFind("Gtk", "IMContextInfo")
 
 // ContextID: unique identification string of the input method.
 func (i *IMContextInfo) ContextID() string {
-	valptr := &i.native.context_id
+	offset := GIRInfoIMContextInfo.StructFieldOffset("context_id")
+	valptr := (*string)(unsafe.Add(i.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -34,7 +39,8 @@ func (i *IMContextInfo) ContextID() string {
 
 // ContextName: human-readable name of the input method.
 func (i *IMContextInfo) ContextName() string {
-	valptr := &i.native.context_name
+	offset := GIRInfoIMContextInfo.StructFieldOffset("context_name")
+	valptr := (*string)(unsafe.Add(i.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -42,7 +48,8 @@ func (i *IMContextInfo) ContextName() string {
 
 // Domain: translation domain to be used with dgettext().
 func (i *IMContextInfo) Domain() string {
-	valptr := &i.native.domain
+	offset := GIRInfoIMContextInfo.StructFieldOffset("domain")
+	valptr := (*string)(unsafe.Add(i.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -50,7 +57,8 @@ func (i *IMContextInfo) Domain() string {
 
 // DomainDirname: name of locale directory for use with bindtextdomain().
 func (i *IMContextInfo) DomainDirname() string {
-	valptr := &i.native.domain_dirname
+	offset := GIRInfoIMContextInfo.StructFieldOffset("domain_dirname")
+	valptr := (*string)(unsafe.Add(i.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v
@@ -59,7 +67,8 @@ func (i *IMContextInfo) DomainDirname() string {
 // DefaultLocales: colon-separated list of locales where this input method
 // should be the default. The asterisk “*” sets the default for all locales.
 func (i *IMContextInfo) DefaultLocales() string {
-	valptr := &i.native.default_locales
+	offset := GIRInfoIMContextInfo.StructFieldOffset("default_locales")
+	valptr := (*string)(unsafe.Add(i.native, offset))
 	var _v string // out
 	_v = C.GoString((*C.gchar)(unsafe.Pointer(*valptr)))
 	return _v

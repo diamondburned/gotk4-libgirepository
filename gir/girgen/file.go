@@ -153,7 +153,7 @@ func (f *GoFileGenerator) Generate() ([]byte, error) {
 		f.header.NeedsExternGLib()
 	}
 
-	if f.LinkMode() == types.RuntimeLinkMode {
+	if f.isRoot && f.LinkMode() == types.RuntimeLinkMode {
 		f.header.ImportCore("girepository")
 	}
 

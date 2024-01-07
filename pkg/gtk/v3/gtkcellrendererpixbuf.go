@@ -6,19 +6,19 @@ import (
 	"unsafe"
 
 	"github.com/diamondburned/gotk4/pkg/core/gextras"
+	"github.com/diamondburned/gotk4/pkg/core/girepository"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 )
 
+// #cgo pkg-config: gobject-2.0
 // #include <stdlib.h>
+// #include <glib.h>
 // #include <glib-object.h>
-// #include <gtk/gtk-a11y.h>
-// #include <gtk/gtk.h>
-// #include <gtk/gtkx.h>
 import "C"
 
 // GType values.
 var (
-	GTypeCellRendererPixbuf = coreglib.Type(C.gtk_cell_renderer_pixbuf_get_type())
+	GTypeCellRendererPixbuf = coreglib.Type(girepository.MustFind("Gtk", "CellRendererPixbuf").RegisteredGType())
 )
 
 func init() {
@@ -85,29 +85,6 @@ func marshalCellRendererPixbuf(p uintptr) (interface{}, error) {
 	return wrapCellRendererPixbuf(coreglib.ValueFromNative(unsafe.Pointer(p)).Object()), nil
 }
 
-// NewCellRendererPixbuf creates a new CellRendererPixbuf. Adjust rendering
-// parameters using object properties. Object properties can be set globally
-// (with g_object_set()). Also, with TreeViewColumn, you can bind a property to
-// a value in a TreeModel. For example, you can bind the “pixbuf” property on
-// the cell renderer to a pixbuf value in the model, thus rendering a different
-// image in each row of the TreeView.
-//
-// The function returns the following values:
-//
-//    - cellRendererPixbuf: new cell renderer.
-//
-func NewCellRendererPixbuf() *CellRendererPixbuf {
-	var _cret *C.GtkCellRenderer // in
-
-	_cret = C.gtk_cell_renderer_pixbuf_new()
-
-	var _cellRendererPixbuf *CellRendererPixbuf // out
-
-	_cellRendererPixbuf = wrapCellRendererPixbuf(coreglib.Take(unsafe.Pointer(_cret)))
-
-	return _cellRendererPixbuf
-}
-
 // CellRendererPixbufClass: instance of this type is always passed by reference.
 type CellRendererPixbufClass struct {
 	*cellRendererPixbufClass
@@ -115,12 +92,7 @@ type CellRendererPixbufClass struct {
 
 // cellRendererPixbufClass is the struct that's finalized.
 type cellRendererPixbufClass struct {
-	native *C.GtkCellRendererPixbufClass
+	native unsafe.Pointer
 }
 
-func (c *CellRendererPixbufClass) ParentClass() *CellRendererClass {
-	valptr := &c.native.parent_class
-	var _v *CellRendererClass // out
-	_v = (*CellRendererClass)(gextras.NewStructNative(unsafe.Pointer(valptr)))
-	return _v
-}
+var GIRInfoCellRendererPixbufClass = girepository.MustFind("Gtk", "CellRendererPixbufClass")
